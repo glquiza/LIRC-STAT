@@ -786,6 +786,10 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
   const handleUpdateStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingStaff) return;
+    if (currentUserId && editingStaff.id === currentUserId && editingStaff.role !== 'librarian') {
+      onNotify('error', 'You cannot demote your own Librarian account.');
+      return;
+    }
     setUpdatingStaff(true);
 
     const rawRow = rawProfiles.find((r) => r.id === editingStaff.id);
@@ -2058,16 +2062,22 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                 <div>
                   <label className="block text-xs font-semibold text-[#332F2B] mb-1">
                     Assigned Role
+                    {Boolean(currentUserId && editingStaff.id === currentUserId) && (
+                      <span className="ml-1.5 text-[10px] text-[#A83232] font-normal">
+                        (Cannot demote own account)
+                      </span>
+                    )}
                   </label>
                   <select
                     value={editingStaff.role}
+                    disabled={Boolean(currentUserId && editingStaff.id === currentUserId)}
                     onChange={(e) =>
                       setEditingStaff({
                         ...editingStaff,
                         role: e.target.value as StaffRole,
                       })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-sm text-[#332F2B]"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-sm text-[#332F2B] disabled:bg-[#FAF5EE] disabled:opacity-75 disabled:cursor-not-allowed"
                   >
                     <option value="student_assistant">Student Assistant</option>
                     <option value="librarian">Librarian</option>
