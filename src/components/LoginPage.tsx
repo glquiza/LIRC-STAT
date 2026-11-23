@@ -5,12 +5,15 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
+  Download,
   Eye,
   EyeOff,
   KeyRound,
+  Laptop,
   LogIn,
   Radio,
   ShieldCheck,
+  Smartphone,
   TrendingUp,
   X,
 } from 'lucide-react';
@@ -69,6 +72,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [pendingNoticeMsg, setPendingNoticeMsg] = useState<string | null>(null);
   const [serverClock, setServerClock] = useState<ServerClock | null>(null);
 
+  // PWA App Installation state
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+  const [activeInstallTab, setActiveInstallTab] = useState<'windows' | 'android' | 'ios'>('windows');
+
   const modalRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const inviteModalRef = useRef<HTMLDivElement | null>(null);
@@ -77,6 +86,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   // Hero Action Buttons GSAP Refs & Interactions
   const createBtnRef = useRef<HTMLButtonElement | null>(null);
   const signInBtnRef = useRef<HTMLButtonElement | null>(null);
+  const installBtnRef = useRef<HTMLButtonElement | null>(null);
   const arrowRef = useRef<SVGSVGElement | null>(null);
 
   const loadClock = async () => {
@@ -88,7 +98,51 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   useEffect(() => {
     loadClock();
+
+    // Check if running in standalone window (PWA already installed)
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (isStandalone) {
+      setIsAppInstalled(true);
+    }
+
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    const handleAppInstalled = () => {
+      setIsAppInstalled(true);
+      setDeferredPrompt(null);
+      setShowInstallModal(false);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
+
+  const handleInstallAppClick = async () => {
+    if (deferredPrompt) {
+      try {
+        await deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice?.outcome === 'accepted') {
+          setIsAppInstalled(true);
+        }
+        setDeferredPrompt(null);
+      } catch {
+        setShowInstallModal(true);
+      }
+    } else {
+      setShowInstallModal(true);
+    }
+  };
 
   // GSAP Entrance animation for hero buttons
   useEffect(() => {
@@ -458,8 +512,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5EBDD]/25 to-[#EDE0CE]/75 dark:via-[#161311]/25 dark:to-[#0D0B0A]/80 pointer-events-none" />
       </div>
 
-      {/* Floating Theme Toggle (Dark / Light Mode) */}
-      <div className="fixed top-4 right-4 z-40">
+      {/* Floating Header: Install App Button & Theme Toggle */}
+      <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+        {!isAppInstalled && (
+          <button
+            type="button"
+            onClick={handleInstallAppClick}
+            className="px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[#241F1A]/95 backdrop-blur-md border border-[#D6C3A9] dark:border-[#3D342C] text-xs font-semibold text-[#A83232] dark:text-[#E7B84B] hover:bg-[#FAF5EE] dark:hover:bg-[#2F2923] transition flex items-center gap-1.5 cursor-pointer shadow-xs select-none"
+            title="Install LIRC STAT as a Desktop or Mobile Application"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Install App</span>
+          </button>
+        )}
         <ThemeToggle showLabel />
       </div>
 
@@ -489,7 +554,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           An Integrated Academic Platform for Library Occupancy Monitoring, Real-Time Statistical Reporting, and Duty Scheduling
         </p>
 
-        {/* Action Buttons: Create Account & Sign In with clean, flat hover animation */}
+        {/* Action Buttons: Create Account, Sign In & Install App */}
         <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14 sm:mb-18">
           <button
             ref={createBtnRef}
@@ -499,7 +564,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onMouseLeave={handleCreateBtnLeave}
             onMouseDown={handleCreateBtnDown}
             onMouseUp={handleCreateBtnUp}
-            className="h-12 px-7 rounded-2xl bg-[#2D2926] dark:bg-[#1E1B18] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none"
+            className="h-12 px-7 rounded-2xl bg-[#2D2926] dark:bg-[#1E1B18] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none shadow-sm hover:bg-[#1E1B18]"
           >
             <span>Create Account</span>
             <ArrowRight ref={arrowRef} className="w-4 h-4 transition-transform" />
@@ -513,10 +578,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onMouseLeave={handleSignInBtnLeave}
             onMouseDown={handleSignInBtnDown}
             onMouseUp={handleSignInBtnUp}
-            className="h-12 px-7 rounded-2xl bg-white dark:bg-[#241F1A] border border-[#D6C3A9] dark:border-[#3D342C] text-[#332F2B] dark:text-[#FAF5EE] font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none"
+            className="h-12 px-7 rounded-2xl bg-white dark:bg-[#241F1A] border border-[#D6C3A9] dark:border-[#3D342C] text-[#332F2B] dark:text-[#FAF5EE] font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none hover:bg-[#FAF5EE] dark:hover:bg-[#2D2721]"
           >
             <span>Sign In</span>
           </button>
+
+          {!isAppInstalled && (
+            <button
+              ref={installBtnRef}
+              type="button"
+              onClick={handleInstallAppClick}
+              className="h-12 px-6 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A241E] border border-[#E7B84B] dark:border-[#B58D3D] text-[#7D5B06] dark:text-[#F3D085] hover:bg-[#F5EBDD] dark:hover:bg-[#342D25] font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none shadow-2xs hover:shadow-xs"
+              title="Install LIRC STAT as Desktop or Mobile Application"
+            >
+              <Download className="w-4 h-4 text-[#A83232] dark:text-[#E7B84B]" />
+              <span>Install App</span>
+            </button>
+          )}
         </div>
 
         {/* 4 Feature Descriptions of What the System Does */}
@@ -1091,6 +1169,191 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          INSTALL APPLICATION MODAL (WINDOWS / ANDROID / IOS)
+      ===================================================================== */}
+      {showInstallModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-literary-fade">
+          <div className="w-full max-w-md bg-white dark:bg-[#1E1B18] rounded-3xl shadow-2xl border border-[#E6D7C3] dark:border-[#3D342C] p-6 relative overflow-hidden">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A241E] border border-[#E7B84B]/60 flex items-center justify-center text-[#7D5B06] dark:text-[#E7B84B]">
+                  <Download className="w-5 h-5 text-[#A83232] dark:text-[#E7B84B]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-heading font-bold text-[#332F2B] dark:text-[#FAF5EE]">
+                    Install LIRC STAT
+                  </h3>
+                  <p className="text-[11px] text-[#6E665E] dark:text-[#A89C8F]">
+                    Run as a standalone desktop or mobile application
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowInstallModal(false)}
+                className="p-1.5 rounded-xl hover:bg-[#FAF5EE] dark:hover:bg-[#2A241E] text-[#6E665E] dark:text-[#A89C8F] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Platform Selector Tabs */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-[#FAF5EE] dark:bg-[#25201C] border border-[#E6D7C3] dark:border-[#3D342C] mb-4">
+              <button
+                type="button"
+                onClick={() => setActiveInstallTab('windows')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  activeInstallTab === 'windows'
+                    ? 'bg-white dark:bg-[#332B24] text-[#A83232] dark:text-[#E7B84B] shadow-2xs font-bold'
+                    : 'text-[#6E665E] dark:text-[#A89C8F] hover:text-[#332F2B]'
+                }`}
+              >
+                <Laptop className="w-3.5 h-3.5" />
+                <span>Windows / PC</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveInstallTab('android')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  activeInstallTab === 'android'
+                    ? 'bg-white dark:bg-[#332B24] text-[#A83232] dark:text-[#E7B84B] shadow-2xs font-bold'
+                    : 'text-[#6E665E] dark:text-[#A89C8F] hover:text-[#332F2B]'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>Android</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveInstallTab('ios')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                  activeInstallTab === 'ios'
+                    ? 'bg-white dark:bg-[#332B24] text-[#A83232] dark:text-[#E7B84B] shadow-2xs font-bold'
+                    : 'text-[#6E665E] dark:text-[#A89C8F] hover:text-[#332F2B]'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>iPhone / iPad</span>
+              </button>
+            </div>
+
+            {/* Tab Instructions Content */}
+            <div className="p-4 rounded-2xl bg-[#FAF5EE]/70 dark:bg-[#25201C]/60 border border-[#E6D7C3] dark:border-[#3D342C] mb-5 text-xs text-[#332F2B] dark:text-[#FAF5EE] space-y-2.5">
+              {activeInstallTab === 'windows' && (
+                <>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#A83232] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <p className="leading-relaxed">
+                      Click the <strong>three dots menu (⋮)</strong> at the top right of your browser (next to your profile).
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#A83232] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <p className="leading-relaxed">
+                      Select <strong>"Save and share"</strong> → <strong>"Install page as app..."</strong> (or <strong>"Install LIRC STAT"</strong>).
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#A83232] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <p className="leading-relaxed">
+                      Click <strong>Install</strong>. A desktop shortcut will be added and the app will open in its own clean window.
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {activeInstallTab === 'android' && (
+                <>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#7D5B06] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <p className="leading-relaxed">
+                      Open this website in <strong>Google Chrome</strong> on your phone or tablet.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#7D5B06] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <p className="leading-relaxed">
+                      Tap the <strong>three dots (⋮)</strong> menu in the upper-right corner.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#7D5B06] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <p className="leading-relaxed">
+                      Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {activeInstallTab === 'ios' && (
+                <>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#3B5998] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <p className="leading-relaxed">
+                      Open this website in <strong>Safari</strong> on your iPhone or iPad.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#3B5998] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <p className="leading-relaxed">
+                      Tap the <strong>Share button</strong> at the bottom of the screen (square with upward arrow).
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-[#3B5998] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <p className="leading-relaxed">
+                      Scroll down and tap <strong>"Add to Home Screen"</strong>, then tap <strong>Add</strong> in the top-right.
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-2.5">
+              {deferredPrompt && (
+                <button
+                  type="button"
+                  onClick={handleInstallAppClick}
+                  className="px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Install Now</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowInstallModal(false)}
+                className="px-4 py-2 rounded-xl border border-[#D6C3A9] dark:border-[#3D342C] bg-white dark:bg-[#241F1A] hover:bg-[#FAF5EE] dark:hover:bg-[#2D2721] text-xs font-semibold text-[#332F2B] dark:text-[#FAF5EE] cursor-pointer transition"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
