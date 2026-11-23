@@ -1,0 +1,443 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --burgundy: #A83232;
+  --burgundy-hover: #8E2828;
+  --burgundy-light: #FDF3F3;
+  --warm-beige: #F5EBDD;
+  --warm-beige-subtle: #FAF5EE;
+  --border-beige: #E6D7C3;
+  --border-beige-strong: #D6C3A9;
+  --mustard: #E7B84B;
+  --mustard-light: #FEF9EC;
+  --mustard-text: #7D5B06;
+  --sage: #71865A;
+  --sage-hover: #5E704A;
+  --sage-light: #F1F5EE;
+  --sage-text: #455436;
+  --pure-white: #FFFFFF;
+  --charcoal: #332F2B;
+  --charcoal-muted: #6E665E;
+}
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--warm-beige);
+    color: var(--charcoal);
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Lora', 'Playfair Display', Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.015em;
+    color: var(--charcoal);
+  }
+
+  .font-collegiate {
+    font-family: 'Cinzel', 'Lora', serif;
+    letter-spacing: 0.04em;
+  }
+
+  /* Academic statistics, counters, and tabular figures */
+  .font-stat, .tabular-nums {
+    font-family: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Clocks, timestamps, and codes */
+  .font-mono, .font-clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Academic Gradient Utility Classes */
+.bg-academic-crimson {
+  background: linear-gradient(135deg, #A83232 0%, #912727 50%, #6E1A1A 100%);
+}
+
+.bg-academic-gold {
+  background: linear-gradient(135deg, #FFFDF8 0%, #FEF9EC 60%, #FBF0D1 100%);
+}
+
+.bg-academic-sage {
+  background: linear-gradient(135deg, #F8FAF7 0%, #F1F5EE 60%, #E2EDDB 100%);
+}
+
+.bg-academic-parchment {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FAF5EE 50%, #F5EBDD 100%);
+}
+
+.border-academic-gold {
+  border-color: rgba(231, 184, 75, 0.55);
+}
+
+.border-academic-sage {
+  border-color: rgba(113, 134, 90, 0.45);
+}
+
+.border-academic-burgundy {
+  border-color: rgba(168, 50, 50, 0.35);
+}
+
+/* Ambient Library Background */
+.bg-library-ambient {
+  background-image: url('/library-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@keyframes academicFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-literary-fade {
+  animation: academicFadeIn 0.22s ease-out forwards;
+}
+
+.literary-card {
+  background: linear-gradient(165deg, #FFFFFF 0%, #FEFDFB 50%, #FAF6F0 100%);
+  border: 1px solid #E6D7C3;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px -2px rgba(51, 47, 43, 0.05), 0 1px 3px -1px rgba(51, 47, 43, 0.03);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.literary-card-hover:hover {
+  border-color: #D6C3A9;
+  box-shadow: 0 8px 22px -4px rgba(51, 47, 43, 0.09), 0 2px 6px -1px rgba(51, 47, 43, 0.04);
+}
+
+/* Warm Academic scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5EBDD;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6C3A9;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8A284;
+}
+
+/* ==========================================================================
+   ACADEMIC MIDNIGHT DARK THEME
+   ========================================================================== */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #141210 !important;
+  color: #F0E8DE !important;
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark .font-heading {
+  color: #F5EEE6 !important;
+}
+
+/* Backgrounds remapping */
+.dark .bg-\[\#F5EBDD\],
+.dark [class*="bg-[#F5EBDD]"] {
+  background-color: #141210 !important;
+}
+
+.dark .bg-\[\#FAF5EE\],
+.dark .bg-\[\#FAF6F0\],
+.dark .bg-\[\#FAF7F2\],
+.dark [class*="bg-[#FAF5EE]"],
+.dark [class*="bg-[#FAF6F0]"] {
+  background-color: #1F1B17 !important;
+}
+
+.dark .bg-\[\#FFFFFF\],
+.dark .bg-white,
+.dark [class*="bg-[#FFFFFF]"] {
+  background-color: #1B1714 !important;
+}
+
+.dark header.bg-\[\#FFFFFF\]\/92,
+.dark header[class*="bg-[#FFFFFF]"] {
+  background-color: rgba(23, 20, 17, 0.92) !important;
+}
+
+.dark aside[class*="bg-[#FFFFFF]"] {
+  background-color: #181512 !important;
+}
+
+/* Card surfaces */
+.dark .literary-card {
+  background: linear-gradient(165deg, #221E1A 0%, #1D1916 50%, #181512 100%) !important;
+  border-color: #383028 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .literary-card-hover:hover {
+  border-color: #524538 !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Alert & tone backgrounds */
+.dark .bg-\[\#FDF3F3\],
+.dark [class*="bg-[#FDF3F3]"] {
+  background-color: #2D1414 !important;
+}
+
+.dark .bg-\[\#FEF9EC\],
+.dark [class*="bg-[#FEF9EC]"] {
+  background-color: #2C2210 !important;
+}
+
+.dark .bg-\[\#F1F5EE\],
+.dark [class*="bg-[#F1F5EE]"] {
+  background-color: #182414 !important;
+}
+
+/* Gradients in dark mode */
+.dark .bg-academic-cream {
+  background: linear-gradient(135deg, #261F12 0%, #20190D 60%, #1A1409 100%) !important;
+}
+
+.dark .bg-academic-sage {
+  background: linear-gradient(135deg, #182414 0%, #141E10 60%, #10180D 100%) !important;
+}
+
+.dark .bg-academic-parchment {
+  background: linear-gradient(145deg, #221E1A 0%, #1D1915 50%, #181512 100%) !important;
+}
+
+/* Server Reference clock widget & light parchment cards */
+.dark .server-clock-card,
+.dark [class*="from-[#FFFFFF]"][class*="via-[#FAF5EE]"],
+.dark [class*="from-[#FAF5EE]"],
+.dark [class*="from-[#FAF6F0]"] {
+  background-color: #1E1914 !important;
+  background-image: linear-gradient(135deg, #241F1A 0%, #1D1915 50%, #181512 100%) !important;
+  border-color: #383028 !important;
+  color: #F0E8DE !important;
+}
+
+.dark .server-clock-card * {
+  color: inherit;
+}
+
+.dark .server-clock-card .font-stat,
+.dark .server-clock-card [class*="text-[#332F2B]"] {
+  color: #FFFFFF !important;
+}
+
+.dark .server-clock-card [class*="text-[#6E665E]"] {
+  color: #C5B7A8 !important;
+}
+
+/* Sage active session alert banner & duty indicators */
+.dark .active-session-banner,
+.dark [class*="from-[#F8FAF7]"] {
+  background-color: #142111 !important;
+  background-image: linear-gradient(90deg, #182515 0%, #141F11 50%, #10190E 100%) !important;
+  border-color: rgba(113, 134, 90, 0.45) !important;
+  color: #D1E7CA !important;
+}
+
+.dark .active-session-banner span,
+.dark [class*="from-[#F8FAF7]"] span {
+  color: #D1E7CA !important;
+}
+
+.dark .active-session-banner strong,
+.dark [class*="from-[#F8FAF7]"] strong,
+.dark [class*="from-[#F8FAF7]"] span.font-stat {
+  color: #FFFFFF !important;
+}
+
+.dark [class*="from-[#F8FAF7]"] button[class*="from-[#A83232]"] {
+  background-image: linear-gradient(to right, #A83232, #942727, #7C1E1E) !important;
+  color: #FFFFFF !important;
+}
+
+.dark [class*="from-[#F8FAF7]"] button:not([class*="from-[#A83232]"]) {
+  background-color: #241F1B !important;
+  color: #F0E8DE !important;
+  border-color: #383028 !important;
+}
+
+/* Off-hours banner in dark mode */
+.dark .off-hours-banner {
+  background-color: #251D0F !important;
+  border-color: #7D5B06 !important;
+  color: #F5E6CC !important;
+}
+
+.dark .off-hours-banner span,
+.dark .off-hours-banner select {
+  color: #F5E6CC !important;
+}
+
+.dark .off-hours-banner strong {
+  color: #FFFFFF !important;
+}
+
+/* Warm gold / duty hero schedule banner in dark mode */
+.dark [class*="from-[#FFFDF8]"] {
+  background-image: linear-gradient(90deg, #261F12 0%, #20190D 50%, #1A1409 100%) !important;
+  border-color: rgba(231, 184, 75, 0.5) !important;
+}
+
+.dark [class*="from-[#FFFDF8]"] * {
+  color: #F7E9CE !important;
+}
+
+.dark [class*="from-[#FFFDF8]"] strong,
+.dark [class*="from-[#FFFDF8]"] h1,
+.dark [class*="from-[#FFFDF8]"] h2,
+.dark [class*="from-[#FFFDF8]"] h3,
+.dark [class*="from-[#FFFDF8]"] span.font-stat {
+  color: #FFFFFF !important;
+}
+
+.dark [class*="from-[#FFFDF8]"] button[class*="from-[#A83232]"] {
+  background-image: linear-gradient(to right, #A83232, #942727, #7C1E1E) !important;
+  color: #FFFFFF !important;
+}
+
+.dark [class*="from-[#FFFDF8]"] button:not([class*="from-[#A83232]"]) {
+  background-color: #241F1B !important;
+  color: #F0E8DE !important;
+  border-color: #42382F !important;
+}
+
+/* Borders */
+.dark .border-\[\#E6D7C3\],
+.dark .border-\[\#D6C3A9\],
+.dark [class*="border-[#E6D7C3]"],
+.dark [class*="border-[#D6C3A9]"] {
+  border-color: #383028 !important;
+}
+
+.dark .border-\[\#E8BDBD\] {
+  border-color: #5C2424 !important;
+}
+
+.dark .border-\[\#C5D3B8\] {
+  border-color: #2F4A24 !important;
+}
+
+/* Text colors */
+.dark .text-\[\#332F2B\],
+.dark [class*="text-[#332F2B]"] {
+  color: #F0E8DE !important;
+}
+
+.dark .text-\[\#6E665E\],
+.dark [class*="text-[#6E665E]"] {
+  color: #A6998C !important;
+}
+
+.dark .text-\[\#455436\] {
+  color: #B2D898 !important;
+}
+
+.dark .text-\[\#7D5B06\] {
+  color: #F5D075 !important;
+}
+
+.dark .text-\[\#A83232\] {
+  color: #E25D5D !important;
+}
+
+.dark .text-\[\#71865A\] {
+  color: #92B577 !important;
+}
+
+/* Form Controls & Tables */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #241F1B !important;
+  color: #F0E8DE !important;
+  border-color: #42382F !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #8C7F72 !important;
+}
+
+.dark select option {
+  background-color: #1F1B17 !important;
+  color: #F0E8DE !important;
+}
+
+.dark table thead tr {
+  background-color: #221E1A !important;
+  border-color: #383028 !important;
+}
+
+.dark table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.035) !important;
+}
+
+/* Scrollbars in dark mode */
+.dark ::-webkit-scrollbar-track {
+  background: #141210;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #383028;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4D4237;
+}
+
+/* Ambient library background overlay in dark mode */
+.dark .bg-\[\#F5EBDD\]\/88,
+.dark [class*="bg-[#F5EBDD]/88"] {
+  background-color: rgba(20, 18, 16, 0.92) !important;
+}
+
+.dark .bg-\[\#F5EBDD\]\/70,
+.dark [class*="bg-[#F5EBDD]/70"] {
+  background-color: rgba(24, 21, 18, 0.85) !important;
+}
+
+.dark [class*="bg-[#FFFFFF]/95"],
+.dark [class*="bg-[#FFFFFF]/90"],
+.dark [class*="bg-white/60"] {
+  background-color: rgba(30, 26, 22, 0.94) !important;
+  border-color: #383028 !important;
+}
+
+@media print {
+  aside, header, nav, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #332F2B !important;
+  }
+  .literary-card {
+    box-shadow: none !important;
+    border: 1px solid #E6D7C3 !important;
+    break-inside: avoid;
+  }
+}
