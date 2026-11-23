@@ -15,7 +15,6 @@ import {
   X,
 } from 'lucide-react';
 import { UserProfile } from '../types/lirc';
-import { parseStaffAccount } from '../utils/invitationWorkflow';
 import { TopProgressBar } from './TopProgressBar';
 import { gsapPopIn } from '../utils/animations';
 import { ThemeToggle } from '../context/ThemeContext';
@@ -402,28 +401,6 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
             </div>
           )}
 
-          {isCollapsed ? (
-            /* Collapsed Sign Out Button */
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="w-12 h-11 mx-auto rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#FDF3F3] dark:hover:bg-[#2F1D1D] hover:text-[#A83232] dark:hover:text-[#E25D5D] hover:border-[#A83232]/30 text-[#332F2B] dark:text-[#F0E8DE] flex items-center justify-center cursor-pointer transition-all duration-200 shadow-2xs hover:scale-105"
-              aria-label="Sign Out"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 text-[#A83232] dark:text-[#E25D5D]" />
-            </button>
-          ) : (
-            /* Expanded Full Sign Out Button */
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="w-full px-3.5 py-2 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#FDF3F3] dark:hover:bg-[#2F1D1D] hover:text-[#A83232] dark:hover:text-[#E25D5D] hover:border-[#A83232]/30 text-[#332F2B] dark:text-[#F0E8DE] text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              Sign Out
-            </button>
-          )}
         </div>
       </aside>
 
@@ -613,14 +590,8 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                       </div>
                     </div>
 
-                    <div className="px-4 py-2 text-[11px] text-[#6E665E] border-b border-[#E6D7C3]">
+                    <div className="px-4 py-2.5 text-[11px] text-[#6E665E] border-b border-[#E6D7C3]">
                       <div>Staff ID: <strong className="text-[#332F2B] font-stat">{profile.staff_code}</strong></div>
-                      <div className="mt-0.5">Duty: {parseStaffAccount(profile).scheduleSummary}</div>
-                    </div>
-
-                    <div className="px-4 py-2.5 border-b border-[#E6D7C3] flex items-center justify-between">
-                      <span className="text-xs font-medium text-[#6E665E]">Appearance</span>
-                      <ThemeToggle showLabel />
                     </div>
 
                     <div className="px-2 pt-1.5">
