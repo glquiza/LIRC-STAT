@@ -143,6 +143,8 @@ export const App: React.FC = () => {
 
   const [initializing, setInitializing] = useState<boolean>(initialInitializing);
   const [profile, setProfile] = useState<UserProfile | null>(cachedInitialProfile.current);
+  const profileRef = useRef<UserProfile | null>(cachedInitialProfile.current);
+  profileRef.current = profile;
   const [areas, setAreas] = useState<LibraryArea[]>(cachedInitialAreas.current);
   const isSigningOutRef = useRef<boolean>(false);
 
@@ -299,8 +301,11 @@ export const App: React.FC = () => {
             localStorage.removeItem(CACHED_PROFILE_KEY);
           }
         } else {
-          // If network timed out but we already have a cached profile, keep the cached profile!
-          if (!cachedInitialProfile.current) {
+          // If network timed out or tab was background-throttled, retain active/cached profile!
+          const activeProf = profileRef.current || getCachedProfile();
+          if (activeProf && localStorage.getItem(LOGGED_OUT_STORAGE_KEY) !== 'true') {
+            setProfile(activeProf);
+          } else {
             setProfile(null);
           }
         }
@@ -344,7 +349,10 @@ export const App: React.FC = () => {
         ) {
           await loadUserProfile(session.user.id);
         } else {
-          if (!cachedInitialProfile.current) {
+          const activeProf = profileRef.current || getCachedProfile();
+          if (activeProf && localStorage.getItem(LOGGED_OUT_STORAGE_KEY) !== 'true') {
+            setProfile(activeProf);
+          } else {
             setProfile(null);
           }
           setInitializing(false);
@@ -367,19 +375,28 @@ export const App: React.FC = () => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
 
-      if (
-        event === 'SIGNED_OUT' ||
-        !session?.user ||
-        isSigningOutRef.current ||
-        localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true'
-      ) {
+      // Only handle explicit SIGNED_OUT if the user actually requested sign-out
+      if (event === 'SIGNED_OUT') {
+        if (isSigningOutRef.current || localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true') {
+          setProfile(null);
+          localStorage.removeItem(CACHED_PROFILE_KEY);
+          setInitializing(false);
+        }
+        return;
+      }
+
+      // If user is explicitly logged out, ignore other background events
+      if (localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true' || isSigningOutRef.current) {
         setProfile(null);
-        localStorage.removeItem(CACHED_PROFILE_KEY);
         setInitializing(false);
         return;
       }
 
-      if (event === 'SIGNED_IN') {
+      // Handle sign-in, token refresh, or user update events smoothly without logging out
+      if (
+        session?.user &&
+        (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED')
+      ) {
         await loadUserProfile(session.user.id);
       }
     });
