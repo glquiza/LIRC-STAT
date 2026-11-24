@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Settings,
   Shield,
+  ShieldAlert,
   SlidersHorizontal,
   Sparkles,
   UserCheck,
@@ -35,6 +36,7 @@ import {
   subscribeToCalendarChanges,
 } from '../utils/calendarActivities';
 import { CalendarActivitiesModal } from './CalendarActivitiesModal';
+import { ViolatorsLogbook } from './ViolatorsLogbook';
 import {
   ComputedStatisticalReport,
   LIBRARY_TIME_SLOTS,
@@ -104,7 +106,7 @@ interface LibrarianDashboardProps {
   onRefreshAreas: () => void;
 }
 
-type LibrarianTab = 'dashboard' | 'assignments' | 'reports' | 'records' | 'logs' | 'manage' | 'settings';
+type LibrarianTab = 'dashboard' | 'assignments' | 'reports' | 'records' | 'logs' | 'manage' | 'settings' | 'violators';
 
 export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
   profile,
@@ -113,6 +115,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
   onRefreshAreas,
 }) => {
   const [activeTab, setActiveTab] = useState<LibrarianTab>('dashboard');
+  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(0);
 
   const sortedAreas = useMemo(
     () =>
@@ -618,6 +621,14 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         badgeTone: 'mustard',
       },
       {
+        id: 'violators',
+        label: 'Violators Logbook',
+        group: 'Records & Administration',
+        icon: ShieldAlert,
+        badge: activeViolatorsCount > 0 ? `${activeViolatorsCount} active` : undefined,
+        badgeTone: 'burgundy',
+      },
+      {
         id: 'calendar_activities',
         label: 'Calendar of Activities',
         group: 'Records & Administration',
@@ -648,7 +659,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         badgeTone: 'mustard',
       },
     ],
-    [dailyComputed.missingSlotsCount, pendingRegistrationsCount, calendarActivities.length, closedDaysOfWeek.length]
+    [dailyComputed.missingSlotsCount, pendingRegistrationsCount, calendarActivities.length, closedDaysOfWeek.length, activeViolatorsCount]
   );
 
   // Notifications dropdown
@@ -729,6 +740,13 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
           subtitle:
             'Inspect intervals and backfill missing records',
           breadcrumbs: ['Librarian', 'Records'],
+        };
+      case 'violators':
+        return {
+          title: 'Violators Logbook & 1-Hour Monitoring',
+          subtitle:
+            'Track library violations, monitor active timers, and export institutional reports',
+          breadcrumbs: ['Librarian', 'Violators Logbook'],
         };
       case 'logs':
         return {
@@ -1979,6 +1997,19 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
             handleGenerateReport({ persistLog: false });
           }}
         />
+      )}
+
+      {/* ===================================================================
+          TAB: VIOLATORS LOGBOOK & 1-HOUR MONITORING REGISTRY
+      =================================================================== */}
+      {activeTab === 'violators' && (
+        <div className="space-y-6 animate-literary-fade">
+          <ViolatorsLogbook
+            mode="librarian"
+            profile={profile}
+            onRecordCountChange={setActiveViolatorsCount}
+          />
+        </div>
       )}
 
       {/* ===================================================================

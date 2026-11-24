@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Search,
   Send,
+  ShieldAlert,
   Users,
   X,
 } from 'lucide-react';
@@ -65,6 +66,7 @@ import {
   subscribeToCalendarChanges,
 } from '../utils/calendarActivities';
 import { CalendarActivitiesModal } from './CalendarActivitiesModal';
+import { ViolatorsLogbook } from './ViolatorsLogbook';
 import {
   BAGGAGE_AREA_ID,
   BAGGAGE_DUTY_AREA,
@@ -205,7 +207,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
   const [liveTimeOffsetMs, setLiveTimeOffsetMs] = useState<number>(0);
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
-  const [viewMode, setViewMode] = useState<'areas' | 'schedule' | 'session' | 'history'>('areas');
+  const [viewMode, setViewMode] = useState<'areas' | 'schedule' | 'session' | 'history' | 'violators'>('areas');
+  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(0);
   const [areaFilterType, setAreaFilterType] = useState<'ALL' | 'STATISTICAL' | 'STATIONS'>('ALL');
   const isInitialSessionCheckRef = useRef<boolean>(true);
 
@@ -1512,8 +1515,16 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       badge: todayMissingList.length > 0 ? `${todayMissingList.length} missing` : undefined,
       badgeTone: 'mustard',
     });
+    list.push({
+      id: 'violators',
+      label: 'Violators Logbook',
+      group: 'Records & Archive',
+      icon: ShieldAlert,
+      badge: activeViolatorsCount > 0 ? `${activeViolatorsCount} active` : undefined,
+      badgeTone: 'burgundy',
+    });
     return list;
-  }, [myActiveSession, activeArea, todayMissingList.length, myDutySchedules.length, calendarActivities.length]);
+  }, [myActiveSession, activeArea, todayMissingList.length, myDutySchedules.length, calendarActivities.length, activeViolatorsCount]);
 
   const notifications = useMemo<NotificationItem[]>(() => {
     const list: NotificationItem[] = [];
@@ -1584,6 +1595,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       ? 'Submitted Occupancy Records'
       : viewMode === 'schedule'
       ? 'My Assigned Duty Schedule'
+      : viewMode === 'violators'
+      ? 'Violators Logbook & Timers'
       : 'Library Areas & Duty Stations';
 
   const breadcrumbs = [
@@ -1595,6 +1608,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       ? 'My Records'
       : viewMode === 'schedule'
       ? 'Duty Schedule'
+      : viewMode === 'violators'
+      ? 'Violators Logbook'
       : 'Library Areas',
   ];
 
@@ -1797,7 +1812,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           setShowDutyScheduleModal(true);
           return;
         }
-        setViewMode(id as 'areas' | 'schedule' | 'session' | 'history');
+        setViewMode(id as 'areas' | 'schedule' | 'session' | 'history' | 'violators');
       }}
       onSignOut={onSignOut}
       clockDateLabel={formatShortDate(todayDate)}
@@ -3657,6 +3672,19 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* ===================================================================
+          VIOLATORS LOGBOOK & 1-HOUR COUNTDOWN TIMERS
+      =================================================================== */}
+      {viewMode === 'violators' && (
+        <div className="space-y-6 animate-literary-fade">
+          <ViolatorsLogbook
+            mode="student_assistant"
+            profile={profile}
+            onRecordCountChange={setActiveViolatorsCount}
+          />
         </div>
       )}
 
