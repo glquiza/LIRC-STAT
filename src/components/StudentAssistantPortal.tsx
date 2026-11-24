@@ -2161,75 +2161,103 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
             );
           })()}
 
-          {/* 30-Minute Interval Countdown & Synchronization Banner */}
-          <div className="literary-card p-4 sm:p-4.5 bg-gradient-to-r from-[#FFFFFF] via-[#FAF5EE] to-[#F5EBDD] dark:from-[#241F1A] dark:via-[#1D1915] dark:to-[#181512] border border-[#E6D7C3] dark:border-[#383028] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-            <div className="flex items-center gap-3">
+          {/* 30-Minute Interval Status & Visual Progress Widget */}
+          <div className="relative overflow-hidden rounded-2xl p-3.5 sm:p-4 bg-white dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 transition-all">
+            {/* Left side: Visual Icon + Clean Interval Range + Status Pill */}
+            <div className="flex items-center gap-3 min-w-0">
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-2xs ${
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs transition-colors ${
                   !isSubmissionLocked
-                    ? 'bg-[#F1F5EE] dark:bg-[#1E2B1E] text-[#71865A] border border-[#71865A]/50'
+                    ? 'bg-[#F1F5EE] dark:bg-[#1A2616] text-[#455436] dark:text-[#90D26D] border border-[#71865A]/40'
                     : intervalCountdown.isDueSoon
-                    ? 'bg-[#FEF9EC] dark:bg-[#332611] text-[#E7B84B] border border-[#E7B84B]'
-                    : 'bg-[#2D2926] dark:bg-[#1E1914] text-[#FAF5EE]'
+                    ? 'bg-[#FEF9EC] dark:bg-[#2F210C] text-[#A83232] dark:text-[#F5A3A3] border border-[#A83232]/40'
+                    : 'bg-[#FAF5EE] dark:bg-[#25201A] text-[#8C6514] dark:text-[#E7B84B] border border-[#D6C3A9] dark:border-[#42382F]'
                 }`}
               >
                 {!isSubmissionLocked ? (
-                  <CheckCircle2 className="w-5 h-5 text-[#71865A]" />
+                  <CheckCircle2 className="w-5 h-5 text-[#455436] dark:text-[#90D26D]" />
                 ) : (
-                  <Clock className={`w-5 h-5 ${intervalCountdown.isDueSoon ? 'animate-pulse text-[#E7B84B]' : 'text-[#E7B84B]'}`} />
+                  <Clock className={`w-5 h-5 ${intervalCountdown.isDueSoon ? 'animate-pulse text-[#A83232] dark:text-[#F5A3A3]' : 'text-[#8C6514] dark:text-[#E7B84B]'}`} />
                 )}
               </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-heading font-bold text-[#332F2B] dark:text-[#FFFFFF]">
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-heading font-extrabold text-sm sm:text-base text-[#332F2B] dark:text-[#FFFFFF] tracking-tight">
                     {!isSubmissionLocked
-                      ? `Completed Interval: ${formatSlotRangeLabel(effectiveTargetSlot)}`
-                      : `30-Minute Interval: ${formatSlotRangeLabel(intervalCountdown.underwaySlot)} (Underway)`}
-                  </h3>
+                      ? formatSlotRangeLabel(effectiveTargetSlot)
+                      : formatSlotRangeLabel(intervalCountdown.underwaySlot)}
+                  </span>
                   {!isSubmissionLocked ? (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#F1F5EE] text-[#455436] border border-[#71865A]/40 font-stat animate-pulse">
-                      Completed · Input Unlocked
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EBF4E5] dark:bg-[#1B2817] text-[#3B6E22] dark:text-[#90D26D] border border-[#71865A]/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3B6E22] dark:bg-[#90D26D] animate-ping" />
+                      Ready for Entry
                     </span>
                   ) : intervalCountdown.isDueSoon ? (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FEF9EC] text-[#7D5B06] border border-[#E7B84B] animate-pulse font-stat">
-                      Unlocks in {intervalCountdown.minsLeft}:{intervalCountdown.secsLeft < 10 ? '0' : ''}{intervalCountdown.secsLeft}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF3F3] dark:bg-[#331717] text-[#A83232] dark:text-[#F5A3A3] border border-[#E8BDBD]/60 animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#A83232] dark:bg-[#F5A3A3]" />
+                      Unlocking Soon
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FEF9EC] text-[#7D5B06] border border-[#E7B84B]/60 font-stat">
-                      Interval in Progress
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF9EC] dark:bg-[#2A2012] text-[#8C6514] dark:text-[#F5D075] border border-[#E7B84B]/40">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E7B84B]" />
+                      In Progress
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-[#6E665E] dark:text-[#A89C8F] mt-0.5">
+
+                <div className="text-xs text-[#7D7063] dark:text-[#A89C8F] font-medium mt-0.5 flex items-center gap-2">
                   {!isSubmissionLocked ? (
-                    <span>
-                      The 30-minute interval has ended. Headcount entry is automatically enabled for <strong>{formatSlotRangeLabel(effectiveTargetSlot)}</strong>.
-                    </span>
+                    <span className="text-[#455436] dark:text-[#90D26D] font-semibold">Headcount entry unlocked</span>
                   ) : (
-                    <span>
-                      Per library protocol, headcount entry unlocks at <strong>{intervalCountdown.nextUnlockTimeFormatted}</strong> (in <strong className="font-stat text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.formattedTimeRemaining}</strong>).
-                    </span>
+                    <span>Unlocks at <strong className="font-stat text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.nextUnlockTimeFormatted}</strong></span>
                   )}
-                </p>
+                </div>
               </div>
             </div>
 
-            <div className="sm:w-56 shrink-0 space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-stat text-[#6E665E] dark:text-[#A89C8F]">
-                <span>Interval Progress</span>
-                <span className="font-bold text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.progressPercent}%</span>
+            {/* Right side: Visual Progress & Prominent Countdown Box */}
+            <div className="flex items-center gap-3 sm:gap-4 md:w-80 shrink-0">
+              {/* Progress Bar with Percentage */}
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between text-[11px] font-stat text-[#7D7063] dark:text-[#A89C8F]">
+                  <span className="font-medium">Progress</span>
+                  <span className="font-bold text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.progressPercent}%</span>
+                </div>
+                <div className="w-full h-2.5 rounded-full bg-[#EFE6D8] dark:bg-[#2C241E] overflow-hidden p-0.5">
+                  <div
+                    className={`h-full rounded-full transition-all duration-1000 ${
+                      !isSubmissionLocked
+                        ? 'bg-gradient-to-r from-[#71865A] to-[#455436]'
+                        : intervalCountdown.isDueSoon
+                        ? 'bg-gradient-to-r from-[#E7B84B] to-[#A83232]'
+                        : 'bg-gradient-to-r from-[#8C6514] via-[#B88728] to-[#71865A]'
+                    }`}
+                    style={{ width: `${intervalCountdown.progressPercent}%` }}
+                  />
+                </div>
               </div>
-              <div className="w-full h-2 rounded-full bg-[#E6D7C3]/60 dark:bg-[#383028] overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-1000 rounded-full ${
-                    !isSubmissionLocked
-                      ? 'bg-gradient-to-r from-[#71865A] to-[#455436]'
-                      : intervalCountdown.isDueSoon
-                      ? 'bg-gradient-to-r from-[#E7B84B] to-[#A83232]'
-                      : 'bg-gradient-to-r from-[#71865A] to-[#8C6514]'
-                  }`}
-                  style={{ width: `${intervalCountdown.progressPercent}%` }}
-                />
+
+              {/* Countdown / Status Box */}
+              <div className="shrink-0">
+                {!isSubmissionLocked ? (
+                  <div className="px-3 py-1.5 rounded-xl bg-[#EBF4E5] dark:bg-[#1B2817] border border-[#71865A]/40 text-[#3B6E22] dark:text-[#90D26D] flex items-center gap-1.5 shadow-2xs">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="text-xs font-bold font-stat uppercase tracking-wider">Unlocked</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#E6D7C3] dark:border-[#383028] shadow-2xs min-w-[95px]">
+                    <Clock className="w-4 h-4 text-[#A83232] dark:text-[#E25D5D] shrink-0" />
+                    <div className="flex flex-col text-left">
+                      <span className="text-[9px] uppercase font-bold text-[#8C7F72] dark:text-[#8E8275] tracking-wider leading-none">
+                        Remaining
+                      </span>
+                      <span className="font-stat font-extrabold text-sm sm:text-base text-[#A83232] dark:text-[#E25D5D] tracking-tight leading-tight">
+                        {intervalCountdown.formattedTimeRemaining}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -2977,25 +3005,36 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
 
                 {/* Status for underway interval waiting for completion */}
                 {intervalCountdown.isOperatingHours && (
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-[#FEF9EC] via-[#FAF5EE] to-[#F5EBDD] dark:from-[#251D0F] dark:via-[#1E1915] dark:to-[#181512] border border-[#E7B84B] dark:border-[#7D5B06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#E7B84B]/20 flex items-center justify-center shrink-0 text-[#7D5B06] dark:text-[#F5D075] mt-0.5">
-                        <Clock className="w-4 h-4 animate-spin" />
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A2012] border border-[#E7B84B]/40 flex items-center justify-center shrink-0 text-[#8C6514] dark:text-[#E7B84B]">
+                        <Clock className="w-5 h-5 animate-pulse" />
                       </div>
-                      <div>
-                        <div className="font-heading font-bold text-[#332F2B] dark:text-[#FFFFFF] text-sm">
-                          Next Interval ({formatSlotRangeLabel(intervalCountdown.underwaySlot)}) In Progress
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-heading font-extrabold text-sm sm:text-base text-[#332F2B] dark:text-[#FFFFFF] tracking-tight">
+                            {formatSlotRangeLabel(intervalCountdown.underwaySlot)}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF9EC] dark:bg-[#2A2012] text-[#8C6514] dark:text-[#F5D075] border border-[#E7B84B]/40">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#E7B84B]" />
+                            In Progress
+                          </span>
                         </div>
-                        <p className="text-[#6E665E] dark:text-[#A89C8F] mt-0.5">
-                          Per library schedule policy, headcount entry will automatically unlock at <strong>{intervalCountdown.nextUnlockTimeFormatted}</strong> once this 30-minute interval completes.
-                        </p>
+                        <div className="text-xs text-[#7D7063] dark:text-[#A89C8F] font-medium mt-0.5">
+                          Unlocks at <strong className="font-stat text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.nextUnlockTimeFormatted}</strong>
+                        </div>
                       </div>
                     </div>
-                    <div className="sm:text-right shrink-0">
-                      <span className="text-[10px] uppercase font-bold text-[#7D5B06] dark:text-[#F5D075] font-stat block">Unlocks in</span>
-                      <span className="text-base font-stat font-bold text-[#332F2B] dark:text-[#FFFFFF]">
-                        {intervalCountdown.formattedTimeRemaining}
-                      </span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#E6D7C3] dark:border-[#383028] shadow-2xs shrink-0">
+                      <Clock className="w-4 h-4 text-[#A83232] dark:text-[#E25D5D] shrink-0" />
+                      <div className="flex flex-col text-left">
+                        <span className="text-[9px] uppercase font-bold text-[#8C7F72] dark:text-[#8E8275] tracking-wider leading-none">
+                          Remaining
+                        </span>
+                        <span className="font-stat font-extrabold text-sm sm:text-base text-[#A83232] dark:text-[#E25D5D] tracking-tight leading-tight">
+                          {intervalCountdown.formattedTimeRemaining}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -3004,35 +3043,50 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               <form onSubmit={handleSubmitOccupancy} className="space-y-5">
                 {/* Underway Interval Lock Notice */}
                 {isSubmissionLocked && (
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-[#FEF9EC] via-[#FAF5EE] to-[#F5EBDD] dark:from-[#251D0F] dark:via-[#1E1915] dark:to-[#181512] border border-[#E7B84B] dark:border-[#7D5B06] space-y-3 shadow-2xs">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#E7B84B]/20 flex items-center justify-center shrink-0 text-[#7D5B06] dark:text-[#F5D075]">
-                        <Lock className="w-4 h-4" />
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] space-y-3 shadow-xs">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A2012] border border-[#E7B84B]/40 flex items-center justify-center shrink-0 text-[#8C6514] dark:text-[#E7B84B]">
+                          <Lock className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-heading font-extrabold text-sm sm:text-base text-[#332F2B] dark:text-[#FFFFFF] tracking-tight">
+                              {formatSlotRangeLabel(effectiveTargetSlot)}
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF9EC] dark:bg-[#2A2012] text-[#8C6514] dark:text-[#F5D075] border border-[#E7B84B]/40">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#E7B84B]" />
+                              In Progress
+                            </span>
+                          </div>
+                          <div className="text-xs text-[#7D7063] dark:text-[#A89C8F] font-medium mt-0.5">
+                            Unlocks at <strong className="font-stat text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.nextUnlockTimeFormatted}</strong>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h3 className="text-sm font-heading font-bold text-[#332F2B] dark:text-[#FFFFFF]">
-                            {formatSlotRangeLabel(effectiveTargetSlot)} Interval in Progress
-                          </h3>
-                          <span className="px-2.5 py-0.5 rounded-full text-xs font-stat font-bold bg-[#FEF9EC] text-[#7D5B06] border border-[#E7B84B] flex items-center gap-1.5 animate-pulse">
-                            <Clock className="w-3.5 h-3.5" />
-                            Unlocks at {intervalCountdown.nextUnlockTimeFormatted} ({intervalCountdown.formattedTimeRemaining})
+
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#E6D7C3] dark:border-[#383028] shadow-2xs shrink-0">
+                        <Clock className="w-4 h-4 text-[#A83232] dark:text-[#E25D5D] shrink-0" />
+                        <div className="flex flex-col text-left">
+                          <span className="text-[9px] uppercase font-bold text-[#8C7F72] dark:text-[#8E8275] tracking-wider leading-none">
+                            Remaining
+                          </span>
+                          <span className="font-stat font-extrabold text-sm sm:text-base text-[#A83232] dark:text-[#E25D5D] tracking-tight leading-tight">
+                            {intervalCountdown.formattedTimeRemaining}
                           </span>
                         </div>
-                        <p className="text-xs text-[#6E665E] dark:text-[#A89C8F] mt-1">
-                          Student Assistants may only enter the student count once the 30-minute interval has completed. The system will automatically enable the count input at <strong>{intervalCountdown.nextUnlockTimeFormatted}</strong>.
-                        </p>
                       </div>
                     </div>
-                    {/* Progress Bar */}
-                    <div className="space-y-1 pt-0.5">
-                      <div className="flex items-center justify-between text-[11px] font-stat text-[#6E665E] dark:text-[#A89C8F]">
-                        <span>Interval Progress ({formatSlotRangeLabel(effectiveTargetSlot)})</span>
+
+                    {/* Visual Progress Bar */}
+                    <div className="space-y-1 pt-1 border-t border-[#E6D7C3]/60 dark:border-[#383028]/60">
+                      <div className="flex items-center justify-between text-[11px] font-stat text-[#7D7063] dark:text-[#A89C8F]">
+                        <span className="font-medium">Interval Progress</span>
                         <span className="font-bold text-[#332F2B] dark:text-[#FFFFFF]">{intervalCountdown.progressPercent}%</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-[#E6D7C3]/60 dark:bg-[#383028] overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-[#EFE6D8] dark:bg-[#2C241E] overflow-hidden p-0.5">
                         <div
-                          className="h-full transition-all duration-1000 rounded-full bg-gradient-to-r from-[#E7B84B] to-[#71865A]"
+                          className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-[#8C6514] via-[#B88728] to-[#71865A]"
                           style={{ width: `${intervalCountdown.progressPercent}%` }}
                         />
                       </div>
@@ -3042,14 +3096,14 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
 
                 {/* Completed Interval Prompt */}
                 {!isSubmissionLocked && (
-                  <div className="p-3.5 rounded-xl bg-[#F1F5EE] dark:bg-[#1E2B1E] border border-[#71865A]/50 flex items-center justify-between gap-3 text-xs shadow-2xs">
-                    <div className="flex items-center gap-2.5 text-[#455436] dark:text-[#A7D49B]">
-                      <CheckCircle2 className="w-4 h-4 text-[#71865A] shrink-0" />
-                      <span>
-                        <strong>Interval Completed ({formatSlotRangeLabel(effectiveTargetSlot)}).</strong> Headcount entry is now unlocked. Please enter and submit the final student headcount observed.
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-[#EBF4E5] dark:bg-[#1B2817] border border-[#71865A]/40 flex items-center justify-between gap-3 text-xs shadow-xs">
+                    <div className="flex items-center gap-2.5 text-[#3B6E22] dark:text-[#90D26D]">
+                      <CheckCircle2 className="w-4 h-4 text-[#3B6E22] dark:text-[#90D26D] shrink-0" />
+                      <span className="font-semibold">
+                        Interval completed ({formatSlotRangeLabel(effectiveTargetSlot)}). Ready for headcount submission.
                       </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-[#71865A] text-white font-stat font-bold text-[10px] shrink-0 uppercase tracking-wider">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#3B6E22] dark:bg-[#457C2A] text-white font-stat font-bold text-[10px] shrink-0 uppercase tracking-wider">
                       Unlocked
                     </span>
                   </div>
