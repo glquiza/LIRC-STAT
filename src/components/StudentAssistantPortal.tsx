@@ -1816,52 +1816,6 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       }
       headerActions={
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* 30-Minute Interval Countdown Reminder Pill */}
-          <div
-            onClick={() => {
-              if (viewMode !== 'areas' && !myActiveSession) setViewMode('areas');
-            }}
-            className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-stat transition-all select-none shadow-2xs max-w-[140px] sm:max-w-none truncate ${
-              !intervalCountdown.isOperatingHours
-                ? 'bg-[#FFFFFF] dark:bg-[#1E1914] border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE]'
-                : !isSubmissionLocked
-                ? 'bg-[#F1F5EE] dark:bg-[#1E2B1E] border-[#71865A]/50 text-[#455436] dark:text-[#A7D49B] animate-pulse cursor-pointer'
-                : intervalCountdown.isDueSoon
-                ? 'bg-[#FEF9EC] dark:bg-[#2C2210] border-[#E7B84B] text-[#7D5B06] dark:text-[#F5D075] animate-pulse cursor-pointer'
-                : 'bg-[#FFFFFF] dark:bg-[#1E1914] border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE]'
-            }`}
-            title={
-              !intervalCountdown.isOperatingHours
-                ? 'Outside operating hours (8:00 AM – 6:00 PM)'
-                : !isSubmissionLocked
-                ? `Interval Completed: ${formatSlotRangeLabel(effectiveTargetSlot)} · Ready for headcount submission`
-                : `Interval Underway: ${formatSlotRangeLabel(intervalCountdown.underwaySlot)} · Unlocks at ${intervalCountdown.nextUnlockTimeFormatted} (in ${intervalCountdown.formattedTimeRemaining})`
-            }
-          >
-            {!intervalCountdown.isOperatingHours ? (
-              <Clock className="w-3.5 h-3.5 shrink-0 text-[#8C6514] dark:text-[#E7B84B]" />
-            ) : !isSubmissionLocked ? (
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-[#71865A]" />
-            ) : (
-              <Lock className="w-3.5 h-3.5 shrink-0 text-[#E7B84B]" />
-            )}
-            <span className="font-semibold truncate">
-              {!intervalCountdown.isOperatingHours ? (
-                <span>Off-Hours</span>
-              ) : !isSubmissionLocked ? (
-                <span>
-                  <span className="hidden sm:inline">Log Count: </span>
-                  <strong className="font-bold">{formatSlotLabel(effectiveTargetSlot)}</strong>
-                </span>
-              ) : (
-                <span>
-                  <span className="hidden sm:inline">Unlocks in: </span>
-                  <strong>{intervalCountdown.formattedTimeRemaining}</strong>
-                </span>
-              )}
-            </span>
-          </div>
-
           <button
             type="button"
             onClick={() => {
