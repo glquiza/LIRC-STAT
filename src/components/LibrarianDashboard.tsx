@@ -73,6 +73,7 @@ import {
 import { LibrarianRecordsAndLogs } from './LibrarianRecordsAndLogs';
 import { LibrarianAdminPanel } from './LibrarianAdminPanel';
 import { LibrarianAreaAssignments } from './LibrarianAreaAssignments';
+import { getAreaBackgroundImage } from '../utils/areaManagement';
 import { LibrarianAdvancedSettings } from './LibrarianAdvancedSettings';
 import { AcademicLayout, NavItem, NotificationItem } from './AcademicLayout';
 import { topProgressBar } from './TopProgressBar';
@@ -972,16 +973,27 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                 const uniqueAreaSessions = Array.from(
                   new Map(areaSessions.map((s) => [s.user_id, s])).values()
                 );
+                const bgPhoto = getAreaBackgroundImage(item.area);
+
                 return (
                   <div
                     key={item.area.id}
-                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden"
+                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden group"
                   >
+                    {bgPhoto && (
+                      <>
+                        <div
+                          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                          style={{ backgroundImage: `url('${bgPhoto}')` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/90 via-[#FAF5EE]/82 to-[#FFFFFF]/94 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                      </>
+                    )}
                     <div
-                      className="h-1 w-full absolute top-0 left-0"
+                      className="h-1 w-full absolute top-0 left-0 z-10"
                       style={{ backgroundColor: item.area.color_hex }}
                     />
-                    <div>
+                    <div className="relative z-10">
                       <div className="flex items-center justify-between mb-2 pt-1">
                         <span className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
                           <span
@@ -1043,7 +1055,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       </div>
                     </div>
 
-                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3] dark:border-[#383028]">
+                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3] dark:border-[#383028] relative z-10">
                       <div className="text-[11px] font-stat text-[#6E665E] dark:text-[#A89887] flex items-center justify-between">
                         <span>
                           {item.recordedSlotsCount}/{item.expectedSlotsCount} slots ·{' '}

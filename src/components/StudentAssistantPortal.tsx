@@ -93,6 +93,7 @@ import {
   trackStationDuty,
   untrackStationDuty,
 } from '../utils/stationDutyTracking';
+import { getAreaBackgroundImage } from '../utils/areaManagement';
 
 interface StudentAssistantPortalProps {
   profile: UserProfile;
@@ -2052,35 +2053,47 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           )}
 
           {/* Active Session Notice */}
-          {myActiveSession && activeArea && (
-            <div className="active-session-banner bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
-              <div className="flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#71865A] dark:bg-[#86A870] animate-pulse shrink-0" />
-                <span>
-                  Active monitoring session in <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{activeArea.name}</strong> (
-                  <span className="font-stat font-bold text-[#332F2B] dark:text-[#FFFFFF]">{myActiveSession.records_submitted}</span>{' '}
-                  count(s) submitted).
-                </span>
+          {myActiveSession && activeArea && (() => {
+            const activeAreaBg = getAreaBackgroundImage(activeArea);
+            return (
+              <div className="active-session-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                {activeAreaBg && (
+                  <>
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                      style={{ backgroundImage: `url('${activeAreaBg}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#182615]/92 dark:via-[#142011]/88 dark:to-[#0F190D]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                  </>
+                )}
+                <div className="relative z-10 flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#71865A] dark:bg-[#86A870] animate-pulse shrink-0" />
+                  <span>
+                    Active monitoring session in <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{activeArea.name}</strong> (
+                    <span className="font-stat font-bold text-[#332F2B] dark:text-[#FFFFFF]">{myActiveSession.records_submitted}</span>{' '}
+                    count(s) submitted).
+                  </span>
+                </div>
+                <div className="relative z-10 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('session')}
+                    className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#A83232] via-[#942727] to-[#7C1E1E] hover:from-[#942727] hover:to-[#6E1A1A] text-[#FFFFFF] text-xs font-semibold shadow-sm shadow-[#A83232]/25 cursor-pointer transition"
+                  >
+                    Open {activeArea.name}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={exitingSession}
+                    onClick={handleExitArea}
+                    className="px-3.5 py-2 rounded-xl bg-[#FFFFFF] dark:bg-[#241F1B] border border-[#E6D7C3] dark:border-[#383028] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-semibold cursor-pointer transition"
+                  >
+                    Exit Area
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('session')}
-                  className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#A83232] via-[#942727] to-[#7C1E1E] hover:from-[#942727] hover:to-[#6E1A1A] text-[#FFFFFF] text-xs font-semibold shadow-sm shadow-[#A83232]/25 cursor-pointer transition"
-                >
-                  Open {activeArea.name}
-                </button>
-                <button
-                  type="button"
-                  disabled={exitingSession}
-                  onClick={handleExitArea}
-                  className="px-3.5 py-2 rounded-xl bg-[#FFFFFF] dark:bg-[#241F1B] border border-[#E6D7C3] dark:border-[#383028] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-semibold cursor-pointer transition"
-                >
-                  Exit Area
-                </button>
-              </div>
-            </div>
-          )}
+            );
+          })()}
 
 
 
@@ -2305,19 +2318,29 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     });
                     const latest = areaRecsToday[areaRecsToday.length - 1];
                     const pct = areaDue > 0 ? Math.min(100, Math.round((areaRecsToday.length / areaDue) * 100)) : 100;
+                    const bgPhoto = getAreaBackgroundImage(area);
 
                     return (
                       <div
                         key={area.id}
-                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden ${
+                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden group ${
                           isMine ? 'ring-2 ring-[#71865A]' : ''
                         }`}
                       >
+                        {bgPhoto && (
+                          <>
+                            <div
+                              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                              style={{ backgroundImage: `url('${bgPhoto}')` }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/90 via-[#FAF5EE]/82 to-[#FFFFFF]/94 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                          </>
+                        )}
                         <div
-                          className="h-1.5 w-full absolute top-0 left-0"
+                          className="h-1.5 w-full absolute top-0 left-0 z-10"
                           style={{ backgroundColor: area.color_hex }}
                         />
-                        <div>
+                        <div className="relative z-10">
                           <div className="flex items-start justify-between gap-2 mb-1.5 pt-1">
                             <div className="flex items-center gap-2">
                               <span
@@ -2419,51 +2442,53 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                           </div>
                         </div>
 
-                        {isMine ? (
-                          <div className="flex items-center gap-2">
+                        <div className="relative z-10">
+                          {isMine ? (
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setViewMode('session')}
+                                className="flex-1 h-10 px-4 rounded-xl bg-[#71865A] hover:bg-[#5E704A] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-[#71865A]/25"
+                              >
+                                <span>Continue Session</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={exitingSession}
+                                onClick={handleExitArea}
+                                className="h-10 px-3.5 rounded-xl bg-white dark:bg-[#1A1613] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] border border-[#E6D7C3] dark:border-[#383028] hover:border-[#A83232]/40 text-[#6E665E] dark:text-[#A89887] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-xs font-semibold transition cursor-pointer"
+                                title="Exit and leave this area"
+                              >
+                                Leave
+                              </button>
+                            </div>
+                          ) : hasMonitors ? (
                             <button
                               type="button"
-                              onClick={() => setViewMode('session')}
-                              className="flex-1 h-10 px-4 rounded-xl bg-[#71865A] hover:bg-[#5E704A] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-[#71865A]/25"
+                              disabled={startingAreaId === area.id}
+                              onClick={() => handleSelectArea(area)}
+                              className="w-full h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm shadow-[#A83232]/20"
                             >
-                              <span>Continue Session</span>
+                              {startingAreaId === area.id
+                                ? 'Opening...'
+                                : sortedMonitors.length > 1
+                                ? `Enter Area (${sortedMonitors.length} Active Monitors)`
+                                : `Enter Area (Active: ${sortedMonitors[0].user_name.split(' ')[0]})`}
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
+                          ) : (
                             <button
                               type="button"
-                              disabled={exitingSession}
-                              onClick={handleExitArea}
-                              className="h-10 px-3.5 rounded-xl bg-white dark:bg-[#1A1613] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] border border-[#E6D7C3] dark:border-[#383028] hover:border-[#A83232]/40 text-[#6E665E] dark:text-[#A89887] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-xs font-semibold transition cursor-pointer"
-                              title="Exit and leave this area"
+                              disabled={startingAreaId === area.id}
+                              onClick={() => handleSelectArea(area)}
+                              className="w-full h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm shadow-[#A83232]/20"
                             >
-                              Leave
+                              {startingAreaId === area.id ? 'Opening...' : 'Enter Area (Start Monitoring)'}
+                              <ArrowRight className="w-3.5 h-3.5" />
                             </button>
-                          </div>
-                        ) : hasMonitors ? (
-                          <button
-                            type="button"
-                            disabled={startingAreaId === area.id}
-                            onClick={() => handleSelectArea(area)}
-                            className="w-full h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm shadow-[#A83232]/20"
-                          >
-                            {startingAreaId === area.id
-                              ? 'Opening...'
-                              : sortedMonitors.length > 1
-                              ? `Enter Area (${sortedMonitors.length} Active Monitors)`
-                              : `Enter Area (Active: ${sortedMonitors[0].user_name.split(' ')[0]})`}
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={startingAreaId === area.id}
-                            onClick={() => handleSelectArea(area)}
-                            className="w-full h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm shadow-[#A83232]/20"
-                          >
-                            {startingAreaId === area.id ? 'Opening...' : 'Enter Area (Start Monitoring)'}
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -2776,63 +2801,77 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       {viewMode === 'session' && myActiveSession && activeArea && (
         <div className="max-w-4xl mx-auto space-y-5 animate-literary-fade">
           {/* Quick Area Header & Exit Bar */}
-          <div className="literary-card p-5 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <span
-                className="w-3 h-11 rounded-full shrink-0"
-                style={{ backgroundColor: activeArea.color_hex }}
-              />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-heading font-bold text-[#332F2B]">
-                    {activeArea.name}
-                  </h2>
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#F1F5EE] text-[#455436] border border-[#71865A]/40">
-                    Active Session
-                  </span>
-                </div>
-                <p className="text-xs text-[#6E665E] font-stat">
-                  Capacity: {activeArea.capacity} seats ·{' '}
-                  {myActiveSession.records_submitted} count(s) submitted ·{' '}
-                  {(() => {
-                    const othersInArea = activeSessions.filter(
-                      (s) => s.area_id === activeArea.id && s.user_id !== profile.id
-                    );
-                    const uniqueOthers = Array.from(
-                      new Map(othersInArea.map((s) => [s.user_id, s])).values()
-                    );
-                    if (uniqueOthers.length > 0) {
-                      return (
-                        <span>
-                          Active Monitors: <strong className="text-[#332F2B] dark:text-[#FFFFFF]">You ({profile.full_name})</strong>
-                          {uniqueOthers.map((o) => (
-                            <React.Fragment key={o.id || o.user_id}>
-                              , <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{o.user_name}</strong>
-                            </React.Fragment>
-                          ))}
-                        </span>
-                      );
-                    }
-                    return (
-                      <span>
-                        Active Monitor: <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{profile.full_name} (You)</strong>
+          {(() => {
+            const sessionBg = getAreaBackgroundImage(activeArea);
+            return (
+              <div className="literary-card p-5 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden group">
+                {sessionBg && (
+                  <>
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                      style={{ backgroundImage: `url('${sessionBg}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                  </>
+                )}
+                <div className="relative z-10 flex items-center gap-3.5">
+                  <span
+                    className="w-3 h-11 rounded-full shrink-0"
+                    style={{ backgroundColor: activeArea.color_hex }}
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE]">
+                        {activeArea.name}
+                      </h2>
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#F1F5EE] text-[#455436] border border-[#71865A]/40 dark:bg-[#71865A]/20 dark:text-[#D1E7CA]">
+                        Active Session
                       </span>
-                    );
-                  })()}
-                </p>
-              </div>
-            </div>
+                    </div>
+                    <p className="text-xs text-[#6E665E] dark:text-[#A89887] font-stat">
+                      Capacity: {activeArea.capacity} seats ·{' '}
+                      {myActiveSession.records_submitted} count(s) submitted ·{' '}
+                      {(() => {
+                        const othersInArea = activeSessions.filter(
+                          (s) => s.area_id === activeArea.id && s.user_id !== profile.id
+                        );
+                        const uniqueOthers = Array.from(
+                          new Map(othersInArea.map((s) => [s.user_id, s])).values()
+                        );
+                        if (uniqueOthers.length > 0) {
+                          return (
+                            <span>
+                              Active Monitors: <strong className="text-[#332F2B] dark:text-[#FFFFFF]">You ({profile.full_name})</strong>
+                              {uniqueOthers.map((o) => (
+                                <React.Fragment key={o.id || o.user_id}>
+                                  , <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{o.user_name}</strong>
+                                </React.Fragment>
+                              ))}
+                            </span>
+                          );
+                        }
+                        return (
+                          <span>
+                            Active Monitor: <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{profile.full_name} (You)</strong>
+                          </span>
+                        );
+                      })()}
+                    </p>
+                  </div>
+                </div>
 
-            <button
-              type="button"
-              disabled={exitingSession}
-              onClick={handleExitArea}
-              className="h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {exitingSession ? 'Exiting...' : 'Exit Area'}
-            </button>
-          </div>
+                <button
+                  type="button"
+                  disabled={exitingSession}
+                  onClick={handleExitArea}
+                  className="relative z-10 h-10 px-4 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {exitingSession ? 'Exiting...' : 'Exit Area'}
+                </button>
+              </div>
+            );
+          })()}
 
           {/* Count Submission Card */}
           <div className="literary-card p-6 space-y-5">

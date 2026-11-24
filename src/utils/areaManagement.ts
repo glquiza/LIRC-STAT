@@ -255,3 +255,16 @@ export function subscribeToAreaChanges(
     channel?.close();
   };
 }
+
+/**
+ * Return custom background photo for known library areas.
+ */
+export function getAreaBackgroundImage(area: { code?: string; slug?: string; name: string }): string | null {
+  const n = (area.name || '').toLowerCase();
+  const c = (area.code || '').toUpperCase();
+  const s = (area.slug || '').toLowerCase();
+  if (c === 'FIL' || s === 'filipiniana' || n.includes('filipiniana')) {
+    return '/filipiniana.jpg';
+  }
+  return null;
+}
