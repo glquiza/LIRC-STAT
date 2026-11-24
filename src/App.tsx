@@ -1,5 +1,4 @@
-/// <reference types="vite/client" />
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import { LibraryArea, UserProfile } from './types/lirc';
@@ -8,10 +7,13 @@ import { StudentAssistantPortal } from './components/StudentAssistantPortal';
 import { LibrarianDashboard } from './components/LibrarianDashboard';
 import { parseStaffAccount } from './utils/invitationWorkflow';
 
+export const LOGGED_OUT_STORAGE_KEY = 'lirc_system_logged_out';
+
 export const App: React.FC = () => {
   const [initializing, setInitializing] = useState<boolean>(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [areas, setAreas] = useState<LibraryArea[]>([]);
+  const isSigningOutRef = useRef<boolean>(false);
 
   const loadAreas = useCallback(async () => {
     const { data } = await supabase
@@ -127,10 +129,23 @@ export const App: React.FC = () => {
 
   const loadUserProfile = useCallback(
     async (userId: string) => {
+      // If the user has logged out or is currently signing out, abort loading profile immediately
+      if (isSigningOutRef.current || localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true') {
+        setProfile(null);
+        setInitializing(false);
+        return;
+      }
+
       const [{ data: profileData }] = await Promise.all([
         supabase.from('user_profiles').select('*').eq('id', userId).maybeSingle(),
         loadAreas(),
       ]);
+
+      if (isSigningOutRef.current || localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true') {
+        setProfile(null);
+        setInitializing(false);
+        return;
+      }
 
       if (profileData) {
         const rawProfile = profileData as UserProfile;
@@ -163,12 +178,24 @@ export const App: React.FC = () => {
     let mounted = true;
 
     async function initSession() {
+      // If user explicitly signed out, never auto-sign-in on startup or reload
+      if (localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true') {
+        if (!mounted) return;
+        setProfile(null);
+        setInitializing(false);
+        return;
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
       if (!mounted) return;
-      if (session?.user) {
+      if (
+        session?.user &&
+        !isSigningOutRef.current &&
+        localStorage.getItem(LOGGED_OUT_STORAGE_KEY) !== 'true'
+      ) {
         await loadUserProfile(session.user.id);
       } else {
         setProfile(null);
@@ -180,13 +207,22 @@ export const App: React.FC = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
-      if (session?.user) {
-        loadUserProfile(session.user.id);
-      } else {
+
+      if (
+        event === 'SIGNED_OUT' ||
+        !session?.user ||
+        isSigningOutRef.current ||
+        localStorage.getItem(LOGGED_OUT_STORAGE_KEY) === 'true'
+      ) {
         setProfile(null);
         setInitializing(false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN') {
+        await loadUserProfile(session.user.id);
       }
     });
 
@@ -197,27 +233,86 @@ export const App: React.FC = () => {
   }, [loadUserProfile]);
 
   const handleSignOut = async () => {
+    // 1. Immediately flag signing out and persist logged out state
+    isSigningOutRef.current = true;
+    localStorage.setItem(LOGGED_OUT_STORAGE_KEY, 'true');
     setInitializing(true);
+
     try {
       if (profile) {
         // Close any active Student Assistant monitoring session cleanly & log sign-out
-        await Promise.all([
-          profile.role === 'student_assistant'
-            ? supabase.rpc('exit_monitoring_session', { p_session_id: null })
-            : Promise.resolve(),
-          supabase.rpc('log_client_activity', {
+        try {
+          if (profile.role === 'student_assistant') {
+            await supabase.rpc('exit_monitoring_session', { p_session_id: null });
+          }
+        } catch {
+          // ignore pre-cleanup error
+        }
+
+        try {
+          await supabase.rpc('log_client_activity', {
             p_action_type: 'user_logout',
             p_description: `${profile.full_name} signed out of LIRC MANAGEMENT SYSTEM`,
             p_target_type: 'auth_session',
-          }),
-        ]);
+          });
+        } catch {
+          // ignore logging error
+        }
       }
     } catch {
-      // Proceed with sign-out even if logging fails
+      // Proceed with sign-out even if pre-cleanup fails
     }
-    await supabase.auth.signOut();
+
+    // 2. Disconnect and remove all Supabase realtime channels
+    try {
+      await supabase.removeAllChannels();
+    } catch {
+      // ignore
+    }
+
+    // 3. Perform local and global Supabase sign out
+    try {
+      await supabase.auth.signOut({ scope: 'local' });
+    } catch {
+      // ignore
+    }
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch {
+      // ignore
+    }
+
+    // 4. Force purge all Supabase session tokens, cached auth items, and station keys from storage
+    try {
+      if (typeof window !== 'undefined') {
+        const purgeTokens = (storage: Storage) => {
+          const keysToRemove: string[] = [];
+          for (let i = 0; i < storage.length; i++) {
+            const k = storage.key(i);
+            if (
+              k &&
+              (k.startsWith('sb-') ||
+                k.includes('auth-token') ||
+                k.includes('supabase') ||
+                k.startsWith('lirc_active_station_'))
+            ) {
+              keysToRemove.push(k);
+            }
+          }
+          keysToRemove.forEach((k) => storage.removeItem(k));
+        };
+
+        purgeTokens(window.localStorage);
+        purgeTokens(window.sessionStorage);
+      }
+    } catch {
+      // ignore
+    }
+
+    // 5. Cleanly reset profile and finish initializing
     setProfile(null);
     setInitializing(false);
+    isSigningOutRef.current = false;
   };
 
   if (initializing) {
@@ -247,11 +342,16 @@ export const App: React.FC = () => {
     return (
       <LoginPage
         onLoginSuccess={async () => {
+          localStorage.removeItem(LOGGED_OUT_STORAGE_KEY);
+          isSigningOutRef.current = false;
+          setInitializing(true);
           const {
             data: { session },
           } = await supabase.auth.getSession();
           if (session?.user) {
             await loadUserProfile(session.user.id);
+          } else {
+            setInitializing(false);
           }
         }}
       />
