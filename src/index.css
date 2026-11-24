@@ -41,19 +41,19 @@
   }
 
   h1, h2, h3, h4, .font-heading {
-    font-family: 'Bodoni Moda', 'Playfair Display', 'Lora', Georgia, 'Times New Roman', serif;
-    letter-spacing: 0.02em;
+    font-family: 'Bitter', 'Zilla Slab', Georgia, serif;
+    letter-spacing: -0.01em;
     color: var(--charcoal);
   }
 
   .font-display {
-    font-family: 'Bodoni Moda', 'Playfair Display', 'Cinzel', Didot, 'Bodoni MT', serif;
-    letter-spacing: 0.18em;
+    font-family: 'Bitter', 'Zilla Slab', Georgia, serif;
+    letter-spacing: 0.04em;
   }
 
   .font-collegiate {
-    font-family: 'Cinzel', 'Bodoni Moda', serif;
-    letter-spacing: 0.06em;
+    font-family: 'Bitter', 'Zilla Slab', serif;
+    letter-spacing: 0.04em;
   }
 
   /* Academic statistics, counters, and tabular figures */

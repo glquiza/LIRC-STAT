@@ -536,8 +536,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </span>
         </div>
 
-        {/* Grand Title: Classical Didone display with refined wide letter tracking */}
-        <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-[3.4rem] xl:text-[3.8rem] font-display font-bold sm:font-extrabold text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.20em] md:tracking-[0.24em] uppercase text-center mb-3 sm:mb-4 leading-tight sm:leading-snug select-none max-w-full break-words">
+        {/* Grand Title: Sturdy Academic Slab */}
+        <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] font-display font-extrabold text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.03em] sm:tracking-[0.05em] uppercase text-center mb-3 sm:mb-4 leading-tight select-none max-w-full break-words">
           LIRC MANAGEMENT SYSTEM
         </h1>
 
