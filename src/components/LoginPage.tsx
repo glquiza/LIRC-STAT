@@ -28,7 +28,7 @@ import { gsapFadeIn, gsapPopIn, gsap } from '../utils/animations';
 import { AnimatedBookLogo } from './AnimatedBookLogo';
 
 interface LoginPageProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (profile?: UserProfile) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
@@ -350,14 +350,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
       localStorage.removeItem('lirc_system_logged_out');
 
-      await supabase.rpc('log_client_activity', {
+      const userProfile: UserProfile = {
+        ...(profileData as UserProfile),
+        staff_code: parsed.displayStaffCode,
+      };
+
+      try {
+        localStorage.setItem('lirc_cached_user_profile', JSON.stringify(userProfile));
+      } catch {
+        // ignore storage errors
+      }
+
+      void supabase.rpc('log_client_activity', {
         p_action_type: 'user_login',
         p_description: `Signed in to LIRC MANAGEMENT SYSTEM (${cleanInput})`,
         p_target_type: 'auth_session',
         p_metadata: { identifier: cleanInput },
-      });
+      }).catch(() => {});
 
-      onLoginSuccess();
+      onLoginSuccess(userProfile);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Unable to sign in.');
     } finally {
