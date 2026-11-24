@@ -47,7 +47,7 @@ export function exportStatisticalReportToExcel(
 
   // Sheet 1: Executive Summary & Area Totals
   const summaryRows: (string | number)[][] = [
-    ['LIRC STAT – LEARNING & INFORMATION RESOURCE CENTER STATISTICAL TRACKING AND ANALYSIS TOOL'],
+    ['LIRC MANAGEMENT SYSTEM – LEARNING & INFORMATION RESOURCE CENTER'],
     [report.reportTitle.toUpperCase()],
     [`Covered Period: ${report.periodLabel}`, '', `Generated: ${report.generatedAt}`],
     [`Date Range: ${report.startDate} to ${report.endDate}`, '', `Prepared By: ${preparedBy}`],
@@ -282,13 +282,13 @@ export function exportStatisticalReportToExcel(
   ];
   XLSX.utils.book_append_sheet(wb, wsLogs, 'Detailed Logs');
 
-  XLSX.writeFile(wb, `LIRC_STAT_Report_${sanitizeFileSlug(report.periodLabel)}.xlsx`);
+  XLSX.writeFile(wb, `LIRC_MANAGEMENT_SYSTEM_Report_${sanitizeFileSlug(report.periodLabel)}.xlsx`);
 }
 
 /**
  * 2. PDF (.pdf) EXPORT
  * Institutional landscape PDF containing:
- * - Formal LIRC STAT banner & covered period metadata
+ * - Formal LIRC MANAGEMENT SYSTEM banner & covered period metadata
  * - Embedded high-DPI Visual Charts (Area Comparison + Hourly Distribution)
  * - Library Area Summary Table
  * - Hourly Occupancy Summary Table
@@ -312,7 +312,7 @@ export function exportStatisticalReportToPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text('LIRC STAT — LEARNING & INFORMATION RESOURCE CENTER', 40, 30);
+  doc.text('LIRC MANAGEMENT SYSTEM — LEARNING & INFORMATION RESOURCE CENTER', 40, 30);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10.5);
@@ -508,14 +508,14 @@ export function exportStatisticalReportToPDF(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(71, 85, 105);
-  doc.text('Certified Correct & Generated via LIRC STAT Automated Statistical Tracking & Analysis Tool:', 40, signY);
+  doc.text('Certified Correct & Generated via LIRC MANAGEMENT SYSTEM Automated Statistical Tracking & Analysis Tool:', 40, signY);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(15, 23, 42);
   doc.text(preparedBy, 40, signY + 22);
   doc.setFont('helvetica', 'normal');
   doc.text('Librarian, Learning & Information Resource Center (LIRC)', 40, signY + 34);
 
-  doc.save(`LIRC_STAT_Report_${sanitizeFileSlug(report.periodLabel)}.pdf`);
+  doc.save(`LIRC_MANAGEMENT_SYSTEM_Report_${sanitizeFileSlug(report.periodLabel)}.pdf`);
 }
 
 /**
@@ -673,7 +673,7 @@ export async function exportStatisticalReportToWord(
       heading: HeadingLevel.HEADING_1,
       children: [
         new TextRun({
-          text: 'LIRC STAT — LEARNING & INFORMATION RESOURCE CENTER',
+          text: 'LIRC MANAGEMENT SYSTEM — LEARNING & INFORMATION RESOURCE CENTER',
           bold: true,
           size: 28,
           color: '1E3A8A',
@@ -861,7 +861,7 @@ export async function exportStatisticalReportToWord(
     new Paragraph({
       children: [
         new TextRun({
-          text: 'Librarian, Learning & Information Resource Center (LIRC STAT)',
+          text: 'Librarian, Learning & Information Resource Center (LIRC MANAGEMENT SYSTEM)',
           size: 18,
           color: '475569',
           font: 'Calibri',
@@ -875,7 +875,7 @@ export async function exportStatisticalReportToWord(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `LIRC_STAT_Report_${sanitizeFileSlug(report.periodLabel)}.docx`;
+  link.download = `LIRC_MANAGEMENT_SYSTEM_Report_${sanitizeFileSlug(report.periodLabel)}.docx`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -890,7 +890,7 @@ export function downloadJsonBackup(payload: unknown, dateSlug: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `LIRC_STAT_Backup_${dateSlug}.json`;
+  link.download = `LIRC_MANAGEMENT_SYSTEM_Backup_${dateSlug}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -945,7 +945,7 @@ export function exportStatisticalReportToCSV(report: ComputedStatisticalReport):
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `LIRC_STAT_Records_${sanitizeFileSlug(report.periodLabel)}.csv`;
+  link.download = `LIRC_MANAGEMENT_SYSTEM_Records_${sanitizeFileSlug(report.periodLabel)}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

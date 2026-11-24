@@ -1587,7 +1587,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       : 'Library Areas & Duty Stations';
 
   const breadcrumbs = [
-    'LIRC STAT',
+    'LIRC MANAGEMENT SYSTEM',
     'Student Assistant',
     viewMode === 'session' && activeArea
       ? activeArea.name

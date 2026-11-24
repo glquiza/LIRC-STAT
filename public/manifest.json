@@ -1,7 +1,7 @@
 {
-  "name": "LIRC STAT – Library Monitoring System",
-  "short_name": "LIRC STAT",
-  "description": "Learning Information and Resource Center Statistical Tracking and Analysis Tool",
+  "name": "LIRC MANAGEMENT SYSTEM",
+  "short_name": "LIRC MANAGEMENT SYSTEM",
+  "description": "Learning Information and Resource Center Management System",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F5EBDD",

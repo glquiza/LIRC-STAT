@@ -2204,7 +2204,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
             </div>
 
             <p className="text-xs text-[#6E665E] leading-relaxed mb-4">
-              Are you sure you want to remove this account? The user will immediately lose sign-in access to LIRC STAT. All historical occupancy counts they previously recorded will be preserved.
+              Are you sure you want to remove this account? The user will immediately lose sign-in access to LIRC MANAGEMENT SYSTEM. All historical occupancy counts they previously recorded will be preserved.
             </p>
 
             <div className="p-3.5 rounded-xl bg-[#FAF5EE] border border-[#E6D7C3] mb-5 space-y-1 text-xs">

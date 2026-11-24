@@ -207,7 +207,7 @@ export const App: React.FC = () => {
             : Promise.resolve(),
           supabase.rpc('log_client_activity', {
             p_action_type: 'user_logout',
-            p_description: `${profile.full_name} signed out of LIRC STAT`,
+            p_description: `${profile.full_name} signed out of LIRC MANAGEMENT SYSTEM`,
             p_target_type: 'auth_session',
           }),
         ]);
@@ -233,11 +233,11 @@ export const App: React.FC = () => {
         </div>
 
         <div className="w-16 h-16 rounded-2xl bg-white border border-[#E6D7C3] flex items-center justify-center p-2 shadow-md relative z-10">
-          <img src="/logo.png" alt="LIRC STAT Logo" className="w-full h-full object-contain" />
+          <img src="/logo.png" alt="LIRC MANAGEMENT SYSTEM Logo" className="w-full h-full object-contain" />
         </div>
         <div className="flex items-center gap-2 text-sm text-[#332F2B] font-heading font-bold relative z-10">
           <RefreshCw className="w-4 h-4 animate-spin text-[#A83232]" />
-          Opening LIRC STAT Registry...
+          Opening LIRC MANAGEMENT SYSTEM Registry...
         </div>
       </div>
     );

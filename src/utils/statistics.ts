@@ -290,7 +290,7 @@ export function getOperatingDatesInRange(
 }
 
 /**
- * LIRC STAT Automated Statistical Computation Engine:
+ * LIRC MANAGEMENT SYSTEM Automated Statistical Computation Engine:
  * Supports Specific Date, Month, or Custom Date Range.
  * Computes:
  * 1. Overall recorded occupancy across all 6 library areas
@@ -333,11 +333,11 @@ export function computeStatisticalReport(params: {
 
   // Build period label and title
   let periodLabel = `${formatShortDate(startDate)} – ${formatShortDate(endDate)}`;
-  let reportTitle = `LIRC STAT Custom Period Statistical Report (${periodLabel})`;
+  let reportTitle = `LIRC MANAGEMENT SYSTEM Custom Period Statistical Report (${periodLabel})`;
 
   if (reportType === 'daily' || startDate === endDate) {
     periodLabel = `${formatShortDate(startDate)} (${getDayOfWeekName(startDate)})`;
-    reportTitle = `LIRC STAT Daily Occupancy Statistical Report — ${periodLabel}`;
+    reportTitle = `LIRC MANAGEMENT SYSTEM Daily Occupancy Statistical Report — ${periodLabel}`;
     const wholeDayCheck = isDateWholeDaySuspended(startDate, calendarActivities, closedDaysOfWeek);
     if (wholeDayCheck.isSuspended && wholeDayCheck.activity) {
       reportTitle += wholeDayCheck.isWeekdayClosed
@@ -348,7 +348,7 @@ export function computeStatisticalReport(params: {
     const [y, m] = startDate.split('-').map(Number);
     const monthName = MONTH_NAMES[(m || 1) - 1] || 'Month';
     periodLabel = `${monthName} ${y}`;
-    reportTitle = `LIRC STAT Monthly Occupancy Statistical Report — ${periodLabel}`;
+    reportTitle = `LIRC MANAGEMENT SYSTEM Monthly Occupancy Statistical Report — ${periodLabel}`;
   }
 
   const recordedDates = new Set<string>();

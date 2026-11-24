@@ -203,7 +203,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
               <>
                 {/* Logo kept at the same size and position in the collapsed sidebar */}
                 <div className="w-7 h-7 rounded-lg bg-white dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-center p-0.5 shadow-2xs shrink-0 group hover:scale-105 transition-transform duration-200">
-                  <img src="/logo.png" alt="LIRC STAT Logo" className="w-full h-full object-contain" />
+                  <img src="/logo.png" alt="LIRC MANAGEMENT SYSTEM Logo" className="w-full h-full object-contain" />
                 </div>
 
                 {/* Greater-than (>) Expand Toggle Button directly below the logo, matching the less-than (<) collapse button */}
@@ -221,11 +221,11 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
               <>
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-center p-1 shadow-2xs shrink-0 group hover:scale-105 transition-transform duration-200">
-                    <img src="/logo.png" alt="LIRC STAT Logo" className="w-full h-full object-contain" />
+                    <img src="/logo.png" alt="LIRC MANAGEMENT SYSTEM Logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE] leading-tight truncate">
-                      LIRC STAT
+                    <div className="font-heading font-bold text-sm text-[#332F2B] dark:text-[#F0E8DE] leading-tight truncate">
+                      LIRC MANAGEMENT SYSTEM
                     </div>
                     <div className="text-[11px] font-medium text-[#6E665E] dark:text-[#A6998C] truncate">
                       {roleLabel}
@@ -603,7 +603,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                         className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-[#A83232] hover:bg-[#FDF3F3] transition flex items-center gap-2 cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        Sign Out of LIRC STAT
+                        Sign Out of LIRC MANAGEMENT SYSTEM
                       </button>
                     </div>
                   </div>

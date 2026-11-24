@@ -345,7 +345,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
       await supabase.rpc('log_client_activity', {
         p_action_type: 'user_login',
-        p_description: `Signed in to LIRC STAT (${cleanInput})`,
+        p_description: `Signed in to LIRC MANAGEMENT SYSTEM (${cleanInput})`,
         p_target_type: 'auth_session',
         p_metadata: { identifier: cleanInput },
       });
@@ -530,8 +530,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         </div>
 
         {/* Grand Title: Large with cohesive letter kerning */}
-        <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] font-heading font-black text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.04em] sm:tracking-[0.08em] md:tracking-[0.10em] lg:tracking-[0.12em] uppercase text-center mb-3 sm:mb-4 leading-none select-none max-w-full break-words">
-          LIRC STAT
+        <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.03em] sm:tracking-[0.06em] md:tracking-[0.08em] uppercase text-center mb-3 sm:mb-4 leading-tight select-none max-w-full break-words">
+          LIRC MANAGEMENT SYSTEM
         </h1>
 
         {/* Subtitle / Platform Mission: Constrained narrower than the grand title */}
@@ -574,7 +574,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               type="button"
               onClick={handleInstallAppClick}
               className="h-11 sm:h-12 px-5 sm:px-6 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A241E] border border-[#E7B84B] dark:border-[#B58D3D] text-[#7D5B06] dark:text-[#F3D085] hover:bg-[#F5EBDD] dark:hover:bg-[#342D25] font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none shadow-2xs hover:shadow-xs w-full sm:w-auto"
-              title="Install LIRC STAT as Desktop or Mobile Application"
+              title="Install LIRC MANAGEMENT SYSTEM as Desktop or Mobile Application"
             >
               <Download className="w-4 h-4 text-[#A83232] dark:text-[#E7B84B]" />
               <span>Install App</span>
@@ -652,7 +652,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         {/* System Motto / Assurance Tag */}
         <div className="flex items-center justify-center gap-2 text-xs text-[#6E665E] bg-white/60 px-4 py-2 rounded-full border border-[#E6D7C3]/80 shadow-2xs">
           <ShieldCheck className="w-4 h-4 text-[#A83232]" />
-          <span>LIRC STAT System — Crafted for academic precision, accuracy, and order</span>
+          <span>LIRC MANAGEMENT SYSTEM — Crafted for academic precision, accuracy, and order</span>
         </div>
       </main>
 
@@ -690,7 +690,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             <div className="flex justify-center mb-3 sm:mb-4">
               <img
                 src="/logo.png"
-                alt="LIRC STAT Logo"
+                alt="LIRC MANAGEMENT SYSTEM Logo"
                 className="h-12 sm:h-14 w-auto object-contain select-none"
               />
             </div>
@@ -1173,7 +1173,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 </div>
                 <div>
                   <h3 className="text-base font-heading font-bold text-[#332F2B] dark:text-[#FAF5EE]">
-                    Install LIRC STAT
+                    Install LIRC MANAGEMENT SYSTEM
                   </h3>
                   <p className="text-[11px] text-[#6E665E] dark:text-[#A89C8F]">
                     Run as a standalone desktop or mobile application
@@ -1246,7 +1246,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       2
                     </span>
                     <p className="leading-relaxed">
-                      Select <strong>"Save and share"</strong> → <strong>"Install page as app..."</strong> (or <strong>"Install LIRC STAT"</strong>).
+                      Select <strong>"Save and share"</strong> → <strong>"Install page as app..."</strong> (or <strong>"Install LIRC MANAGEMENT SYSTEM"</strong>).
                     </p>
                   </div>
                   <div className="flex items-start gap-2.5">

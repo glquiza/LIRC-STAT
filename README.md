@@ -1,6 +1,6 @@
-# LIRC STAT – Learning Information and Resource Center Statistical Tracking and Analysis Tool
+# LIRC MANAGEMENT SYSTEM – Learning Information and Resource Center
 
-**LIRC STAT** is a web-based occupancy tracking and statistical analysis system built with **React + TypeScript + Tailwind CSS + Supabase (PostgreSQL, Row-Level Security & Auth)** featuring a **Classic Literary** aesthetic (Walnut Brown, Warm Beige, Ivory, Burgundy, and Antique Gold paired with *Playfair Display* and *DM Sans*). It digitizes and automates 30-minute student occupancy monitoring across all six library areas of the Learning Information and Resource Center (LIRC).
+**LIRC MANAGEMENT SYSTEM** is a web-based occupancy tracking and statistical analysis system built with **React + TypeScript + Tailwind CSS + Supabase (PostgreSQL, Row-Level Security & Auth)** featuring a **Classic Literary** aesthetic (Walnut Brown, Warm Beige, Ivory, Burgundy, and Antique Gold paired with *Playfair Display* and *DM Sans*). It digitizes and automates 30-minute student occupancy monitoring across all six library areas of the Learning Information and Resource Center (LIRC).
 
 ---
 

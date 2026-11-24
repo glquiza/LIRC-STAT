@@ -17,7 +17,7 @@ export const AnimatedBookLogo: React.FC<AnimatedBookLogoProps> = ({
         aspectRatio: '1024 / 682',
         perspective: '1200px',
       }}
-      title="LIRC STAT — Learning & Information Resource Center"
+      title="LIRC MANAGEMENT SYSTEM — Learning & Information Resource Center"
     >
       <style>{`
         @keyframes book-float {
@@ -222,7 +222,7 @@ export const AnimatedBookLogo: React.FC<AnimatedBookLogoProps> = ({
         {/* Base Logo Image */}
         <img
           src="/logo.png"
-          alt="LIRC STAT Logo"
+          alt="LIRC MANAGEMENT SYSTEM Logo"
           className="w-full h-full object-contain relative z-0 drop-shadow-md select-none transition-transform duration-300 group-hover:scale-[1.02]"
           draggable={false}
         />

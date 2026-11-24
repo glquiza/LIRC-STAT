@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 /**
- * GSAP Animation Suite for LIRC STAT (Academic Theme)
+ * GSAP Animation Suite for LIRC MANAGEMENT SYSTEM (Academic Theme)
  * Uses gsap.context for React 19 safety & automatic cleanup.
  */
 

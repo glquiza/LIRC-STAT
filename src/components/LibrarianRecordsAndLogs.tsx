@@ -482,7 +482,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `LIRC_STAT_Filtered_Records_${startDate}_to_${endDate}.csv`;
+    link.download = `LIRC_MANAGEMENT_SYSTEM_Filtered_Records_${startDate}_to_${endDate}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -508,7 +508,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `LIRC_STAT_Selected_${selectedList.length}_Records.csv`;
+    link.download = `LIRC_MANAGEMENT_SYSTEM_Selected_${selectedList.length}_Records.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -532,7 +532,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `LIRC_STAT_Selected_${selectedList.length}_Logs.csv`;
+    link.download = `LIRC_MANAGEMENT_SYSTEM_Selected_${selectedList.length}_Logs.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

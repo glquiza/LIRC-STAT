@@ -1,5 +1,5 @@
-// LIRC STAT Lightweight Service Worker for PWA Installability
-const CACHE_NAME = 'lirc-stat-v1';
+// LIRC MANAGEMENT SYSTEM Lightweight Service Worker for PWA Installability
+const CACHE_NAME = 'lirc-management-system-v1';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
