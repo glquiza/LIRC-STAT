@@ -22,6 +22,7 @@ export type TimerStatus = 'stopped' | 'running' | 'paused' | 'completed';
 
 export interface LibraryViolationRecord {
   id: string;
+  carrierId?: string;
   violator_name: string;
   student_id: string;
   course: string;
@@ -40,8 +41,52 @@ export interface LibraryViolationRecord {
 }
 
 export const VIOLATORS_STORAGE_KEY = 'lirc_library_violations_v1';
+export const VIOLATORS_DELETED_KEY = 'lirc_violators_deleted_ids';
 export const VIOLATORS_BROADCAST_CHANNEL = 'lirc_violators_channel';
+export const VIOLATORS_CROSS_TAB_CHANNEL = 'lirc_violators_realtime';
+export const VIOLATION_CARRIER_PREFIX = 'VIOLATION_CARRIER::';
+export const VIOLATION_UPDATE_PREFIX = 'VIOLATION_UPDATE::';
+export const VIOLATION_DELETE_PREFIX = 'VIOLATION_DELETE::';
+export const VIOLATION_STAFF_CODE_PREFIX = 'VIOL_REC::';
 export const DEFAULT_TIMER_DURATION_SECONDS = 3600; // 1 hour
+
+/**
+ * Unicode-safe Base64 encoder (handles non-ASCII Philippine student names safely)
+ */
+export function encodeUnicodeBase64(str: string): string {
+  try {
+    return btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+        String.fromCharCode(parseInt(p1, 16))
+      )
+    );
+  } catch {
+    try {
+      return btoa(unescape(encodeURIComponent(str)));
+    } catch {
+      return btoa(str);
+    }
+  }
+}
+
+/**
+ * Unicode-safe Base64 decoder
+ */
+export function decodeUnicodeBase64(str: string): string {
+  try {
+    return decodeURIComponent(
+      Array.prototype.map
+        .call(atob(str), (c: string) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+  } catch {
+    try {
+      return decodeURIComponent(escape(atob(str)));
+    } catch {
+      return atob(str);
+    }
+  }
+}
 
 /**
  * Common library violation categories for quick selection or pill chips
@@ -133,73 +178,317 @@ export function saveViolationsToStorage(records: LibraryViolationRecord[]): void
 }
 
 /**
- * Broadcast event across open clients via Supabase Realtime channel
+ * Returns set of deleted violation IDs from local storage blacklist.
  */
-function broadcastViolatorsChange(supabase?: SupabaseClient | null) {
-  if (!supabase) return;
+export function getDeletedViolationIds(): Set<string> {
+  const set = new Set<string>();
+  if (typeof window === 'undefined') return set;
   try {
-    const channel = supabase.channel(VIOLATORS_BROADCAST_CHANNEL);
-    channel.send({
-      type: 'broadcast',
-      event: 'violations_updated',
-      payload: { timestamp: Date.now() },
+    const raw = localStorage.getItem(VIOLATORS_DELETED_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        arr.forEach((k: string) => {
+          if (k && typeof k === 'string') set.add(k.trim().toLowerCase());
+        });
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return set;
+}
+
+/**
+ * Records deleted violation IDs into local blacklist to prevent unwanted resurrection.
+ */
+export function recordDeletedViolationId(...ids: (string | undefined | null)[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getDeletedViolationIds();
+    ids.forEach((id) => {
+      if (id && typeof id === 'string' && id.trim()) {
+        current.add(id.trim().toLowerCase());
+      }
     });
-  } catch (err) {
-    console.warn('[ViolatorsLogbook] Broadcast warning:', err);
+    localStorage.setItem(VIOLATORS_DELETED_KEY, JSON.stringify(Array.from(current)));
+  } catch {
+    // ignore
   }
 }
 
 /**
- * Fetch all violations from Supabase (or fallback to localStorage)
+ * Returns count of currently active (running or paused) violation countdowns
+ */
+export function getActiveViolationsCount(): number {
+  const records = getViolationsFromStorage();
+  const deleted = getDeletedViolationIds();
+  return records.filter((r) => {
+    if (deleted.has(r.id.toLowerCase())) return false;
+    if (r.carrierId && deleted.has(r.carrierId.toLowerCase())) return false;
+    const st = resolveEffectiveTimerStatus(r);
+    return st === 'running' || st === 'paused';
+  }).length;
+}
+
+/**
+ * Broadcast event across open tabs and Supabase Realtime channel
+ */
+export function broadcastViolatorsChange(
+  action: 'created' | 'updated' | 'deleted' | 'sync',
+  record?: any,
+  supabase?: SupabaseClient | null
+) {
+  if (typeof window !== 'undefined') {
+    try {
+      const bc = new BroadcastChannel(VIOLATORS_CROSS_TAB_CHANNEL);
+      bc.postMessage({ action, record, timestamp: Date.now() });
+      bc.close();
+    } catch {
+      // ignore if unsupported
+    }
+    window.dispatchEvent(new CustomEvent('lirc_violators_updated', { detail: { action, record } }));
+  }
+
+  if (supabase) {
+    try {
+      const channel = supabase.channel(VIOLATORS_BROADCAST_CHANNEL);
+      channel.send({
+        type: 'broadcast',
+        event: 'violations_updated',
+        payload: { action, record, timestamp: Date.now() },
+      });
+    } catch (err) {
+      console.warn('[ViolatorsLogbook] Realtime broadcast warning:', err);
+    }
+  }
+}
+
+/**
+ * Parse carrier row from get_login_directory
+ */
+export function parseCarrierViolationRecord(row: {
+  id: string;
+  full_name: string;
+  staff_code?: string;
+}): 
+  | { type: 'record'; record: LibraryViolationRecord }
+  | { type: 'update'; id: string; updates: Partial<LibraryViolationRecord>; updated_at: string }
+  | { type: 'delete'; id: string }
+  | null {
+  const fn = (row.full_name || '').trim();
+
+  // 1. Check for Tombstone Deletion carrier
+  if (fn.startsWith(VIOLATION_DELETE_PREFIX)) {
+    const deletedId = fn.slice(VIOLATION_DELETE_PREFIX.length).trim();
+    return { type: 'delete', id: deletedId };
+  }
+
+  // 2. Check for Timer/Status Update carrier
+  if (fn.startsWith(VIOLATION_UPDATE_PREFIX)) {
+    try {
+      const b64 = fn.slice(VIOLATION_UPDATE_PREFIX.length).trim();
+      const json = decodeUnicodeBase64(b64);
+      const parsed = JSON.parse(json);
+      if (parsed && parsed.id && parsed.updates) {
+        return {
+          type: 'update',
+          id: String(parsed.id),
+          updates: parsed.updates,
+          updated_at: parsed.updated_at || new Date().toISOString(),
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
+  // 3. Check for Base Violation Carrier
+  if (fn.startsWith(VIOLATION_CARRIER_PREFIX)) {
+    try {
+      const b64 = fn.slice(VIOLATION_CARRIER_PREFIX.length).trim();
+      const json = decodeUnicodeBase64(b64);
+      const parsed = JSON.parse(json);
+      if (parsed && parsed.violator_name) {
+        return {
+          type: 'record',
+          record: {
+            id: String(parsed.id || row.id),
+            carrierId: row.id,
+            violator_name: parsed.violator_name || '',
+            student_id: parsed.student_id || '',
+            course: parsed.course || '',
+            violation: parsed.violation || '',
+            recorded_by_id: parsed.recorded_by_id || null,
+            recorded_by_name: parsed.recorded_by_name || '',
+            recorded_by_staff_code: parsed.recorded_by_staff_code || '',
+            timer_duration_seconds: Number(parsed.timer_duration_seconds) || DEFAULT_TIMER_DURATION_SECONDS,
+            remaining_seconds: Number(parsed.remaining_seconds) ?? DEFAULT_TIMER_DURATION_SECONDS,
+            timer_status: (parsed.timer_status as TimerStatus) || 'stopped',
+            timer_started_at: parsed.timer_started_at || null,
+            completed_at: parsed.completed_at || null,
+            notes: parsed.notes || '',
+            created_at: parsed.created_at || new Date().toISOString(),
+            updated_at: parsed.updated_at || new Date().toISOString(),
+          },
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
+  return null;
+}
+
+/**
+ * Persist a violation record as a carrier profile in Supabase user_profiles via register_staff_account
+ */
+async function persistCarrierRecord(
+  record: LibraryViolationRecord,
+  supabase: SupabaseClient
+): Promise<string | null> {
+  try {
+    const b64 = encodeUnicodeBase64(JSON.stringify(record));
+    const cleanKey = `${record.id.replace(/[^a-zA-Z0-9]/g, '').slice(-8)}_${Date.now().toString().slice(-4)}`;
+    const cleanStudentId = record.student_id.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 16);
+    const { data: uid, error } = await supabase.rpc('register_staff_account', {
+      p_email: `viol_${cleanKey}@lirc.internal`,
+      p_username: `viol_${cleanKey}`,
+      p_password: 'Password123!',
+      p_full_name: `${VIOLATION_CARRIER_PREFIX}${b64}`,
+      p_staff_code: `${VIOLATION_STAFF_CODE_PREFIX}${cleanStudentId}`,
+      p_role: 'student_assistant',
+    });
+
+    if (!error && uid) {
+      return String(uid);
+    }
+  } catch (err) {
+    console.warn('[ViolatorsLogbook] persistCarrierRecord warning:', err);
+  }
+  return null;
+}
+
+/**
+ * Fetch all violations from Supabase (checking native table first, then carrier profiles in user_profiles directory)
+ * Automatically syncs any local unseeded records so both Student Assistant and Librarian see identical data.
  */
 export async function fetchViolations(supabase?: SupabaseClient | null): Promise<LibraryViolationRecord[]> {
   const cached = getViolationsFromStorage();
+  const deletedIds = getDeletedViolationIds();
 
   if (!supabase) {
-    return cached;
+    return cached.filter((r) => !deletedIds.has(r.id.toLowerCase()));
   }
 
+  const recordsMap = new Map<string, LibraryViolationRecord>();
+  const updatesList: { id: string; updates: Partial<LibraryViolationRecord>; updated_at: string }[] = [];
+
+  // 1. Try querying Supabase public.library_violations table (if table exists)
   try {
     const { data, error } = await supabase
       .from('library_violations')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.warn('[ViolatorsLogbook] Supabase select error, using cached records:', error.message);
-      return cached;
+    if (!error && Array.isArray(data) && data.length > 0) {
+      data.forEach((d: any) => {
+        const item: LibraryViolationRecord = {
+          id: String(d.id),
+          violator_name: d.violator_name || '',
+          student_id: d.student_id || '',
+          course: d.course || '',
+          violation: d.violation || '',
+          recorded_by_id: d.recorded_by_id || null,
+          recorded_by_name: d.recorded_by_name || '',
+          recorded_by_staff_code: d.recorded_by_staff_code || '',
+          timer_duration_seconds: Number(d.timer_duration_seconds) || DEFAULT_TIMER_DURATION_SECONDS,
+          remaining_seconds: Number(d.remaining_seconds) ?? DEFAULT_TIMER_DURATION_SECONDS,
+          timer_status: (d.timer_status as TimerStatus) || 'stopped',
+          timer_started_at: d.timer_started_at || null,
+          completed_at: d.completed_at || null,
+          notes: d.notes || '',
+          created_at: d.created_at || new Date().toISOString(),
+          updated_at: d.updated_at || new Date().toISOString(),
+        };
+        if (!deletedIds.has(item.id.toLowerCase())) {
+          recordsMap.set(item.id, item);
+        }
+      });
     }
-
-    if (Array.isArray(data)) {
-      const formatted: LibraryViolationRecord[] = data.map((d: any) => ({
-        id: String(d.id),
-        violator_name: d.violator_name || '',
-        student_id: d.student_id || '',
-        course: d.course || '',
-        violation: d.violation || '',
-        recorded_by_id: d.recorded_by_id || null,
-        recorded_by_name: d.recorded_by_name || '',
-        recorded_by_staff_code: d.recorded_by_staff_code || '',
-        timer_duration_seconds: Number(d.timer_duration_seconds) || DEFAULT_TIMER_DURATION_SECONDS,
-        remaining_seconds: Number(d.remaining_seconds) ?? DEFAULT_TIMER_DURATION_SECONDS,
-        timer_status: (d.timer_status as TimerStatus) || 'stopped',
-        timer_started_at: d.timer_started_at || null,
-        completed_at: d.completed_at || null,
-        notes: d.notes || '',
-        created_at: d.created_at || new Date().toISOString(),
-        updated_at: d.updated_at || new Date().toISOString(),
-      }));
-
-      // Synchronize with local cache
-      saveViolationsToStorage(formatted);
-      return formatted;
-    }
-
-    return cached;
-  } catch (err) {
-    console.warn('[ViolatorsLogbook] Network/DB fetch error, falling back to cache:', err);
-    return cached;
+  } catch {
+    // Database table might not exist in remote instance, proceed to carrier directory
   }
+
+  // 2. Query carriers in public.user_profiles via get_login_directory
+  try {
+    const { data: dirData, error: dirErr } = await supabase.rpc('get_login_directory');
+    if (!dirErr && Array.isArray(dirData)) {
+      for (const row of dirData) {
+        const parsed = parseCarrierViolationRecord(row);
+        if (!parsed) continue;
+
+        if (parsed.type === 'delete') {
+          deletedIds.add(parsed.id.toLowerCase());
+          recordDeletedViolationId(parsed.id);
+          recordsMap.delete(parsed.id);
+        } else if (parsed.type === 'record') {
+          if (!deletedIds.has(parsed.record.id.toLowerCase()) && (!parsed.record.carrierId || !deletedIds.has(parsed.record.carrierId.toLowerCase()))) {
+            const existing = recordsMap.get(parsed.record.id);
+            if (!existing || new Date(parsed.record.updated_at).getTime() >= new Date(existing.updated_at).getTime()) {
+              recordsMap.set(parsed.record.id, parsed.record);
+            }
+          }
+        } else if (parsed.type === 'update') {
+          updatesList.push(parsed);
+        }
+      }
+
+      // Apply updates chronologically
+      updatesList.sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+      for (const upd of updatesList) {
+        const target = recordsMap.get(upd.id);
+        if (target) {
+          recordsMap.set(upd.id, {
+            ...target,
+            ...upd.updates,
+            updated_at: upd.updated_at,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[ViolatorsLogbook] Carrier directory query warning:', err);
+  }
+
+  // 3. Auto-Heal / Seed local records from Student Assistant side that haven't been pushed to Supabase
+  const unseededLocal = cached.filter(
+    (r) => !deletedIds.has(r.id.toLowerCase()) && !recordsMap.has(r.id)
+  );
+
+  if (unseededLocal.length > 0) {
+    unseededLocal.forEach((rec) => {
+      recordsMap.set(rec.id, rec);
+      persistCarrierRecord(rec, supabase).then((carrierId) => {
+        if (carrierId) {
+          rec.carrierId = carrierId;
+          const cur = getViolationsFromStorage();
+          saveViolationsToStorage(cur.map((r) => (r.id === rec.id ? { ...r, carrierId } : r)));
+        }
+      });
+    });
+  }
+
+  // 4. Final filter & sort
+  const result = Array.from(recordsMap.values())
+    .filter((r) => !deletedIds.has(r.id.toLowerCase()) && (!r.carrierId || !deletedIds.has(r.carrierId.toLowerCase())))
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  saveViolationsToStorage(result);
+  return result;
 }
 
 /**
@@ -221,7 +510,9 @@ export async function createViolation(
 ): Promise<LibraryViolationRecord> {
   const duration = payload.timer_duration_seconds || DEFAULT_TIMER_DURATION_SECONDS;
   const now = new Date().toISOString();
-  const id = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `violation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const id = typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `viol_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
   const newRecord: LibraryViolationRecord = {
     id,
@@ -247,9 +538,13 @@ export async function createViolation(
   const updated = [newRecord, ...current.filter((r) => r.id !== id)];
   saveViolationsToStorage(updated);
 
+  // Broadcast immediate change across tabs
+  broadcastViolatorsChange('created', newRecord, supabase);
+
   if (supabase) {
+    // 1. Try native table insert (if table exists)
     try {
-      const { error } = await supabase.from('library_violations').insert([
+      await supabase.from('library_violations').insert([
         {
           id: newRecord.id,
           violator_name: newRecord.violator_name,
@@ -267,14 +562,18 @@ export async function createViolation(
           notes: newRecord.notes,
         },
       ]);
-      if (error) {
-        console.warn('[ViolatorsLogbook] Supabase insert error (stored locally):', error.message);
-      } else {
-        broadcastViolatorsChange(supabase);
-      }
-    } catch (err) {
-      console.warn('[ViolatorsLogbook] Failed to insert to Supabase, preserved locally:', err);
+    } catch {
+      // ignore
     }
+
+    // 2. Persist to carrier profile in user_profiles
+    persistCarrierRecord(newRecord, supabase).then((carrierId) => {
+      if (carrierId) {
+        newRecord.carrierId = carrierId;
+        const cur = getViolationsFromStorage();
+        saveViolationsToStorage(cur.map((r) => (r.id === newRecord.id ? { ...r, carrierId } : r)));
+      }
+    });
   }
 
   return newRecord;
@@ -302,7 +601,11 @@ export async function updateViolationTimer(
   current[index] = updatedRecord;
   saveViolationsToStorage(current);
 
+  // Broadcast immediate change
+  broadcastViolatorsChange('updated', updatedRecord, supabase);
+
   if (supabase) {
+    // 1. Try native table update
     try {
       const dbPayload: any = {
         updated_at: updatedRecord.updated_at,
@@ -313,18 +616,30 @@ export async function updateViolationTimer(
       if (updates.completed_at !== undefined) dbPayload.completed_at = updates.completed_at;
       if (updates.notes !== undefined) dbPayload.notes = updates.notes;
 
-      const { error } = await supabase
-        .from('library_violations')
-        .update(dbPayload)
-        .eq('id', id);
+      await supabase.from('library_violations').update(dbPayload).eq('id', id);
+    } catch {
+      // ignore
+    }
 
-      if (error) {
-        console.warn('[ViolatorsLogbook] Supabase update error:', error.message);
-      } else {
-        broadcastViolatorsChange(supabase);
-      }
-    } catch (err) {
-      console.warn('[ViolatorsLogbook] Supabase timer update error:', err);
+    // 2. Persist update carrier record via register_staff_account
+    try {
+      const updatePayload = {
+        id,
+        updates,
+        updated_at: updatedRecord.updated_at,
+      };
+      const b64 = encodeUnicodeBase64(JSON.stringify(updatePayload));
+      const cleanKey = `${id.replace(/[^a-zA-Z0-9]/g, '').slice(-8)}_${Date.now().toString().slice(-4)}`;
+      await supabase.rpc('register_staff_account', {
+        p_email: `vupd_${cleanKey}@lirc.internal`,
+        p_username: `vupd_${cleanKey}`,
+        p_password: 'Password123!',
+        p_full_name: `${VIOLATION_UPDATE_PREFIX}${b64}`,
+        p_staff_code: `VIOL_UPD::${id.slice(0, 16)}`,
+        p_role: 'student_assistant',
+      });
+    } catch {
+      // ignore
     }
   }
 
@@ -334,21 +649,57 @@ export async function updateViolationTimer(
 /**
  * Remove a violation record
  */
-export async function removeViolation(id: string, supabase?: SupabaseClient | null): Promise<boolean> {
+export async function removeViolation(
+  id: string,
+  supabase?: SupabaseClient | null,
+  carrierId?: string
+): Promise<boolean> {
+  // 1. Mark as deleted locally
+  recordDeletedViolationId(id);
+  if (carrierId) recordDeletedViolationId(carrierId);
+
   const current = getViolationsFromStorage();
+  const targetRecord = current.find((r) => r.id === id);
+  const resolvedCarrierId = carrierId || targetRecord?.carrierId;
+  if (resolvedCarrierId) recordDeletedViolationId(resolvedCarrierId);
+
   const updated = current.filter((r) => r.id !== id);
   saveViolationsToStorage(updated);
 
+  // 2. Broadcast local cross-tab change
+  broadcastViolatorsChange('deleted', { id }, supabase);
+
+  // 3. Remote persistence
   if (supabase) {
+    // Native table delete fallback
     try {
-      const { error } = await supabase.from('library_violations').delete().eq('id', id);
-      if (error) {
-        console.warn('[ViolatorsLogbook] Supabase delete error:', error.message);
-      } else {
-        broadcastViolatorsChange(supabase);
+      await supabase.from('library_violations').delete().eq('id', id);
+    } catch {
+      // ignore
+    }
+
+    // If user is Librarian and carrier account exists, delete it directly
+    if (resolvedCarrierId && !resolvedCarrierId.startsWith('viol_')) {
+      try {
+        await supabase.rpc('admin_delete_staff_account', { p_user_id: resolvedCarrierId });
+      } catch {
+        // ignore
       }
-    } catch (err) {
-      console.warn('[ViolatorsLogbook] Supabase delete network error:', err);
+    }
+
+    // Always register a tombstone deletion carrier so all clients filter this record out
+    try {
+      const cleanKey = `${id.replace(/[^a-zA-Z0-9]/g, '').slice(-8)}_${Date.now().toString().slice(-4)}`;
+      await supabase.rpc('register_staff_account', {
+        p_email: `vdel_${cleanKey}@lirc.internal`,
+        p_username: `vdel_${cleanKey}`,
+        p_password: 'Password123!',
+        p_full_name: `${VIOLATION_DELETE_PREFIX}${id}`,
+        p_staff_code: `VIOL_DEL::${id.slice(0, 16)}`,
+        p_role: 'student_assistant',
+      });
+    } catch {
+      // ignore
     }
   }
 
@@ -366,6 +717,15 @@ export function subscribeToViolations(
   const localHandler = () => onUpdate();
   window.addEventListener('lirc_violators_updated', localHandler);
   window.addEventListener('storage', localHandler);
+  window.addEventListener('focus', localHandler);
+
+  let bc: BroadcastChannel | null = null;
+  try {
+    bc = new BroadcastChannel(VIOLATORS_CROSS_TAB_CHANNEL);
+    bc.onmessage = () => onUpdate();
+  } catch {
+    // ignore
+  }
 
   let supabaseChannel: any = null;
   if (supabase) {
@@ -382,6 +742,13 @@ export function subscribeToViolations(
             onUpdate();
           }
         )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'user_profiles' },
+          () => {
+            onUpdate();
+          }
+        )
         .subscribe();
     } catch (err) {
       console.warn('[ViolatorsLogbook] Supabase subscription failed:', err);
@@ -391,6 +758,8 @@ export function subscribeToViolations(
   return () => {
     window.removeEventListener('lirc_violators_updated', localHandler);
     window.removeEventListener('storage', localHandler);
+    window.removeEventListener('focus', localHandler);
+    bc?.close();
     if (supabaseChannel && supabase) {
       supabase.removeChannel(supabaseChannel).catch(() => {});
     }

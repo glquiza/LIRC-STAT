@@ -37,6 +37,7 @@ import {
 } from '../utils/calendarActivities';
 import { CalendarActivitiesModal } from './CalendarActivitiesModal';
 import { ViolatorsLogbook } from './ViolatorsLogbook';
+import { getActiveViolationsCount, subscribeToViolations } from '../utils/violatorsLogbook';
 import {
   ComputedStatisticalReport,
   LIBRARY_TIME_SLOTS,
@@ -115,7 +116,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
   onRefreshAreas,
 }) => {
   const [activeTab, setActiveTab] = useState<LibrarianTab>('dashboard');
-  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(0);
+  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(() => getActiveViolationsCount());
 
   const sortedAreas = useMemo(
     () =>
@@ -509,8 +510,14 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
       setCalendarActivities(fresh);
       if (freshClosed) setClosedDaysOfWeek(freshClosed);
     });
+
+    const unsubViolations = subscribeToViolations(supabase, () => {
+      setActiveViolatorsCount(getActiveViolationsCount());
+    });
+
     return () => {
       unsubscribe();
+      unsubViolations();
     };
   }, []);
 

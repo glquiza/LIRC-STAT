@@ -263,7 +263,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
     if (!recordToDelete) return;
     setDeleting(true);
     try {
-      await removeViolation(recordToDelete.id, supabase);
+      await removeViolation(recordToDelete.id, supabase, recordToDelete.carrierId);
       setRecordToDelete(null);
       await loadData();
     } catch (err) {

@@ -1089,7 +1089,18 @@ export function parseStaffAccount(profile: UserProfile): ParsedStaffAccount {
     profile.full_name.startsWith('CALENDAR_ACTIVITY::') ||
     rawCode.startsWith('CAL_ACT::') ||
     (profile.username || '').startsWith('cal_');
-  const isRemoved = profile.shift_schedule === 'REMOVED' || isCalendarCarrier;
+  const isViolationsCarrier =
+    profile.full_name.startsWith('VIOLATION_CARRIER::') ||
+    profile.full_name.startsWith('VIOLATION_UPDATE::') ||
+    profile.full_name.startsWith('VIOLATION_DELETE::') ||
+    rawCode.startsWith('VIOL_REC::') ||
+    rawCode.startsWith('VIOL_UPD::') ||
+    rawCode.startsWith('VIOL_DEL::') ||
+    (profile.username || '').startsWith('viol_') ||
+    (profile.username || '').startsWith('vupd_') ||
+    (profile.username || '').startsWith('vdel_') ||
+    (profile.username || '').startsWith('vtest_');
+  const isRemoved = profile.shift_schedule === 'REMOVED' || isCalendarCarrier || isViolationsCarrier;
 
   let isRegistrationRequest = false;
   let approvalStatus: RegistrationApprovalStatus = 'approved';

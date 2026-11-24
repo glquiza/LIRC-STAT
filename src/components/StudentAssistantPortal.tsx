@@ -67,6 +67,7 @@ import {
 } from '../utils/calendarActivities';
 import { CalendarActivitiesModal } from './CalendarActivitiesModal';
 import { ViolatorsLogbook } from './ViolatorsLogbook';
+import { getActiveViolationsCount, subscribeToViolations } from '../utils/violatorsLogbook';
 import {
   BAGGAGE_AREA_ID,
   BAGGAGE_DUTY_AREA,
@@ -208,7 +209,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
   const [viewMode, setViewMode] = useState<'areas' | 'schedule' | 'session' | 'history' | 'violators'>('areas');
-  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(0);
+  const [activeViolatorsCount, setActiveViolatorsCount] = useState<number>(() => getActiveViolationsCount());
   const [areaFilterType, setAreaFilterType] = useState<'ALL' | 'STATISTICAL' | 'STATIONS'>('ALL');
   const isInitialSessionCheckRef = useRef<boolean>(true);
 
@@ -616,8 +617,14 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       setCalendarActivities(fresh);
       if (freshClosed) setClosedDaysOfWeek(freshClosed);
     });
+
+    const unsubViolations = subscribeToViolations(supabase, () => {
+      setActiveViolatorsCount(getActiveViolationsCount());
+    });
+
     return () => {
       unsubscribe();
+      unsubViolations();
     };
   }, []);
 
