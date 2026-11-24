@@ -2289,15 +2289,10 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
             {(areaFilterType === 'ALL' || areaFilterType === 'STATISTICAL') && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-1">
-                  <div>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#A83232]" />
-                      Monitored Reading Areas ({sortedAreas.length})
-                    </h3>
-                    <p className="text-xs text-[#8B7355] dark:text-[#A89887] mt-0.5">
-                      Hourly student head-count recording & occupancy monitoring
-                    </p>
-                  </div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#A83232]" />
+                    Monitored Reading Areas ({sortedAreas.length})
+                  </h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
