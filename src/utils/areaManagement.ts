@@ -300,7 +300,11 @@ export function getAreaBackgroundImage(area: { code?: string; slug?: string; nam
   if (c === 'ENT' || s === 'entrance-exit' || n.includes('entrance') || n.includes('exit')) {
     return '/entrance.jpg';
   }
-  // 10. General Reading Area
+  // 10. Baggage Duty Station
+  if (c === 'BAG' || s === 'baggage' || n.includes('baggage')) {
+    return '/baggage.jpg';
+  }
+  // 11. General Reading Area
   if (n.includes('reading area')) {
     return encodeURI('/reading area.jpg');
   }
