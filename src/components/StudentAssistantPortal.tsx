@@ -2063,7 +2063,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                       style={{ backgroundImage: `url('${activeAreaBg}')` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#182615]/92 dark:via-[#142011]/88 dark:to-[#0F190D]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/50 to-white/85 dark:from-[#182615]/90 dark:via-[#142011]/60 dark:to-[#0F190D]/90 pointer-events-none" />
                   </>
                 )}
                 <div className="relative z-10 flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
@@ -2110,7 +2110,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                       style={{ backgroundImage: `url('${stationBg}')` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#182615]/92 dark:via-[#142011]/88 dark:to-[#0F190D]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/50 to-white/85 dark:from-[#182615]/90 dark:via-[#142011]/60 dark:to-[#0F190D]/90 pointer-events-none" />
                   </>
                 )}
                 <div className="relative z-10 flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
@@ -2338,7 +2338,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                               style={{ backgroundImage: `url('${bgPhoto}')` }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/90 via-[#FAF5EE]/82 to-[#FFFFFF]/94 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/35 to-white/80 dark:from-[#1E1914]/85 dark:via-[#16120F]/45 dark:to-[#1E1914]/90 pointer-events-none" />
                           </>
                         )}
                         <div
@@ -2352,7 +2352,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                                 className="w-3 h-3 rounded-full shrink-0"
                                 style={{ backgroundColor: area.color_hex }}
                               />
-                              <h2 className="font-heading font-bold text-lg text-[#332F2B] dark:text-[#F0E8DE]">
+                              <h2 className="font-heading font-bold text-lg text-[#2A241F] dark:text-[#FFFFFF] drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                                 {area.name}
                               </h2>
                             </div>
@@ -2417,7 +2417,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             )}
                           </div>
 
-                          <div className="space-y-1.5 mb-4 pb-3 border-t border-[#E6D7C3] dark:border-[#383028]">
+                          <div className="bg-white/80 dark:bg-[#1E1914]/85 backdrop-blur-xs p-2.5 rounded-xl border border-white/60 dark:border-[#383028]/70 shadow-2xs space-y-1.5 mb-3.5">
                             <div className="flex items-center justify-between text-xs text-[#332F2B] dark:text-[#F0E8DE] font-stat">
                               <span>
                                 Today: <strong>{areaRecsToday.length}</strong>/{areaDue}
@@ -2534,7 +2534,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                               style={{ backgroundImage: `url('${bgPhoto}')` }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/90 via-[#FAF5EE]/82 to-[#FFFFFF]/94 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/35 to-white/80 dark:from-[#1E1914]/85 dark:via-[#16120F]/45 dark:to-[#1E1914]/90 pointer-events-none" />
                           </>
                         )}
                         <div
@@ -2548,7 +2548,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                                 className="w-3 h-3 rounded-full shrink-0"
                                 style={{ backgroundColor: area.color_hex }}
                               />
-                              <h2 className="font-heading font-bold text-lg text-[#332F2B] dark:text-[#F0E8DE]">
+                              <h2 className="font-heading font-bold text-lg text-[#2A241F] dark:text-[#FFFFFF] drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                                 {area.name}
                               </h2>
                             </div>
@@ -2605,8 +2605,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             )}
                           </div>
 
-                          <div className="space-y-1.5 mb-4 pb-3 border-t border-[#E6D7C3] dark:border-[#383028]">
-                            <div className="flex items-center justify-between text-xs text-[#332F2B] dark:text-[#F0E8DE] font-stat pt-1">
+                          <div className="bg-white/80 dark:bg-[#1E1914]/85 backdrop-blur-xs p-2.5 rounded-xl border border-white/60 dark:border-[#383028]/70 shadow-2xs space-y-1.5 mb-3.5">
+                            <div className="flex items-center justify-between text-xs text-[#332F2B] dark:text-[#F0E8DE] font-stat pt-0.5">
                               <span className="flex items-center gap-1 text-[#7D5B06] dark:text-[#E7B84B] font-medium">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-[#71865A] shrink-0" />
                                 Statistics not required
@@ -2817,7 +2817,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                       className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                       style={{ backgroundImage: `url('${sessionBg}')` }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/45 to-white/85 dark:from-[#1E1914]/90 dark:via-[#1A1613]/55 dark:to-[#1E1914]/92 pointer-events-none" />
                   </>
                 )}
                 <div className="relative z-10 flex items-center gap-3.5">
@@ -2827,7 +2827,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-xl font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE]">
+                      <h2 className="text-xl font-heading font-bold text-[#2A241F] dark:text-[#FFFFFF] drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
                         {activeArea.name}
                       </h2>
                       <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#F1F5EE] text-[#455436] border border-[#71865A]/40 dark:bg-[#71865A]/20 dark:text-[#D1E7CA]">
