@@ -93,7 +93,7 @@ import {
   trackStationDuty,
   untrackStationDuty,
 } from '../utils/stationDutyTracking';
-import { getAreaBackgroundImage } from '../utils/areaManagement';
+import { getAreaBackgroundImage, getAreaBorderGradientStyle } from '../utils/areaManagement';
 
 interface StudentAssistantPortalProps {
   profile: UserProfile;
@@ -2056,7 +2056,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           {myActiveSession && activeArea && (() => {
             const activeAreaBg = getAreaBackgroundImage(activeArea);
             return (
-              <div className="active-session-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+              <div className="active-session-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-transparent rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                <div className="card-gradient-border" style={getAreaBorderGradientStyle(activeArea.color_hex, true)} />
                 {activeAreaBg && (
                   <>
                     <div
@@ -2103,7 +2104,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
             const matchingShift = dutyStatus.todayShifts.find((s) => s.areaId === stationObj.id);
             const stationBg = getAreaBackgroundImage(stationObj);
             return (
-              <div className="active-station-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+              <div className="active-station-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-transparent rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                <div className="card-gradient-border" style={getAreaBorderGradientStyle(stationObj.color_hex, true)} />
                 {stationBg && (
                   <>
                     <div
@@ -2328,10 +2330,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     return (
                       <div
                         key={area.id}
-                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden group ${
-                          isMine ? 'ring-2 ring-[#71865A]' : ''
+                        className={`sa-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between relative overflow-hidden group ${
+                          isMine ? 'shadow-[0_0_18px_-2px_rgba(113,134,90,0.45)]' : ''
                         }`}
                       >
+                        <div className="card-gradient-border" style={getAreaBorderGradientStyle(area.color_hex, isMine)} />
                         {bgPhoto && (
                           <>
                             <div
@@ -2343,7 +2346,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         )}
                         <div
                           className="h-1.5 w-full absolute top-0 left-0 z-10"
-                          style={{ backgroundColor: area.color_hex }}
+                          style={{ background: `linear-gradient(90deg, ${area.color_hex} 0%, #E7B84B 60%, ${area.color_hex}30 100%)` }}
                         />
                         <div className="relative z-10">
                           <div className="flex items-start justify-between gap-2 mb-1.5 pt-1">
@@ -2520,14 +2523,15 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     return (
                       <div
                         key={`exempt-area-${area.id}`}
-                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between group ${
+                        className={`sa-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between group relative overflow-hidden ${
                           isEntered
-                            ? 'ring-2 ring-[#71865A]'
+                            ? 'shadow-[0_0_18px_-2px_rgba(113,134,90,0.45)]'
                             : isCurrentShiftForArea
-                            ? 'ring-2 ring-[#E7B84B]'
+                            ? 'shadow-[0_0_18px_-2px_rgba(231,184,75,0.45)]'
                             : ''
-                        } relative overflow-hidden`}
+                        }`}
                       >
+                        <div className="card-gradient-border" style={getAreaBorderGradientStyle(area.color_hex, isEntered)} />
                         {bgPhoto && (
                           <>
                             <div
@@ -2539,7 +2543,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         )}
                         <div
                           className="h-1.5 w-full absolute top-0 left-0 z-10"
-                          style={{ backgroundColor: area.color_hex }}
+                          style={{ background: `linear-gradient(90deg, ${area.color_hex} 0%, #E7B84B 60%, ${area.color_hex}30 100%)` }}
                         />
                         <div className="relative z-10">
                           <div className="flex items-start justify-between gap-2 mb-1.5 pt-1">
@@ -2810,7 +2814,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           {(() => {
             const sessionBg = getAreaBackgroundImage(activeArea);
             return (
-              <div className="literary-card p-5 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden group">
+              <div className="literary-card border-transparent! p-5 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden group">
+                <div className="card-gradient-border" style={getAreaBorderGradientStyle(activeArea.color_hex, true)} />
                 {sessionBg && (
                   <>
                     <div

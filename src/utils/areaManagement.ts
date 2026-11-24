@@ -311,3 +311,20 @@ export function getAreaBackgroundImage(area: { code?: string; slug?: string; nam
 
   return null;
 }
+
+/**
+ * Return smooth gradient border CSS custom properties for area cards.
+ */
+export function getAreaBorderGradientStyle(colorHex?: string, isActive?: boolean): React.CSSProperties {
+  const baseColor = colorHex || '#A83232';
+  if (isActive) {
+    return {
+      '--card-gradient-border': 'linear-gradient(135deg, #71865A 0%, #86A870 30%, #E7B84B 65%, #71865A 100%)',
+      '--card-gradient-border-dark': 'linear-gradient(135deg, #86A870 0%, #E7B84B 40%, #71865A 75%, rgba(134, 168, 112, 0.6) 100%)',
+    } as React.CSSProperties;
+  }
+  return {
+    '--card-gradient-border': `linear-gradient(135deg, ${baseColor} 0%, #E7B84B 40%, ${baseColor}99 75%, rgba(230, 215, 195, 0.6) 100%)`,
+    '--card-gradient-border-dark': `linear-gradient(135deg, ${baseColor} 0%, #E7B84B 45%, ${baseColor}88 75%, rgba(56, 48, 40, 0.7) 100%)`,
+  } as React.CSSProperties;
+}

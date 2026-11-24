@@ -127,6 +127,30 @@
   box-shadow: 0 8px 22px -4px rgba(51, 47, 43, 0.09), 0 2px 6px -1px rgba(51, 47, 43, 0.04);
 }
 
+/* Smooth Color Gradient Border for Cards */
+.card-gradient-border {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--card-gradient-border, linear-gradient(135deg, #A83232 0%, #E7B84B 50%, #71865A 100%));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  z-index: 20;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.dark .card-gradient-border {
+  background: var(--card-gradient-border-dark, var(--card-gradient-border, linear-gradient(135deg, #A83232 0%, #E7B84B 50%, #71865A 100%)));
+}
+
+.group:hover .card-gradient-border {
+  filter: brightness(1.2) saturate(1.2);
+}
+
 /* Warm Academic scrollbars */
 ::-webkit-scrollbar {
   width: 8px;

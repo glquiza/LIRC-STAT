@@ -73,7 +73,7 @@ import {
 import { LibrarianRecordsAndLogs } from './LibrarianRecordsAndLogs';
 import { LibrarianAdminPanel } from './LibrarianAdminPanel';
 import { LibrarianAreaAssignments } from './LibrarianAreaAssignments';
-import { getAreaBackgroundImage } from '../utils/areaManagement';
+import { getAreaBackgroundImage, getAreaBorderGradientStyle } from '../utils/areaManagement';
 import { LibrarianAdvancedSettings } from './LibrarianAdvancedSettings';
 import { AcademicLayout, NavItem, NotificationItem } from './AcademicLayout';
 import { topProgressBar } from './TopProgressBar';
@@ -978,8 +978,9 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                 return (
                   <div
                     key={item.area.id}
-                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden group"
+                    className="lib-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between relative overflow-hidden group"
                   >
+                    <div className="card-gradient-border" style={getAreaBorderGradientStyle(item.area.color_hex, uniqueAreaSessions.length > 0)} />
                     {bgPhoto && (
                       <>
                         <div
@@ -991,7 +992,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                     )}
                     <div
                       className="h-1 w-full absolute top-0 left-0 z-10"
-                      style={{ backgroundColor: item.area.color_hex }}
+                      style={{ background: `linear-gradient(90deg, ${item.area.color_hex} 0%, #E7B84B 60%, ${item.area.color_hex}30 100%)` }}
                     />
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-2 pt-1">
@@ -1148,8 +1149,9 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                 return (
                   <div
                     key={`service-station-${area.id}`}
-                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden group"
+                    className="lib-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between relative overflow-hidden group"
                   >
+                    <div className="card-gradient-border" style={getAreaBorderGradientStyle(area.color_hex, isActivelyMonitoredLive)} />
                     {bgPhoto && (
                       <>
                         <div
@@ -1161,7 +1163,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                     )}
                     <div
                       className="h-1 w-full absolute top-0 left-0 z-10"
-                      style={{ backgroundColor: area.color_hex }}
+                      style={{ background: `linear-gradient(90deg, ${area.color_hex} 0%, #E7B84B 60%, ${area.color_hex}30 100%)` }}
                     />
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-2 pt-1">
