@@ -1706,7 +1706,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
               <option value="backup_exported">Backup Saved</option>
             </select>
 
-            <div className="relative">
+            <div className="relative w-full sm:w-48">
               <Search className="w-3.5 h-3.5 text-[#6E665E] absolute left-3 top-2.5" />
               <input
                 type="text"
@@ -1716,7 +1716,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                   setLogsPage(1);
                 }}
                 placeholder="Search logs..."
-                className="h-9 pl-8 pr-3 rounded-xl bg-[#FFFFFF] border border-[#E6D7C3] text-xs w-48 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                className="h-9 pl-8 pr-3 rounded-xl bg-[#FFFFFF] border border-[#E6D7C3] text-xs w-full focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
               />
             </div>
 
@@ -1743,13 +1743,13 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
 
         {/* Multi-select Floating Action Dock for Logs */}
         {selectedLogIds.size > 0 && (
-          <div className="sticky bottom-4 z-40 bg-[#FFFFFF]/95 dark:bg-[#1E1914]/95 backdrop-blur-md border border-[#A83232]/50 p-3 sm:p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 animate-literary-fade shadow-xl">
-            <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-xl bg-[#A83232] text-white flex items-center justify-center text-xs font-stat font-bold shadow-2xs">
+          <div className="sticky bottom-4 z-40 bg-[#FFFFFF]/95 dark:bg-[#1E1914]/95 backdrop-blur-md border border-[#A83232]/50 p-2.5 sm:p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 animate-literary-fade shadow-xl">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-[#A83232] text-white flex items-center justify-center text-xs font-stat font-bold shadow-2xs">
                 {selectedLogIds.size}
               </span>
               <span className="text-xs font-semibold text-[#991B1B] dark:text-[#FCA5A5]">
-                {selectedLogIds.size} log {selectedLogIds.size > 1 ? 'entries' : 'entry'} selected
+                {selectedLogIds.size} selected
               </span>
               {selectedLogIds.size < filteredLogs.length && (
                 <button
@@ -1761,28 +1761,28 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleExportSelectedLogsCSV}
-                className="px-3 py-1.5 rounded-xl border border-[#D6C3A9] dark:border-[#4A3C28] bg-white dark:bg-[#26201B] hover:bg-[#FAF5EE] dark:hover:bg-[#332A20] text-xs font-semibold text-[#332F2B] dark:text-[#FAF5EE] inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+                className="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#D6C3A9] dark:border-[#4A3C28] bg-white dark:bg-[#26201B] hover:bg-[#FAF5EE] dark:hover:bg-[#332A20] text-xs font-semibold text-[#332F2B] dark:text-[#FAF5EE] inline-flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs"
                 title="Export selected logs as CSV"
               >
                 <Download className="w-3.5 h-3.5 text-[#8C6514] dark:text-[#E7B84B]" />
-                <span>Export Selected</span>
+                <span>Export</span>
               </button>
               <button
                 type="button"
                 onClick={promptDeleteBatchLogs}
-                className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs cursor-pointer transition"
+                className="flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold inline-flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Selected ({selectedLogIds.size})</span>
+                <span>Delete ({selectedLogIds.size})</span>
               </button>
               <button
                 type="button"
                 onClick={clearLogSelection}
-                className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#3D342C] bg-[#FFFFFF] dark:bg-[#26201B] text-[#6E665E] hover:text-[#332F2B] dark:text-[#FAF5EE] hover:bg-[#FAF5EE] cursor-pointer transition"
+                className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#3D342C] bg-[#FFFFFF] dark:bg-[#26201B] text-[#6E665E] hover:text-[#332F2B] dark:text-[#FAF5EE] hover:bg-[#FAF5EE] cursor-pointer transition shrink-0"
                 title="Clear selection"
               >
                 <X className="w-4 h-4" />
@@ -2062,8 +2062,8 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
 
       {/* Modal: Record Missing Interval */}
       {backfillTarget && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
-          <div className="literary-card shadow-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade">
+          <div className="literary-card shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[92vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-2 mb-4">
               <div>
                 <h3 className="text-lg font-heading font-bold text-[#332F2B]">
@@ -2088,11 +2088,11 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                 <label className="block text-xs font-semibold text-[#332F2B] mb-1.5">
                   Student Count
                 </label>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                   <button
                     type="button"
                     onClick={() => setBackfillCount((c) => Math.max(0, c - 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 5"
                   >
                     -5
@@ -2100,7 +2100,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                   <button
                     type="button"
                     onClick={() => setBackfillCount((c) => Math.max(0, c - 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-9 sm:w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 1"
                   >
                     <Minus className="w-4 h-4" />
@@ -2112,12 +2112,12 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                     required
                     value={backfillCount}
                     onChange={(e) => setBackfillCount(Number(e.target.value))}
-                    className="flex-1 h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] text-sm font-stat font-bold focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                    className="flex-1 min-w-[50px] max-w-[96px] h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] text-sm font-stat font-bold focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                   />
                   <button
                     type="button"
                     onClick={() => setBackfillCount((c) => Math.min(2000, c + 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-9 sm:w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 1"
                   >
                     <Plus className="w-4 h-4" />
@@ -2125,7 +2125,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                   <button
                     type="button"
                     onClick={() => setBackfillCount((c) => Math.min(2000, c + 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 5"
                   >
                     +5
@@ -2133,7 +2133,7 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
                   <button
                     type="button"
                     onClick={() => setBackfillCount((c) => Math.min(2000, c + 10))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 10"
                   >
                     +10
@@ -2192,13 +2192,13 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
 
       {/* Multi-select Action Bar for Records */}
       {recordsSubTab === 'submitted' && selectedRecordIds.size > 0 && (
-        <div className="sticky bottom-4 z-40 bg-[#FFFFFF]/95 dark:bg-[#1E1914]/95 backdrop-blur-md border border-[#A83232]/50 p-3 sm:p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 animate-literary-fade shadow-xl">
-          <div className="flex items-center gap-2.5">
-            <span className="w-7 h-7 rounded-xl bg-[#A83232] text-white flex items-center justify-center text-xs font-stat font-bold shadow-2xs">
+        <div className="sticky bottom-4 z-40 bg-[#FFFFFF]/95 dark:bg-[#1E1914]/95 backdrop-blur-md border border-[#A83232]/50 p-2.5 sm:p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 animate-literary-fade shadow-xl">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-[#A83232] text-white flex items-center justify-center text-xs font-stat font-bold shadow-2xs">
               {selectedRecordIds.size}
             </span>
             <span className="text-xs font-semibold text-[#991B1B] dark:text-[#FCA5A5]">
-              {selectedRecordIds.size} occupancy record{selectedRecordIds.size > 1 ? 's' : ''} selected
+              {selectedRecordIds.size} selected
             </span>
             {selectedRecordIds.size < filteredRecords.length && (
               <button
@@ -2210,28 +2210,28 @@ export const LibrarianRecordsAndLogs: React.FC<LibrarianRecordsAndLogsProps> = (
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto">
             <button
               type="button"
               onClick={handleExportSelectedRecordsCSV}
-              className="px-3 py-1.5 rounded-xl border border-[#D6C3A9] dark:border-[#4A3C28] bg-white dark:bg-[#26201B] hover:bg-[#FAF5EE] dark:hover:bg-[#332A20] text-xs font-semibold text-[#332F2B] dark:text-[#FAF5EE] inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+              className="flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#D6C3A9] dark:border-[#4A3C28] bg-white dark:bg-[#26201B] hover:bg-[#FAF5EE] dark:hover:bg-[#332A20] text-xs font-semibold text-[#332F2B] dark:text-[#FAF5EE] inline-flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs"
               title="Export selected records as CSV"
             >
               <Download className="w-3.5 h-3.5 text-[#8C6514] dark:text-[#E7B84B]" />
-              <span>Export Selected</span>
+              <span>Export</span>
             </button>
             <button
               type="button"
               onClick={promptDeleteBatchRecords}
-              className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs cursor-pointer transition"
+              className="flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-[#FFFFFF] text-xs font-semibold inline-flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete Selected ({selectedRecordIds.size})</span>
+              <span>Delete ({selectedRecordIds.size})</span>
             </button>
             <button
               type="button"
               onClick={clearRecordSelection}
-              className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#3D342C] bg-[#FFFFFF] dark:bg-[#26201B] text-[#6E665E] hover:text-[#332F2B] dark:text-[#FAF5EE] hover:bg-[#FAF5EE] cursor-pointer transition"
+              className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#3D342C] bg-[#FFFFFF] dark:bg-[#26201B] text-[#6E665E] hover:text-[#332F2B] dark:text-[#FAF5EE] hover:bg-[#FAF5EE] cursor-pointer transition shrink-0"
               title="Clear selection"
             >
               <X className="w-4 h-4" />

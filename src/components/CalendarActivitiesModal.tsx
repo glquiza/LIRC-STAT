@@ -574,12 +574,14 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                 {isLibrarian ? (
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#FEF9EC] dark:bg-[#2C2210] text-[#7D5B06] dark:text-[#F5D075] border border-[#E7B84B]/50 shrink-0">
                     <ShieldCheck className="w-3 h-3 text-[#B88412]" />
-                    Librarian · Full Edit Access
+                    <span>Librarian</span>
+                    <span className="hidden sm:inline">· Full Edit Access</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#F1F5EE] dark:bg-[#182414] text-[#455436] dark:text-[#B2D898] border border-[#71865A]/40 shrink-0">
                     <Lock className="w-3 h-3 text-[#71865A]" />
-                    Student Assistant · Read-Only
+                    <span>Student Assistant</span>
+                    <span className="hidden sm:inline">· Read-Only</span>
                   </span>
                 )}
               </div>
@@ -636,26 +638,26 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
             CALENDAR NAVIGATION & LEGEND STRIP
         ===================================================================== */}
         {displayMode === 'calendar' && (
-          <div className="px-4 sm:px-6 py-2.5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-wrap items-center justify-between gap-3 bg-[#FFFFFF] dark:bg-[#1C1814]">
+          <div className="px-3 sm:px-6 py-2 sm:py-2.5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-wrap items-center justify-between gap-2 sm:gap-3 bg-[#FFFFFF] dark:bg-[#1C1814]">
             {/* Month & Year Navigator */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
                 onClick={handlePrevMonth}
-                className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#221D18] hover:bg-[#FAF5EE] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs"
+                className="p-1 sm:p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#221D18] hover:bg-[#FAF5EE] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs"
                 title="Previous Month"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
-              <div className="px-3 py-1 text-base sm:text-lg font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE] min-w-[170px] text-center select-none">
+              <div className="px-2 sm:px-3 py-1 text-sm sm:text-lg font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE] min-w-[130px] sm:min-w-[170px] text-center select-none">
                 {MONTH_NAMES[viewMonth]} {viewYear}
               </div>
 
               <button
                 type="button"
                 onClick={handleNextMonth}
-                className="p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#221D18] hover:bg-[#FAF5EE] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs"
+                className="p-1 sm:p-1.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#221D18] hover:bg-[#FAF5EE] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer shadow-2xs"
                 title="Next Month"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -664,14 +666,14 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
               <button
                 type="button"
                 onClick={handleGoToToday}
-                className="ml-2 px-3 py-1 rounded-xl border border-[#D6C3A9] dark:border-[#42382F] bg-[#FAF5EE] dark:bg-[#25201A] hover:bg-[#F5EBDD] dark:hover:bg-[#2F271F] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-semibold transition cursor-pointer"
+                className="ml-1 sm:ml-2 px-2 sm:px-3 py-1 rounded-xl border border-[#D6C3A9] dark:border-[#42382F] bg-[#FAF5EE] dark:bg-[#25201A] hover:bg-[#F5EBDD] dark:hover:bg-[#2F271F] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-semibold transition cursor-pointer"
               >
                 Today
               </button>
             </div>
 
             {/* Legend Indicators */}
-            <div className="flex flex-wrap items-center gap-3 text-xs">
+            <div className="hidden sm:flex flex-wrap items-center gap-3 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#A83232] shrink-0" />
                 <span className="text-[#6E665E] dark:text-[#A6998C]">No Classes (Whole Day)</span>
@@ -733,9 +735,14 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                       >
                         <span>{w}</span>
                         {isClosed && (
-                          <span className="text-[9px] font-black uppercase text-[#A83232] dark:text-[#F5A3A3] leading-none">
-                            [Closed]
-                          </span>
+                          <>
+                            <span className="hidden sm:inline text-[9px] font-black uppercase text-[#A83232] dark:text-[#F5A3A3] leading-none">
+                              [Closed]
+                            </span>
+                            <span className="sm:hidden text-[8px] font-bold text-[#A83232] dark:text-[#F5A3A3] leading-none">
+                              ✕
+                            </span>
+                          </>
                         )}
                       </div>
                     );
@@ -751,7 +758,7 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                         type="button"
                         key={cell.dateStr}
                         onClick={() => handleSelectDay(cell.dateStr, cell.isCurrentMonth)}
-                        className={`group relative text-left rounded-2xl p-1.5 sm:p-2.5 border transition-all duration-150 flex flex-col justify-between cursor-pointer min-h-[75px] sm:min-h-[92px] lg:min-h-[105px] overflow-hidden ${
+                        className={`group relative text-left rounded-xl sm:rounded-2xl p-1 sm:p-2.5 border transition-all duration-150 flex flex-col justify-between cursor-pointer min-h-[56px] sm:min-h-[92px] lg:min-h-[105px] overflow-hidden ${
                           cell.isSelected
                             ? 'ring-2 ring-[#A83232] border-[#A83232] bg-[#FFF8F0] dark:bg-[#2A1D13] shadow-md z-10'
                             : cell.isWeekdayClosed
@@ -768,7 +775,7 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                           <span
                             className={`inline-flex items-center justify-center font-stat font-bold text-xs sm:text-sm rounded-full transition-colors ${
                               cell.isToday
-                                ? 'w-6 h-6 sm:w-7 sm:h-7 bg-[#A83232] text-white shadow-xs'
+                                ? 'w-5 h-5 sm:w-7 sm:h-7 bg-[#A83232] text-white shadow-xs text-[11px] sm:text-sm'
                                 : cell.isSelected
                                 ? 'text-[#A83232] dark:text-[#F5A3A3] font-black'
                                 : cell.isWeekdayClosed
@@ -786,20 +793,20 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                           <div className="flex items-center gap-1">
                             {cell.isWeekdayClosed ? (
                               <span
-                                className="text-[9px] font-bold text-[#A83232] dark:text-[#F5A3A3] uppercase px-1.5 py-0.5 rounded bg-[#FDF3F3] dark:bg-[#381616] border border-[#E8BDBD]/60 flex items-center gap-1"
+                                className="text-[9px] font-bold text-[#A83232] dark:text-[#F5A3A3] uppercase px-1 sm:px-1.5 py-0.5 rounded bg-[#FDF3F3] dark:bg-[#381616] border border-[#E8BDBD]/60 flex items-center gap-1"
                                 title={`Library is temporarily closed on every ${cell.weekdayName}`}
                               >
-                                <ShieldAlert className="w-2.5 h-2.5" />
-                                Closed
+                                <ShieldAlert className="w-2.5 h-2.5 shrink-0" />
+                                <span className="hidden sm:inline">Closed</span>
                               </span>
                             ) : cell.isSunday ? (
-                              <span className="text-[9px] font-bold text-[#8C7F72] dark:text-[#7D7063] uppercase px-1 py-0.5 rounded bg-[#F0E6D8]/60 dark:bg-[#241F1A]">
+                              <span className="hidden sm:inline text-[9px] font-bold text-[#8C7F72] dark:text-[#7D7063] uppercase px-1 py-0.5 rounded bg-[#F0E6D8]/60 dark:bg-[#241F1A]">
                                 Closed
                               </span>
                             ) : null}
                             {/* Suspension Indicator Dots */}
                             {hasActs && (
-                              <span className="flex items-center gap-1">
+                              <span className="hidden sm:flex items-center gap-1">
                                 {cell.isWholeDay ? (
                                   <span className="w-2 h-2 rounded-full bg-[#A83232] animate-pulse" title="Whole Day Suspension" />
                                 ) : (
@@ -811,10 +818,10 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                         </div>
 
                         {/* Activity Chips inside the Day Cell */}
-                        <div className="mt-1 space-y-1 w-full overflow-hidden flex-1">
+                        <div className="mt-0.5 sm:mt-1 space-y-1 w-full overflow-hidden flex-1">
                           {cell.isWeekdayClosed && (
                             <div
-                              className="truncate px-1.5 py-0.5 rounded-md text-[10px] font-bold leading-tight bg-[#FDF3F3] dark:bg-[#331717] text-[#A83232] dark:text-[#F5A3A3] border border-[#E8BDBD]/70 flex items-center gap-1"
+                              className="hidden sm:flex truncate px-1.5 py-0.5 rounded-md text-[10px] font-bold leading-tight bg-[#FDF3F3] dark:bg-[#331717] text-[#A83232] dark:text-[#F5A3A3] border border-[#E8BDBD]/70 items-center gap-1"
                               title={`Library is temporarily closed on every ${cell.weekdayName}`}
                             >
                               <span>🚫</span>
@@ -825,7 +832,7 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                           {cell.activities.slice(0, 2).map((act) => (
                             <div
                               key={act.id}
-                              className={`truncate px-1.5 py-0.5 rounded-md text-[10px] font-semibold leading-tight ${
+                              className={`hidden sm:block truncate px-1.5 py-0.5 rounded-md text-[10px] font-semibold leading-tight ${
                                 act.isWholeDay
                                   ? 'bg-[#FDF3F3] dark:bg-[#331717] text-[#A83232] dark:text-[#F5A3A3] border border-[#E8BDBD]/60'
                                   : 'bg-[#FEF9EC] dark:bg-[#2C2210] text-[#7D5B06] dark:text-[#F5D075] border border-[#E7B84B]/40'
@@ -838,15 +845,29 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
                           ))}
 
                           {cell.activities.length > 2 && (
-                            <div className="text-[9px] font-bold text-[#6E665E] dark:text-[#A6998C] px-1">
+                            <div className="hidden sm:block text-[9px] font-bold text-[#6E665E] dark:text-[#A6998C] px-1">
                               +{cell.activities.length - 2} more
                             </div>
                           )}
+
+                          {/* Mobile Dot Indicators (< sm screens) */}
+                          <div className="flex sm:hidden items-center justify-center gap-1 mt-1 flex-wrap">
+                            {cell.isWeekdayClosed && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#A83232]" title="Closed Day" />
+                            )}
+                            {cell.activities.map((act) => (
+                              <span
+                                key={act.id}
+                                className={`w-1.5 h-1.5 rounded-full ${act.isWholeDay ? 'bg-[#A83232]' : 'bg-[#E7B84B]'}`}
+                                title={act.title}
+                              />
+                            ))}
+                          </div>
                         </div>
 
                         {/* Subtle Librarian Add Hint on Hover */}
                         {isLibrarian && !hasActs && !cell.isSunday && !cell.isWeekdayClosed && (
-                          <div className="text-[10px] text-[#A83232] dark:text-[#E25D5D] opacity-0 group-hover:opacity-100 transition-opacity font-semibold pt-0.5 text-right w-full">
+                          <div className="text-[10px] text-[#A83232] dark:text-[#E25D5D] opacity-0 group-hover:opacity-100 transition-opacity font-semibold pt-0.5 text-right w-full hidden sm:block">
                             + Add
                           </div>
                         )}
@@ -857,7 +878,7 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
               </div>
 
               {/* RIGHT COLUMN: DAY INSPECTOR & LIBRARIAN EDIT PANEL */}
-              <div className="w-full lg:w-[380px] xl:w-[420px] border-t lg:border-t-0 lg:border-l border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1C1814] flex flex-col shrink-0 overflow-y-auto">
+              <div className="w-full lg:w-[380px] xl:w-[420px] border-t lg:border-t-0 lg:border-l border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1C1814] flex flex-col shrink-0 overflow-y-auto max-h-[50vh] lg:max-h-none">
                 {/* Day Inspector Header */}
                 <div className="p-4 sm:p-5 border-b border-[#E6D7C3] dark:border-[#383028] bg-[#FAF5EE]/50 dark:bg-[#191512]">
                   <div className="flex items-center justify-between gap-2">

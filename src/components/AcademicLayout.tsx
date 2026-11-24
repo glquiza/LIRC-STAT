@@ -408,9 +408,9 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
       <div className="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.2,0,0,1)]">
         {/* Clean Header */}
         <header className="bg-[#FFFFFF]/92 backdrop-blur-md border-b border-[#E6D7C3] sticky top-0 z-20 shadow-2xs">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
             {/* Left: Hamburger / Panel Toggle + Breadcrumbs & Page Title */}
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <button
                 type="button"
                 onClick={() => {
@@ -420,7 +420,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                     toggleSidebarCollapsed();
                   }
                 }}
-                className="p-2 rounded-xl border border-[#E6D7C3] text-[#332F2B] hover:bg-[#F5EBDD] cursor-pointer shrink-0 transition-colors"
+                className="p-1.5 sm:p-2 rounded-xl border border-[#E6D7C3] text-[#332F2B] hover:bg-[#F5EBDD] cursor-pointer shrink-0 transition-colors"
                 aria-label="Toggle navigation menu"
                 title="Toggle sidebar (Ctrl+B)"
               >
@@ -445,17 +445,16 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                     </React.Fragment>
                   ))}
                 </div>
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
+                <div className="flex items-baseline gap-x-2 min-w-0 overflow-hidden">
                   <h1
-                    className="text-base sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight"
+                    className="text-sm sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight truncate"
                     title={pageTitle}
                   >
                     {pageTitle}
                   </h1>
                   {pageSubtitle && (
-                    <span className="text-xs sm:text-sm text-[#6E665E] leading-tight">
-                      <span className="hidden sm:inline">· </span>
-                      {pageSubtitle}
+                    <span className="hidden md:inline text-xs sm:text-sm text-[#6E665E] leading-tight truncate shrink-0">
+                      · {pageSubtitle}
                     </span>
                   )}
                 </div>
@@ -463,7 +462,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
             </div>
 
             {/* Right: Search (optional) + Header Actions + Notifications + User Menu */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {onSearchChange && (
                 <div className="hidden md:block relative w-44 lg:w-56 transition-all duration-150 focus-within:w-60">
                   <Search className="w-3.5 h-3.5 text-[#6E665E] absolute left-3 top-2.5 pointer-events-none" />
@@ -487,19 +486,19 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => setNotifOpen((v) => !v)}
-                  className="relative p-2 rounded-xl border border-[#E6D7C3] bg-[#FFFFFF] hover:bg-[#F5EBDD] text-[#332F2B] transition cursor-pointer"
+                  className="relative p-1.5 sm:p-2 rounded-xl border border-[#E6D7C3] bg-[#FFFFFF] hover:bg-[#F5EBDD] text-[#332F2B] transition cursor-pointer"
                   aria-label="Notifications"
                 >
                   <Bell className="w-4 h-4" />
                   {notifications.length > 0 && (
-                    <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#A83232] text-[#FFFFFF] text-[10px] font-stat font-bold flex items-center justify-center border-2 border-[#FFFFFF] absolute -top-1.5 -right-1.5">
+                    <span className="min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-0.5 sm:px-1 rounded-full bg-[#A83232] text-[#FFFFFF] text-[9px] sm:text-[10px] font-stat font-bold flex items-center justify-center border-2 border-[#FFFFFF] absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5">
                       {notifications.length}
                     </span>
                   )}
                 </button>
 
                 {notifOpen && (
-                  <div ref={notifDropdownRef} className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#FFFFFF] rounded-2xl border border-[#E6D7C3] shadow-xl py-2 z-50">
+                  <div ref={notifDropdownRef} className="absolute right-0 mt-2 w-[calc(100vw-24px)] max-w-sm sm:w-96 bg-[#FFFFFF] rounded-2xl border border-[#E6D7C3] shadow-xl py-2 z-50">
                     <div className="px-4 py-2 border-b border-[#E6D7C3] flex items-center justify-between">
                       <span className="text-xs font-bold text-[#332F2B]">
                         System &amp; Duty Notifications
@@ -555,9 +554,9 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => setUserMenuOpen((v) => !v)}
-                  className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-xl border border-[#E6D7C3] bg-[#FFFFFF] hover:bg-[#F5EBDD] transition cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2.5 p-1 sm:pl-2 sm:pr-2.5 sm:py-1.5 rounded-xl border border-[#E6D7C3] bg-[#FFFFFF] hover:bg-[#F5EBDD] transition cursor-pointer"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-[#A83232] text-[#FFFFFF] text-xs font-bold flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-[#A83232] text-[#FFFFFF] text-xs font-bold flex items-center justify-center shrink-0">
                     {initials || 'U'}
                   </div>
                   <div className="hidden sm:block text-left">
@@ -568,11 +567,11 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                       {profile.staff_code}
                     </div>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-[#6E665E]" />
+                  <ChevronDown className="w-3.5 h-3.5 text-[#6E665E] hidden sm:block shrink-0" />
                 </button>
 
                 {userMenuOpen && (
-                  <div ref={userDropdownRef} className="absolute right-0 mt-2 w-60 bg-[#FFFFFF] rounded-2xl border border-[#E6D7C3] shadow-xl py-2 z-50">
+                  <div ref={userDropdownRef} className="absolute right-0 mt-2 w-56 sm:w-60 bg-[#FFFFFF] rounded-2xl border border-[#E6D7C3] shadow-xl py-2 z-50">
                     <div className="px-4 py-2.5 border-b border-[#E6D7C3]">
                       <div className="text-xs font-bold text-[#332F2B]">
                         {profile.full_name}

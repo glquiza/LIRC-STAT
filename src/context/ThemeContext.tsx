@@ -88,7 +88,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         <Sun className="w-4 h-4 text-[#C98A16] hover:text-[#A83232] transition-transform duration-200 hover:rotate-45" />
       )}
       {showLabel && (
-        <span className="text-xs font-semibold">
+        <span className="text-xs font-semibold hidden sm:inline">
           {isDark ? 'Dark Mode' : 'Light Mode'}
         </span>
       )}

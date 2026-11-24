@@ -753,9 +753,9 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
   }, [activeTab, selectedDate, activeSessions]);
 
   const dashboardHeaderActions = (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       {activeTab === 'dashboard' && (
-        <>
+        <div className="hidden sm:flex items-center gap-2">
           <input
             type="date"
             value={selectedDate}
@@ -773,14 +773,14 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
           >
             Today
           </button>
-        </>
+        </div>
       )}
 
       {activeTab === 'dashboard' && (
         <button
           type="button"
           onClick={fetchOverviewData}
-          className="p-2 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1A1613] hover:bg-[#F5EBDD] dark:hover:bg-[#25201B] text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition"
+          className="p-1.5 sm:p-2 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-white dark:bg-[#1A1613] hover:bg-[#F5EBDD] dark:hover:bg-[#25201B] text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shrink-0"
           title="Refresh data"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loadingDaily ? 'animate-spin' : ''}`} />
@@ -838,54 +838,76 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
           TAB 1: DASHBOARD (OVERVIEW + INSIGHTS + CHARTS + DAILY MATRIX)
       =================================================================== */}
       {activeTab === 'dashboard' && (
-        <div className="space-y-6 animate-literary-fade">
+        <div className="space-y-4 sm:space-y-6 animate-literary-fade">
+          {/* Mobile Date Filter Bar */}
+          <div className="flex sm:hidden items-center justify-between gap-2 p-2.5 rounded-xl bg-white dark:bg-[#1A1613] border border-[#E6D7C3] dark:border-[#383028] shadow-2xs">
+            <span className="text-xs font-semibold text-[#6E665E] dark:text-[#A89887] shrink-0">Date:</span>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="flex-1 h-9 px-2.5 rounded-lg border border-[#D6C3A9] dark:border-[#383028] bg-[#FAF5EE] dark:bg-[#241F1A] text-xs font-stat font-semibold text-[#332F2B] dark:text-[#F0E8DE]"
+            />
+            <button
+              type="button"
+              onClick={() => setSelectedDate(todayDate)}
+              className={`h-9 px-3 rounded-lg text-xs font-semibold shrink-0 cursor-pointer transition ${
+                selectedDate === todayDate
+                  ? 'bg-[#A83232] text-white'
+                  : 'bg-[#FAF5EE] dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE]'
+              }`}
+            >
+              Today
+            </button>
+          </div>
+
           {/* 4 KPI Stat Cards */}
-          <div ref={kpiGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="lib-kpi-card literary-card p-5 relative overflow-hidden shadow-xs">
+          <div ref={kpiGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="lib-kpi-card literary-card p-3.5 sm:p-5 relative overflow-hidden shadow-xs">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#C96C32] to-[#E7B84B] absolute top-0 left-0" />
-              <div className="text-xs font-medium text-[#6E665E]">Total Occupancy</div>
-              <div className="text-2xl sm:text-3xl font-stat font-bold text-[#332F2B] mt-1">
+              <div className="text-[11px] sm:text-xs font-medium text-[#6E665E]">Total Occupancy</div>
+              <div className="text-xl sm:text-3xl font-stat font-bold text-[#332F2B] mt-1">
                 {dailyComputed.overallTotal.toLocaleString()}
               </div>
-              <div className="text-xs text-[#6E665E] mt-0.5">Across all 6 library areas</div>
+              <div className="text-[10px] sm:text-xs text-[#6E665E] mt-0.5 truncate">Across all 6 library areas</div>
             </div>
 
-            <div className="lib-kpi-card literary-card p-5 relative overflow-hidden shadow-xs">
+            <div className="lib-kpi-card literary-card p-3.5 sm:p-5 relative overflow-hidden shadow-xs">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#E7B84B] to-[#F5C75A] absolute top-0 left-0" />
-              <div className="text-xs font-medium text-[#6E665E]">Most Occupied Area</div>
-              <div className="text-xl sm:text-2xl font-heading font-bold text-[#A83232] mt-1 truncate">
+              <div className="text-[11px] sm:text-xs font-medium text-[#6E665E]">Most Occupied Area</div>
+              <div className="text-lg sm:text-2xl font-heading font-bold text-[#A83232] mt-1 truncate">
                 {dailyComputed.peakArea?.areaName || '—'}
               </div>
-              <div className="text-xs font-stat text-[#6E665E] mt-0.5">
+              <div className="text-[10px] sm:text-xs font-stat text-[#6E665E] mt-0.5 truncate">
                 {dailyComputed.peakArea
                   ? `${dailyComputed.peakArea.sharePercent}% of total`
                   : 'No data'}
               </div>
             </div>
 
-            <div className="lib-kpi-card literary-card p-5 relative overflow-hidden shadow-xs">
+            <div className="lib-kpi-card literary-card p-3.5 sm:p-5 relative overflow-hidden shadow-xs">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#71865A] to-[#8FA872] absolute top-0 left-0" />
-              <div className="text-xs font-medium text-[#6E665E]">Peak Operating Hour</div>
-              <div className="text-lg sm:text-xl font-stat font-bold text-[#332F2B] mt-1.5">
+              <div className="text-[11px] sm:text-xs font-medium text-[#6E665E]">Peak Operating Hour</div>
+              <div className="text-base sm:text-xl font-stat font-bold text-[#332F2B] mt-1.5 truncate">
                 {dailyComputed.peakHour?.label || '—'}
               </div>
-              <div className="text-xs font-stat text-[#6E665E] mt-0.5">
+              <div className="text-[10px] sm:text-xs font-stat text-[#6E665E] mt-0.5 truncate">
                 {dailyComputed.peakHour
                   ? `${dailyComputed.peakHour.total.toLocaleString()} students`
                   : 'No data'}
               </div>
             </div>
 
-            <div className="lib-kpi-card literary-card p-5 relative overflow-hidden shadow-xs">
+            <div className="lib-kpi-card literary-card p-3.5 sm:p-5 relative overflow-hidden shadow-xs">
               <div className="h-1.5 w-full bg-gradient-to-r from-[#332F2B] to-[#5C544E] absolute top-0 left-0" />
-              <div className="text-xs font-medium text-[#6E665E]">Missing Intervals</div>
-              <div className="text-2xl sm:text-3xl font-stat font-bold text-[#A83232] mt-1">
+              <div className="text-[11px] sm:text-xs font-medium text-[#6E665E]">Missing Intervals</div>
+              <div className="text-xl sm:text-3xl font-stat font-bold text-[#A83232] mt-1">
                 {dailyComputed.missingSlotsCount}
               </div>
               <button
                 type="button"
                 onClick={() => setActiveTab('records')}
-                className="text-xs font-semibold text-[#A83232] hover:underline mt-0.5 cursor-pointer"
+                className="text-[11px] sm:text-xs font-semibold text-[#A83232] hover:underline mt-0.5 cursor-pointer block truncate"
               >
                 Review &amp; resolve →
               </button>

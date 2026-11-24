@@ -1815,13 +1815,13 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           : undefined
       }
       headerActions={
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* 30-Minute Interval Countdown Reminder Pill */}
           <div
             onClick={() => {
               if (viewMode !== 'areas' && !myActiveSession) setViewMode('areas');
             }}
-            className={`px-3 py-1.5 rounded-xl border flex items-center gap-2 text-xs font-stat transition-all select-none shadow-2xs ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-stat transition-all select-none shadow-2xs max-w-[140px] sm:max-w-none truncate ${
               !intervalCountdown.isOperatingHours
                 ? 'bg-[#FFFFFF] dark:bg-[#1E1914] border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE]'
                 : !isSubmissionLocked
@@ -1845,13 +1845,13 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
             ) : (
               <Lock className="w-3.5 h-3.5 shrink-0 text-[#E7B84B]" />
             )}
-            <span className="font-semibold whitespace-nowrap">
+            <span className="font-semibold truncate">
               {!intervalCountdown.isOperatingHours ? (
-                <span>Off-Hours Mode</span>
+                <span>Off-Hours</span>
               ) : !isSubmissionLocked ? (
                 <span>
                   <span className="hidden sm:inline">Log Count: </span>
-                  <strong className="font-bold">{formatSlotLabel(effectiveTargetSlot)} (Ready)</strong>
+                  <strong className="font-bold">{formatSlotLabel(effectiveTargetSlot)}</strong>
                 </span>
               ) : (
                 <span>
@@ -1868,10 +1868,10 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               loadDashboardData();
               syncServerClock();
             }}
-            className="p-2 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] transition cursor-pointer shrink-0"
             title="Refresh data"
           >
-            <RefreshCw className={`w-4 h-4 ${loadingDashboard ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loadingDashboard ? 'animate-spin' : ''}`} />
           </button>
         </div>
       }
@@ -2235,47 +2235,47 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           </div>
 
           {/* Areas Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 pb-1">
-            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#F5EBDD] dark:bg-[#25201B] border border-[#E6D7C3] dark:border-[#383028]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1 pb-1">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#F5EBDD] dark:bg-[#25201B] border border-[#E6D7C3] dark:border-[#383028] overflow-x-auto max-w-full">
               <button
                 type="button"
                 onClick={() => setAreaFilterType('ALL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 shrink-0 ${
                   areaFilterType === 'ALL'
                     ? 'bg-white dark:bg-[#1A1613] text-[#A83232] shadow-xs'
                     : 'text-[#8B7355] dark:text-[#A89887] hover:text-[#332F2B] dark:hover:text-[#F0E8DE]'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
-                <span>All Areas & Stations ({assignableDutyAreas.length})</span>
+                <span><span className="hidden sm:inline">All Areas & Stations</span><span className="sm:hidden">All</span> ({assignableDutyAreas.length})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setAreaFilterType('STATISTICAL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 shrink-0 ${
                   areaFilterType === 'STATISTICAL'
                     ? 'bg-white dark:bg-[#1A1613] text-[#A83232] shadow-xs'
                     : 'text-[#8B7355] dark:text-[#A89887] hover:text-[#332F2B] dark:hover:text-[#F0E8DE]'
                 }`}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>Reading Areas · Stats Required ({sortedAreas.length})</span>
+                <span><span className="hidden sm:inline">Reading Areas · Stats Required</span><span className="sm:hidden">Stats Required</span> ({sortedAreas.length})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setAreaFilterType('STATIONS')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center gap-1.5 shrink-0 ${
                   areaFilterType === 'STATIONS'
                     ? 'bg-white dark:bg-[#1A1613] text-[#A83232] shadow-xs'
                     : 'text-[#8B7355] dark:text-[#A89887] hover:text-[#332F2B] dark:hover:text-[#F0E8DE]'
                 }`}
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#71865A]" />
-                <span>Service Stations · No Stats ({EXEMPT_DUTY_AREAS.length})</span>
+                <span><span className="hidden sm:inline">Service Stations · No Stats</span><span className="sm:hidden">Stations</span> ({EXEMPT_DUTY_AREAS.length})</span>
               </button>
             </div>
 
-            <span className="text-xs text-[#8B7355] dark:text-[#A89887] font-stat">
+            <span className="text-xs text-[#8B7355] dark:text-[#A89887] font-stat hidden sm:block">
               Showing{' '}
               <strong className="text-[#332F2B] dark:text-[#F0E8DE]">
                 {areaFilterType === 'ALL'
@@ -3059,14 +3059,14 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-2">
                     Number of Students Currently in {activeArea.name} ({formatSlotRangeLabel(effectiveTargetSlot)})
                   </label>
-                  <div className={`flex flex-wrap items-center gap-3 ${isSubmissionLocked ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <div className={`space-y-3 ${isSubmissionLocked ? 'opacity-50 pointer-events-none' : ''}`}>
                     {/* Stepper Buttons: -5, -1, [Input], +1, +5, +10 */}
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1 sm:gap-1.5 max-w-full">
                       <button
                         type="button"
                         disabled={isSubmissionLocked}
                         onClick={() => setStudentCount((c) => Math.max(0, c - 5))}
-                        className="h-11 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50"
+                        className="h-10 sm:h-11 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50 shrink-0"
                         title="Subtract 5 students"
                       >
                         -5
@@ -3075,11 +3075,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         type="button"
                         disabled={isSubmissionLocked}
                         onClick={() => setStudentCount((c) => Math.max(0, c - 1))}
-                        className="w-11 h-11 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs disabled:opacity-50"
+                        className="w-9 sm:w-11 h-10 sm:h-11 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs disabled:opacity-50 shrink-0"
                         aria-label="Decrease count"
                         title="Subtract 1 student"
                       >
-                        <Minus className="w-4 h-4" />
+                        <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </button>
                       <input
                         type="number"
@@ -3088,24 +3088,24 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         disabled={isSubmissionLocked}
                         value={studentCount}
                         onChange={(e) => setStudentCount(Math.max(0, Number(e.target.value)))}
-                        className="w-24 h-11 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-2xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] disabled:bg-gray-100 dark:disabled:bg-gray-900"
+                        className="flex-1 max-w-[96px] h-10 sm:h-11 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-xl sm:text-2xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] disabled:bg-gray-100 dark:disabled:bg-gray-900"
                         required
                       />
                       <button
                         type="button"
                         disabled={isSubmissionLocked}
                         onClick={() => setStudentCount((c) => Math.min(2000, c + 1))}
-                        className="w-11 h-11 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs disabled:opacity-50"
+                        className="w-9 sm:w-11 h-10 sm:h-11 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs disabled:opacity-50 shrink-0"
                         aria-label="Increase count"
                         title="Add 1 student"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </button>
                       <button
                         type="button"
                         disabled={isSubmissionLocked}
                         onClick={() => setStudentCount((c) => Math.min(2000, c + 5))}
-                        className="h-11 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50"
+                        className="h-10 sm:h-11 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50 shrink-0"
                         title="Add 5 students"
                       >
                         +5
@@ -3114,7 +3114,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         type="button"
                         disabled={isSubmissionLocked}
                         onClick={() => setStudentCount((c) => Math.min(2000, c + 10))}
-                        className="h-11 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50"
+                        className="h-10 sm:h-11 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] text-xs font-bold font-stat cursor-pointer transition shadow-2xs disabled:opacity-50 shrink-0"
                         title="Add 10 students"
                       >
                         +10
@@ -3129,7 +3129,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                           type="button"
                           disabled={isSubmissionLocked}
                           onClick={() => setStudentCount(preset)}
-                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer disabled:opacity-50 ${
+                          className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold border transition cursor-pointer disabled:opacity-50 ${
                             studentCount === preset
                               ? 'bg-[#A83232] text-[#FFFFFF] border-[#A83232]'
                               : 'bg-[#FFFFFF] dark:bg-[#1E1914] text-[#332F2B] dark:text-[#F0E8DE] border-[#E6D7C3] dark:border-[#383028] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C]'
@@ -3671,11 +3671,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           MODAL 1: EDIT EXISTING OCCUPANCY RECORD
       =================================================================== */}
       {editingRecord && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
-          <div ref={editModalRef} className="literary-card shadow-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade overflow-y-auto">
+          <div ref={editModalRef} className="literary-card shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[92vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-2 mb-4">
               <div>
-                <h3 className="text-lg font-heading font-bold text-[#332F2B]">
+                <h3 className="text-base sm:text-lg font-heading font-bold text-[#332F2B]">
                   Edit Occupancy Count
                 </h3>
                 <p className="text-xs text-[#6E665E] mt-0.5 font-stat">
@@ -3687,7 +3687,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setEditingRecord(null)}
-                className="p-1 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -3705,11 +3705,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                 <label className="block text-xs font-semibold text-[#332F2B] mb-1.5">
                   Direct Student Count
                 </label>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 sm:gap-1.5 max-w-full">
                   <button
                     type="button"
                     onClick={() => setEditCount((c) => Math.max(0, c - 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 5"
                   >
                     -5
@@ -3717,10 +3717,10 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setEditCount((c) => Math.max(0, c - 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-8 sm:w-10 h-9 sm:h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 1"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <input
                     type="number"
@@ -3729,20 +3729,20 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     required
                     value={editCount}
                     onChange={(e) => setEditCount(Math.max(0, Number(e.target.value)))}
-                    className="flex-1 h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                    className="flex-1 max-w-[80px] sm:max-w-[100px] h-9 sm:h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-lg sm:text-xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                   />
                   <button
                     type="button"
                     onClick={() => setEditCount((c) => Math.min(2000, c + 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-8 sm:w-10 h-9 sm:h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 1"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditCount((c) => Math.min(2000, c + 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 5"
                   >
                     +5
@@ -3750,7 +3750,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setEditCount((c) => Math.min(2000, c + 10))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 10"
                   >
                     +10
@@ -3834,11 +3834,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           MODAL 2: RECORD MISSING PAST SLOT
       =================================================================== */}
       {fillingSlot && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
-          <div ref={fillModalRef} className="literary-card shadow-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade overflow-y-auto">
+          <div ref={fillModalRef} className="literary-card shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[92vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-2 mb-4">
               <div>
-                <h3 className="text-lg font-heading font-bold text-[#332F2B]">
+                <h3 className="text-base sm:text-lg font-heading font-bold text-[#332F2B]">
                   Record Missing Slot
                 </h3>
                 <p className="text-xs text-[#6E665E] mt-0.5 font-stat">
@@ -3849,9 +3849,9 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setFillingSlot(null)}
-                className="p-1 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -3860,11 +3860,11 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                 <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1.5">
                   Observed Student Headcount
                 </label>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 sm:gap-1.5 max-w-full">
                   <button
                     type="button"
                     onClick={() => setFillCount((c) => Math.max(0, c - 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#332F2B] dark:text-[#F0E8DE] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 5"
                   >
                     -5
@@ -3872,10 +3872,10 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFillCount((c) => Math.max(0, c - 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-8 sm:w-10 h-9 sm:h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Subtract 1"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <input
                     type="number"
@@ -3884,20 +3884,20 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     required
                     value={fillCount}
                     onChange={(e) => setFillCount(Math.max(0, Number(e.target.value)))}
-                    className="flex-1 h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                    className="flex-1 max-w-[80px] sm:max-w-[100px] h-9 sm:h-10 text-center rounded-xl bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] text-[#332F2B] dark:text-[#F0E8DE] font-stat font-bold text-lg sm:text-xl focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                   />
                   <button
                     type="button"
                     onClick={() => setFillCount((c) => Math.min(2000, c + 1))}
-                    className="w-10 h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs"
+                    className="w-8 sm:w-10 h-9 sm:h-10 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] flex items-center justify-center text-[#332F2B] dark:text-[#F0E8DE] cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 1"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setFillCount((c) => Math.min(2000, c + 5))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 5"
                   >
                     +5
@@ -3905,7 +3905,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   <button
                     type="button"
                     onClick={() => setFillCount((c) => Math.min(2000, c + 10))}
-                    className="h-10 px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs"
+                    className="h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl border border-[#E6D7C3] dark:border-[#383028] bg-[#FFFFFF] dark:bg-[#1E1914] hover:bg-[#F5EBDD] dark:hover:bg-[#2A231C] text-[#A83232] dark:text-[#E25D5D] font-bold text-xs font-stat cursor-pointer transition shadow-2xs shrink-0"
                     title="Add 10"
                   >
                     +10
@@ -3983,20 +3983,20 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           MODAL 3: STUDENT ASSISTANT — VIEW ASSIGNED DUTY SCHEDULE (READ-ONLY)
       =================================================================== */}
       {showDutyScheduleModal && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
-          <div ref={scheduleModalRef} className="literary-card shadow-2xl max-w-2xl w-full max-h-[88vh] flex flex-col relative overflow-hidden">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade overflow-y-auto">
+          <div ref={scheduleModalRef} className="literary-card shadow-2xl max-w-2xl w-full max-h-[92vh] sm:max-h-[88vh] flex flex-col relative overflow-hidden">
             <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
 
-            <div className="p-5 border-b border-[#E6D7C3] flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#FDF3F3] border border-[#E8BDBD] flex items-center justify-center text-[#A83232]">
-                  <CalendarClock className="w-5 h-5" />
+            <div className="p-3.5 sm:p-5 border-b border-[#E6D7C3] flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FDF3F3] border border-[#E8BDBD] flex items-center justify-center text-[#A83232] shrink-0">
+                  <CalendarClock className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-heading font-bold text-[#332F2B]">
+                <div className="min-w-0">
+                  <h3 className="text-base sm:text-lg font-heading font-bold text-[#332F2B] truncate">
                     My Assigned Weekly Duty Schedule
                   </h3>
-                  <p className="text-xs text-[#6E665E]">
+                  <p className="text-xs text-[#6E665E] truncate">
                     {profile.full_name} (@{profile.username} · {profile.staff_code}) — View your fixed weekly area rotations (MWF, TTh, Saturday)
                   </p>
                 </div>
@@ -4004,13 +4004,13 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowDutyScheduleModal(false)}
-                className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-5 overflow-y-auto space-y-4">
+            <div className="p-3.5 sm:p-5 overflow-y-auto space-y-4">
               {/* Current Duty Area & Next Assigned Duty Overview Cards in Modal */}
               {(dutyStatus.currentShiftOccurrence || dutyStatus.upcomingShiftOccurrence) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

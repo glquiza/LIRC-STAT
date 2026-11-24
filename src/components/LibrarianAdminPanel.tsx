@@ -985,19 +985,19 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
 
           <form
             onSubmit={handleGenerateInvitationCode}
-            className="flex flex-wrap items-center gap-2"
+            className="flex flex-wrap items-center gap-2 w-full sm:w-auto"
           >
             <input
               type="text"
               value={newInviteLabel}
               onChange={(e) => setNewInviteLabel(e.target.value)}
               placeholder="Optional label (e.g. 1st Sem)"
-              className="px-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-xs text-[#332F2B] w-48 sm:w-56"
+              className="px-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-xs text-[#332F2B] w-full sm:w-56"
             />
             <button
               type="submit"
               disabled={generatingInvite}
-              className="px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition"
             >
               <Plus className="w-4 h-4" />
               {generatingInvite ? 'Generating...' : 'Generate Code'}
@@ -1092,7 +1092,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-1 bg-[#F5EBDD] p-1 rounded-xl border border-[#E6D7C3]">
+          <div className="flex items-center gap-1 bg-[#F5EBDD] p-1 rounded-xl border border-[#E6D7C3] overflow-x-auto max-w-full">
             {(
               [
                 {
@@ -1120,7 +1120,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                 key={tab.id}
                 type="button"
                 onClick={() => setRequestFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition shrink-0 whitespace-nowrap ${
                   requestFilter === tab.id
                     ? 'bg-[#A83232] text-white shadow-xs'
                     : 'text-[#6E665E] hover:text-[#332F2B]'
@@ -1257,21 +1257,21 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
               Manage approved Librarian and Student Assistant accounts, roles, and multi-area daily duty schedules.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="relative">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <div className="relative w-full sm:w-56">
               <Search className="w-3.5 h-3.5 text-[#6E665E] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={staffSearch}
                 onChange={(e) => setStaffSearch(e.target.value)}
                 placeholder="Search name, username, ID..."
-                className="pl-8 pr-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-xs text-[#332F2B] w-56"
+                className="pl-8 pr-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-xs text-[#332F2B] w-full"
               />
             </div>
             <button
               type="button"
               onClick={() => openDutyScheduleModal()}
-              className="px-4 py-2 rounded-xl border border-[#A83232] bg-[#FDF3F3] hover:bg-[#A83232] text-[#A83232] hover:text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl border border-[#A83232] bg-[#FDF3F3] hover:bg-[#A83232] text-[#A83232] hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition"
             >
               <CalendarClock className="w-4 h-4" />
               Duty Schedules ({allDutySchedules.length})
@@ -1474,18 +1474,18 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
           DEDICATED "DUTY SCHEDULE MANAGEMENT" MODAL (MULTI-AREA DAILY ROTATIONS)
       ===================================================================== */}
       {showDutyScheduleModal && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade">
           <div className="literary-card shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col relative overflow-hidden">
             <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
 
             {/* Modal Header */}
-            <div className="p-5 border-b border-[#E6D7C3] flex items-center justify-between gap-3">
+            <div className="p-4 sm:p-5 border-b border-[#E6D7C3] flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#FDF3F3] border border-[#E8BDBD] flex items-center justify-center text-[#A83232]">
+                <div className="w-10 h-10 rounded-xl bg-[#FDF3F3] border border-[#E8BDBD] flex items-center justify-center text-[#A83232] shrink-0">
                   <CalendarClock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-heading font-bold text-[#332F2B]">
+                  <h3 className="text-base sm:text-lg font-heading font-bold text-[#332F2B]">
                     Duty Schedule Management
                   </h3>
                   <p className="text-xs text-[#6E665E]">
@@ -1506,11 +1506,11 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
             </div>
 
             {/* Modal Scrollable Content */}
-            <div className="p-5 overflow-y-auto space-y-6">
+            <div className="p-3.5 sm:p-5 overflow-y-auto space-y-6">
               {/* Multi-Area Daily Schedule Builder Form */}
               <form
                 onSubmit={handleSaveDutySchedule}
-                className="p-4 sm:p-5 rounded-xl bg-[#FAF5EE] border border-[#E6D7C3] space-y-4"
+                className="p-3.5 sm:p-5 rounded-xl bg-[#FAF5EE] border border-[#E6D7C3] space-y-4"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
@@ -2015,11 +2015,11 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
 
       {/* Edit User Modal */}
       {editingStaff && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
-          <div className="literary-card shadow-2xl max-w-md w-full p-6 relative overflow-hidden">
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade">
+          <div className="literary-card shadow-2xl max-w-md w-full p-4 sm:p-6 relative overflow-hidden max-h-[92vh] overflow-y-auto">
             <div className="h-1 w-full bg-[#E7B84B] absolute top-0 left-0" />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-heading font-bold text-[#332F2B]">
+              <h3 className="text-base sm:text-lg font-heading font-bold text-[#332F2B]">
                 Edit User Account &amp; Role
               </h3>
               <button
@@ -2044,7 +2044,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                   className="w-full px-3 py-2 rounded-xl bg-white border border-[#D6C3A9] text-sm text-[#332F2B]"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-[#332F2B] mb-1">
                     Username
@@ -2141,12 +2141,12 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                 />
                 Account Active
               </label>
-              <div className="flex items-center justify-between gap-2 pt-3 border-t border-[#E6D7C3]">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[#E6D7C3]">
                 {!currentUserId || editingStaff.id !== currentUserId ? (
                   <button
                     type="button"
                     onClick={() => setDeletingStaff(editingStaff)}
-                    className="px-3 py-2 rounded-xl border border-[#E8BDBD] bg-[#FDF3F3] hover:bg-[#A83232] text-[#A83232] hover:text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition"
+                    className="w-full sm:w-auto px-3 py-2 rounded-xl border border-[#E8BDBD] bg-[#FDF3F3] hover:bg-[#A83232] text-[#A83232] hover:text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer transition"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Remove Account
@@ -2154,21 +2154,21 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                 ) : (
                   <span />
                 )}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => {
                       setEditingStaff(null);
                       setEditPassword('');
                     }}
-                    className="px-4 py-2 rounded-xl border border-[#D6C3A9] bg-white hover:bg-[#FAF5EE] text-xs font-semibold text-[#332F2B] cursor-pointer"
+                    className="flex-1 sm:flex-initial px-4 py-2 rounded-xl border border-[#D6C3A9] bg-white hover:bg-[#FAF5EE] text-xs font-semibold text-[#332F2B] cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updatingStaff}
-                    className="px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                    className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
                   >
                     {updatingStaff ? 'Saving...' : 'Save Changes'}
                   </button>

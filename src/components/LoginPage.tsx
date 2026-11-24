@@ -513,12 +513,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       </div>
 
       {/* Floating Header: Install App Button & Theme Toggle */}
-      <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-40 flex items-center gap-1.5 sm:gap-2">
         {!isAppInstalled && (
           <button
             type="button"
             onClick={handleInstallAppClick}
-            className="px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[#241F1A]/95 backdrop-blur-md border border-[#D6C3A9] dark:border-[#3D342C] text-xs font-semibold text-[#A83232] dark:text-[#E7B84B] hover:bg-[#FAF5EE] dark:hover:bg-[#2F2923] transition flex items-center gap-1.5 cursor-pointer shadow-xs select-none"
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[#241F1A]/95 backdrop-blur-md border border-[#D6C3A9] dark:border-[#3D342C] text-xs font-semibold text-[#A83232] dark:text-[#E7B84B] hover:bg-[#FAF5EE] dark:hover:bg-[#2F2923] transition flex items-center gap-1.5 cursor-pointer shadow-xs select-none"
             title="Install LIRC STAT as a Desktop or Mobile Application"
           >
             <Download className="w-3.5 h-3.5" />
@@ -531,31 +531,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       {/* =====================================================================
           LANDING HERO & FEATURE CARDS (MAIN VIEW)
       ===================================================================== */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex flex-col justify-center items-center relative z-10">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-20 flex flex-col justify-center items-center relative z-10">
         {/* Transparent & Expanded Animated Hero Logo */}
-        <div className="flex justify-center mb-6 sm:mb-7 animate-literary-fade">
-          <AnimatedBookLogo className="h-20 sm:h-24 md:h-28 w-auto" />
+        <div className="flex justify-center mb-5 sm:mb-7 animate-literary-fade">
+          <AnimatedBookLogo className="h-16 sm:h-24 md:h-28 w-auto" />
         </div>
 
         {/* Institution Badge Pill */}
-        <div className="mb-4 text-center">
-          <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#FFFFFF]/95 dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#3D342C] text-[10.5px] sm:text-[11px] font-semibold text-[#8C6514] dark:text-[#E7B84B] tracking-[0.16em] uppercase shadow-2xs">
+        <div className="mb-3 sm:mb-4 text-center max-w-[95vw]">
+          <span className="inline-flex items-center px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-[#FFFFFF]/95 dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#3D342C] text-[9.5px] sm:text-[11px] font-semibold text-[#8C6514] dark:text-[#E7B84B] tracking-[0.08em] sm:tracking-[0.16em] uppercase shadow-2xs text-center">
             LEARNING &amp; INFORMATION RESOURCE CENTER
           </span>
         </div>
 
         {/* Grand Title: Large with cohesive letter kerning */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] font-heading font-black text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.06em] sm:tracking-[0.08em] md:tracking-[0.10em] lg:tracking-[0.12em] uppercase text-center mb-4 leading-none select-none">
+        <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] font-heading font-black text-[#2B2621] dark:text-[#F5EFE6] tracking-[0.04em] sm:tracking-[0.08em] md:tracking-[0.10em] lg:tracking-[0.12em] uppercase text-center mb-3 sm:mb-4 leading-none select-none max-w-full break-words">
           LIRC STAT
         </h1>
 
         {/* Subtitle / Platform Mission: Constrained narrower than the grand title */}
-        <p className="text-xs sm:text-sm md:text-base text-[#665D53] dark:text-[#A89C8F] max-w-md sm:max-w-lg md:max-w-xl mx-auto text-center leading-relaxed font-normal mb-8 sm:mb-10">
+        <p className="text-xs sm:text-sm md:text-base text-[#665D53] dark:text-[#A89C8F] max-w-xs sm:max-w-lg md:max-w-xl mx-auto text-center leading-relaxed font-normal mb-6 sm:mb-10 px-2">
           An Integrated Academic Platform for Library Occupancy Monitoring, Real-Time Statistical Reporting, and Duty Scheduling
         </p>
 
         {/* Action Buttons: Create Account, Sign In & Install App */}
-        <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14 sm:mb-18">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-xs sm:max-w-none mb-10 sm:mb-18">
           <button
             ref={createBtnRef}
             type="button"
@@ -564,7 +564,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onMouseLeave={handleCreateBtnLeave}
             onMouseDown={handleCreateBtnDown}
             onMouseUp={handleCreateBtnUp}
-            className="h-12 px-7 rounded-2xl bg-[#2D2926] dark:bg-[#1E1B18] text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none shadow-sm hover:bg-[#1E1B18]"
+            className="h-11 sm:h-12 px-6 sm:px-7 rounded-2xl bg-[#2D2926] dark:bg-[#1E1B18] text-white font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none shadow-sm hover:bg-[#1E1B18] w-full sm:w-auto"
           >
             <span>Create Account</span>
             <ArrowRight ref={arrowRef} className="w-4 h-4 transition-transform" />
@@ -578,7 +578,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             onMouseLeave={handleSignInBtnLeave}
             onMouseDown={handleSignInBtnDown}
             onMouseUp={handleSignInBtnUp}
-            className="h-12 px-7 rounded-2xl bg-white dark:bg-[#241F1A] border border-[#D6C3A9] dark:border-[#3D342C] text-[#332F2B] dark:text-[#FAF5EE] font-semibold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none hover:bg-[#FAF5EE] dark:hover:bg-[#2D2721]"
+            className="h-11 sm:h-12 px-6 sm:px-7 rounded-2xl bg-white dark:bg-[#241F1A] border border-[#D6C3A9] dark:border-[#3D342C] text-[#332F2B] dark:text-[#FAF5EE] font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer select-none hover:bg-[#FAF5EE] dark:hover:bg-[#2D2721] w-full sm:w-auto"
           >
             <span>Sign In</span>
           </button>
@@ -588,7 +588,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               ref={installBtnRef}
               type="button"
               onClick={handleInstallAppClick}
-              className="h-12 px-6 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A241E] border border-[#E7B84B] dark:border-[#B58D3D] text-[#7D5B06] dark:text-[#F3D085] hover:bg-[#F5EBDD] dark:hover:bg-[#342D25] font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none shadow-2xs hover:shadow-xs"
+              className="h-11 sm:h-12 px-5 sm:px-6 rounded-2xl bg-[#FEF9EC] dark:bg-[#2A241E] border border-[#E7B84B] dark:border-[#B58D3D] text-[#7D5B06] dark:text-[#F3D085] hover:bg-[#F5EBDD] dark:hover:bg-[#342D25] font-semibold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer select-none shadow-2xs hover:shadow-xs w-full sm:w-auto"
               title="Install LIRC STAT as Desktop or Mobile Application"
             >
               <Download className="w-4 h-4 text-[#A83232] dark:text-[#E7B84B]" />
@@ -681,11 +681,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               closeAuthModal();
             }
           }}
-          className="fixed inset-0 z-50 bg-[#332F2B]/60 backdrop-blur-xs overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-start min-h-screen"
+          className="fixed inset-0 z-50 bg-[#332F2B]/60 backdrop-blur-xs overflow-y-auto p-3 sm:p-6 flex flex-col items-center justify-start sm:justify-center min-h-screen"
         >
           <div
             ref={modalRef}
-            className="max-w-[460px] w-full rounded-3xl p-5 sm:p-7 bg-[#FFFFFF] shadow-2xl border border-[#E6D7C3] relative overflow-hidden my-auto shrink-0"
+            className="max-w-[460px] w-full rounded-2xl sm:rounded-3xl p-4 sm:p-7 bg-[#FFFFFF] shadow-2xl border border-[#E6D7C3] relative overflow-hidden my-auto shrink-0 max-h-[92vh] overflow-y-auto"
           >
             {/* Top Academic Accent Gradient Stripe */}
             <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0 z-10" />
@@ -1083,8 +1083,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           SUBMIT INVITATION CODE MODAL
       ===================================================================== */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-50 bg-[#332F2B]/60 backdrop-blur-xs overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-start min-h-screen">
-          <div ref={inviteModalRef} className="rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 bg-white border border-[#E6D7C3] relative overflow-hidden my-auto shrink-0">
+        <div className="fixed inset-0 z-50 bg-[#332F2B]/60 backdrop-blur-xs overflow-y-auto p-3 sm:p-6 flex flex-col items-center justify-start sm:justify-center min-h-screen">
+          <div ref={inviteModalRef} className="rounded-2xl sm:rounded-3xl shadow-2xl max-w-md w-full p-4 sm:p-7 bg-white border border-[#E6D7C3] relative overflow-hidden my-auto shrink-0 max-h-[92vh] overflow-y-auto">
             <div className="h-1.5 w-full bg-[#A83232] absolute top-0 left-0 z-10" />
 
             <div className="flex items-center justify-between mb-3">
@@ -1177,8 +1177,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           INSTALL APPLICATION MODAL (WINDOWS / ANDROID / IOS)
       ===================================================================== */}
       {showInstallModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-literary-fade">
-          <div className="w-full max-w-md bg-white dark:bg-[#1E1B18] rounded-3xl shadow-2xl border border-[#E6D7C3] dark:border-[#3D342C] p-6 relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-literary-fade overflow-y-auto">
+          <div className="w-full max-w-md bg-white dark:bg-[#1E1B18] rounded-2xl sm:rounded-3xl shadow-2xl border border-[#E6D7C3] dark:border-[#3D342C] p-4 sm:p-6 relative overflow-hidden max-h-[92vh] overflow-y-auto">
             <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
 
             <div className="flex items-center justify-between mb-4">

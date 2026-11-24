@@ -23,10 +23,21 @@
 }
 
 @layer base {
+  html {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--warm-beige);
     color: var(--charcoal);
+    overflow-x: hidden;
+  }
+
+  button, a, input, select {
+    touch-action: manipulation;
   }
 
   h1, h2, h3, h4, .font-heading {
