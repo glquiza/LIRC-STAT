@@ -2101,9 +2101,19 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
           {activeStationDutyAreaId !== null && !myActiveSession && (() => {
             const stationObj = assignableDutyAreas.find((a) => a.id === activeStationDutyAreaId) || BAGGAGE_DUTY_AREA;
             const matchingShift = dutyStatus.todayShifts.find((s) => s.areaId === stationObj.id);
+            const stationBg = getAreaBackgroundImage(stationObj);
             return (
-              <div className="active-station-banner bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
-                <div className="flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
+              <div className="active-station-banner relative overflow-hidden group bg-gradient-to-r from-[#F8FAF7] via-[#F1F5EE] to-[#E3EEDC] dark:from-[#182615] dark:via-[#142011] dark:to-[#0F190D] border border-[#71865A]/45 dark:border-[#71865A]/60 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+                {stationBg && (
+                  <>
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                      style={{ backgroundImage: `url('${stationBg}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFFFFF]/90 via-[#FAF5EE]/85 to-[#FFFFFF]/92 dark:from-[#182615]/92 dark:via-[#142011]/88 dark:to-[#0F190D]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                  </>
+                )}
+                <div className="relative z-10 flex items-center gap-2.5 text-sm text-[#332F2B] dark:text-[#D1E7CA]">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#71865A] dark:bg-[#86A870] animate-pulse shrink-0" />
                   <span>
                     Active monitoring at <strong className="text-[#332F2B] dark:text-[#FFFFFF]">{stationObj.name}</strong> (
@@ -2111,7 +2121,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     Service station duty active).
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="relative z-10 flex items-center gap-2">
                   <span className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#1A1613] text-[#455436] dark:text-[#B2D898] border border-[#71865A]/30 text-xs font-semibold inline-flex items-center gap-1.5">
                     <Radio className="w-3.5 h-3.5 text-[#71865A] animate-pulse" />
                     Active Monitoring
@@ -2512,11 +2522,12 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     const isCurrentShiftForArea = dutyStatus.currentShift?.areaId === area.id;
                     const isStationActive = activeStationDutyAreaId === area.id;
                     const isEntered = isStationActive;
+                    const bgPhoto = getAreaBackgroundImage(area);
 
                     return (
                       <div
                         key={`exempt-area-${area.id}`}
-                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between ${
+                        className={`sa-area-card literary-card literary-card-hover p-5 flex flex-col justify-between group ${
                           isEntered
                             ? 'ring-2 ring-[#71865A]'
                             : isCurrentShiftForArea
@@ -2524,11 +2535,20 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             : ''
                         } relative overflow-hidden`}
                       >
+                        {bgPhoto && (
+                          <>
+                            <div
+                              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
+                              style={{ backgroundImage: `url('${bgPhoto}')` }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#FFFFFF]/90 via-[#FAF5EE]/82 to-[#FFFFFF]/94 dark:from-[#1E1914]/93 dark:via-[#1A1613]/86 dark:to-[#1E1914]/95 backdrop-blur-[0.5px] pointer-events-none" />
+                          </>
+                        )}
                         <div
-                          className="h-1.5 w-full absolute top-0 left-0"
+                          className="h-1.5 w-full absolute top-0 left-0 z-10"
                           style={{ backgroundColor: area.color_hex }}
                         />
-                        <div>
+                        <div className="relative z-10">
                           <div className="flex items-start justify-between gap-2 mb-1.5 pt-1">
                             <div className="flex items-center gap-2">
                               <span
@@ -2624,31 +2644,33 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                           </div>
                         </div>
 
-                        {isEntered ? (
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-10 px-3 rounded-xl bg-[#F1F5EE] dark:bg-[#182414] border border-[#71865A]/40 text-[#455436] dark:text-[#B2D898] text-xs font-semibold flex items-center justify-center gap-1.5">
-                              <Radio className="w-4 h-4 text-[#71865A] animate-pulse" />
-                              <span>Active Monitoring · Entered</span>
+                        <div className="relative z-10">
+                          {isEntered ? (
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-10 px-3 rounded-xl bg-[#F1F5EE] dark:bg-[#182414] border border-[#71865A]/40 text-[#455436] dark:text-[#B2D898] text-xs font-semibold flex items-center justify-center gap-1.5">
+                                <Radio className="w-4 h-4 text-[#71865A] animate-pulse" />
+                                <span>Active Monitoring · Entered</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleLeaveStationArea(area)}
+                                className="h-10 px-3.5 rounded-xl bg-white dark:bg-[#1A1613] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] border border-[#E6D7C3] dark:border-[#383028] hover:border-[#A83232]/40 text-[#6E665E] dark:text-[#A89887] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-xs font-semibold transition cursor-pointer"
+                                title="Leave this station"
+                              >
+                                Leave
+                              </button>
                             </div>
+                          ) : (
                             <button
                               type="button"
-                              onClick={() => handleLeaveStationArea(area)}
-                              className="h-10 px-3.5 rounded-xl bg-white dark:bg-[#1A1613] hover:bg-[#FDF3F3] dark:hover:bg-[#332020] border border-[#E6D7C3] dark:border-[#383028] hover:border-[#A83232]/40 text-[#6E665E] dark:text-[#A89887] hover:text-[#A83232] dark:hover:text-[#E25D5D] text-xs font-semibold transition cursor-pointer"
-                              title="Leave this station"
+                              onClick={() => handleEnterStationArea(area)}
+                              className="w-full h-10 px-4 rounded-xl bg-gradient-to-r from-[#71865A] via-[#5E704A] to-[#4B5A3B] hover:from-[#5E704A] hover:to-[#3E4A31] text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-[#71865A]/20"
                             >
-                              Leave
+                              <span>Enter Area {matchingShiftsToday.length > 0 ? '(Mark Assignment)' : ''}</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
                             </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleEnterStationArea(area)}
-                            className="w-full h-10 px-4 rounded-xl bg-gradient-to-r from-[#71865A] via-[#5E704A] to-[#4B5A3B] hover:from-[#5E704A] hover:to-[#3E4A31] text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-[#71865A]/20"
-                          >
-                            <span>Enter Area {matchingShiftsToday.length > 0 ? '(Mark Assignment)' : ''}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
                     );
                   })}

@@ -257,14 +257,53 @@ export function subscribeToAreaChanges(
 }
 
 /**
- * Return custom background photo for known library areas.
+ * Return custom background photo for known library areas and duty stations.
  */
 export function getAreaBackgroundImage(area: { code?: string; slug?: string; name: string }): string | null {
   const n = (area.name || '').toLowerCase();
   const c = (area.code || '').toUpperCase();
   const s = (area.slug || '').toLowerCase();
+
+  // 1. Filipiniana
   if (c === 'FIL' || s === 'filipiniana' || n.includes('filipiniana')) {
     return '/filipiniana.jpg';
   }
+  // 2. Circulation (Area & Duty Station)
+  if (c === 'CIR' || s === 'circulation' || n.includes('circulation')) {
+    return '/circulation.jpg';
+  }
+  // 3. Periodicals
+  if (c === 'PER' || s === 'periodicals' || n.includes('periodical')) {
+    return '/periodicals.jpg';
+  }
+  // 4. Learning Commons
+  if (c === 'LC' || s === 'learning-commons' || n.includes('learning commons') || n.includes('commons')) {
+    return encodeURI('/learning commons.jpg');
+  }
+  // 5. Discussion Rooms
+  if (c === 'DR' || s === 'discussion-rooms' || n.includes('discussion')) {
+    return encodeURI('/discussion rooms.jpg');
+  }
+  // 6. Reference
+  if (c === 'REF' || s === 'reference' || n.includes('reference')) {
+    return '/reference.jpg';
+  }
+  // 7. Shelver Duty Station
+  if (c === 'SHL' || s === 'shelver' || n.includes('shelver') || n.includes('stack')) {
+    return '/shelver.jpg';
+  }
+  // 8. Technical Duty Station
+  if (c === 'TECH' || s === 'technical' || n.includes('technical') || n.includes('catalog')) {
+    return '/technical.jpg';
+  }
+  // 9. Entrance / Exit Duty Station
+  if (c === 'ENT' || s === 'entrance-exit' || n.includes('entrance') || n.includes('exit')) {
+    return '/entrance.jpg';
+  }
+  // 10. General Reading Area
+  if (n.includes('reading area')) {
+    return encodeURI('/reading area.jpg');
+  }
+
   return null;
 }
