@@ -2417,13 +2417,6 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             )}
                           </div>
 
-                          <p className="text-xs text-[#6E665E] dark:text-[#A89887] mb-1 font-stat">
-                            Capacity: {area.capacity} seats
-                          </p>
-                          <p className="text-xs text-[#6E665E] dark:text-[#A89887] line-clamp-2 mb-3">
-                            {area.description}
-                          </p>
-
                           <div className="space-y-1.5 mb-4 pb-3 border-t border-[#E6D7C3] dark:border-[#383028]">
                             <div className="flex items-center justify-between text-xs text-[#332F2B] dark:text-[#F0E8DE] font-stat">
                               <span>
@@ -2611,10 +2604,6 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                               </div>
                             )}
                           </div>
-
-                          <p className="text-xs text-[#6E665E] dark:text-[#A89887] line-clamp-2 mb-3">
-                            {area.description}
-                          </p>
 
                           <div className="space-y-1.5 mb-4 pb-3 border-t border-[#E6D7C3] dark:border-[#383028]">
                             <div className="flex items-center justify-between text-xs text-[#332F2B] dark:text-[#F0E8DE] font-stat pt-1">
@@ -2846,7 +2835,6 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                       </span>
                     </div>
                     <p className="text-xs text-[#6E665E] dark:text-[#A89887] font-stat">
-                      Capacity: {activeArea.capacity} seats ·{' '}
                       {myActiveSession.records_submitted} count(s) submitted ·{' '}
                       {(() => {
                         const othersInArea = activeSessions.filter(
