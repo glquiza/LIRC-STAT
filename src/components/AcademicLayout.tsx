@@ -224,7 +224,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                     <img src="/logo.png" alt="LIRC MANAGEMENT SYSTEM Logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="min-w-0">
-                    <div className="font-heading font-bold text-sm text-[#332F2B] dark:text-[#F0E8DE] leading-tight truncate">
+                    <div className="font-display font-bold text-xs tracking-[0.08em] text-[#332F2B] dark:text-[#F0E8DE] leading-tight truncate uppercase">
                       LIRC MANAGEMENT SYSTEM
                     </div>
                     <div className="text-[11px] font-medium text-[#6E665E] dark:text-[#A6998C] truncate">
