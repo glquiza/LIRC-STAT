@@ -475,146 +475,6 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
         </div>
       </div>
 
-      {/* Inline Input Form for Student Assistant (when expanded or always visible on SA portal) */}
-      {mode === 'student_assistant' && (
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 bg-stone-50/70 border-b border-stone-200 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#A83232]/10 text-[#A83232] flex items-center justify-center">
-                <Plus className="w-4 h-4" />
-              </div>
-              <h2 className="text-base font-bold text-stone-900">Record Library Violation</h2>
-            </div>
-            <span className="text-xs text-stone-500 bg-white px-2.5 py-1 rounded-md border border-stone-200">
-              Auto-assigned 1-Hour Timer (3600s)
-            </span>
-          </div>
-
-          <form onSubmit={handleSubmitViolation} className="p-6 space-y-5">
-            {formError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-medium flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{formError}</span>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Violator Name */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                  Violator&apos;s Full Name <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 absolute left-3 top-3 text-stone-400" />
-                  <input
-                    type="text"
-                    required
-                    value={violatorName}
-                    onChange={(e) => setViolatorName(e.target.value)}
-                    placeholder="e.g. Juan Dela Cruz"
-                    className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition bg-white"
-                  />
-                </div>
-              </div>
-
-              {/* Student ID */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                  Student ID Number <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <GraduationCap className="w-4 h-4 absolute left-3 top-3 text-stone-400" />
-                  <input
-                    type="text"
-                    required
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="e.g. 2024-01234"
-                    className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition bg-white uppercase"
-                  />
-                </div>
-              </div>
-
-              {/* Course */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
-                  Course / Academic Program <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={course}
-                  onChange={(e) => setCourse(e.target.value)}
-                  placeholder="e.g. BS Information Technology"
-                  className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition bg-white"
-                />
-              </div>
-            </div>
-
-            {/* Violation Details */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
-                  Violation Description <span className="text-red-500">*</span>
-                </label>
-                <span className="text-[11px] text-stone-400">Click a quick preset or type custom violation</span>
-              </div>
-              <input
-                type="text"
-                required
-                value={violation}
-                onChange={(e) => setViolation(e.target.value)}
-                placeholder="Enter violation details or select from quick presets below..."
-                className="w-full px-3.5 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition bg-white"
-              />
-
-              {/* Common Violation Chips */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {COMMON_VIOLATIONS.map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setViolation(preset)}
-                    className={`text-xs px-2.5 py-1 rounded-lg border transition ${
-                      violation === preset
-                        ? 'bg-[#A83232] text-white border-[#A83232] font-semibold'
-                        : 'bg-stone-100 hover:bg-stone-200/80 text-stone-700 border-stone-200'
-                    }`}
-                  >
-                    {preset}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Student Assistant Name (Automatic) & Action */}
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-stone-100">
-              <div className="flex items-center gap-2 text-xs text-stone-600 bg-stone-50 px-3 py-2 rounded-xl border border-stone-200/60">
-                <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>
-                  Recorded By: <strong className="text-stone-900">{profile.full_name || 'Current Student Assistant'}</strong>
-                  {profile.staff_code ? ` (${profile.staff_code})` : ''}
-                  <span className="text-stone-400 ml-1.5 font-normal">(Automatic from user profile)</span>
-                </span>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-5 py-2.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {submitting ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Plus className="w-4 h-4" />
-                )}
-                <span>Record Violation & Arm 1-Hr Timer</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search Input */}
@@ -667,7 +527,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
       {/* Violations Table / List */}
       <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between bg-stone-50/50">
+        <div className="px-6 py-4 border-b border-stone-200 flex flex-wrap items-center justify-between gap-3 bg-stone-50/50">
           <div>
             <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
               Recorded Violations ({filteredRecords.length})
@@ -676,6 +536,13 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
               Each record includes its 1-hour timer with Play, Pause, Completed status, and Remove controls.
             </p>
           </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Log Violation</span>
+          </button>
         </div>
 
         {loading ? (
