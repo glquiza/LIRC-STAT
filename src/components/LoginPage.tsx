@@ -25,7 +25,6 @@ import {
   parseStaffAccount,
 } from '../utils/invitationWorkflow';
 import { gsapFadeIn, gsapPopIn, gsap } from '../utils/animations';
-import { ThemeToggle } from '../context/ThemeContext';
 import { AnimatedBookLogo } from './AnimatedBookLogo';
 
 interface LoginPageProps {
@@ -512,21 +511,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5EBDD]/25 to-[#EDE0CE]/75 dark:via-[#161311]/25 dark:to-[#0D0B0A]/80 pointer-events-none" />
       </div>
 
-      {/* Floating Header: Install App Button & Theme Toggle */}
-      <div className="fixed top-3 right-3 sm:top-4 sm:right-4 z-40 flex items-center gap-1.5 sm:gap-2">
-        {!isAppInstalled && (
-          <button
-            type="button"
-            onClick={handleInstallAppClick}
-            className="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-[#241F1A]/95 backdrop-blur-md border border-[#D6C3A9] dark:border-[#3D342C] text-xs font-semibold text-[#A83232] dark:text-[#E7B84B] hover:bg-[#FAF5EE] dark:hover:bg-[#2F2923] transition flex items-center gap-1.5 cursor-pointer shadow-xs select-none"
-            title="Install LIRC STAT as a Desktop or Mobile Application"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Install App</span>
-          </button>
-        )}
-        <ThemeToggle showLabel />
-      </div>
+
 
       {/* =====================================================================
           LANDING HERO & FEATURE CARDS (MAIN VIEW)
