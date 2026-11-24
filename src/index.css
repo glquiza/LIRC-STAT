@@ -30,7 +30,7 @@
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--warm-beige);
     color: var(--charcoal);
     overflow-x: hidden;
@@ -41,14 +41,14 @@
   }
 
   h1, h2, h3, h4, .font-heading {
-    font-family: 'Lora', 'Playfair Display', Georgia, 'Times New Roman', serif;
-    letter-spacing: -0.015em;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.025em;
     color: var(--charcoal);
   }
 
   .font-collegiate {
-    font-family: 'Cinzel', 'Lora', serif;
-    letter-spacing: 0.04em;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    letter-spacing: 0.02em;
   }
 
   /* Academic statistics, counters, and tabular figures */
