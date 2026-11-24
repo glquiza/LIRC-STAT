@@ -73,7 +73,6 @@ import {
 import { LibrarianRecordsAndLogs } from './LibrarianRecordsAndLogs';
 import { LibrarianAdminPanel } from './LibrarianAdminPanel';
 import { LibrarianAreaAssignments } from './LibrarianAreaAssignments';
-import { getAreaBackgroundImage, getAreaBorderGradientStyle } from '../utils/areaManagement';
 import { LibrarianAdvancedSettings } from './LibrarianAdvancedSettings';
 import { AcademicLayout, NavItem, NotificationItem } from './AcademicLayout';
 import { topProgressBar } from './TopProgressBar';
@@ -973,37 +972,25 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                 const uniqueAreaSessions = Array.from(
                   new Map(areaSessions.map((s) => [s.user_id, s])).values()
                 );
-                const bgPhoto = getAreaBackgroundImage(item.area);
-
                 return (
                   <div
                     key={item.area.id}
-                    className="lib-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between relative overflow-hidden group"
+                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden"
                   >
-                    <div className="card-gradient-border" style={getAreaBorderGradientStyle(item.area.color_hex, uniqueAreaSessions.length > 0)} />
-                    {bgPhoto && (
-                      <>
-                        <div
-                          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                          style={{ backgroundImage: `url('${bgPhoto}')` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/35 to-white/80 dark:from-[#1E1914]/85 dark:via-[#16120F]/45 dark:to-[#1E1914]/90 pointer-events-none" />
-                      </>
-                    )}
                     <div
-                      className="h-1 w-full absolute top-0 left-0 z-10"
-                      style={{ background: `linear-gradient(90deg, ${item.area.color_hex} 0%, #E7B84B 60%, ${item.area.color_hex}30 100%)` }}
+                      className="h-1 w-full absolute top-0 left-0"
+                      style={{ backgroundColor: item.area.color_hex }}
                     />
-                    <div className="relative z-10">
+                    <div>
                       <div className="flex items-center justify-between mb-2 pt-1">
-                        <span className="font-heading font-bold text-base text-[#2A241F] dark:text-[#FFFFFF] flex items-center gap-2 drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                        <span className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
                           <span
                             className="w-2.5 h-2.5 rounded-full"
                             style={{ backgroundColor: item.area.color_hex }}
                           />
                           {item.area.name}
                         </span>
-                        <span className="text-xs font-stat font-semibold text-[#6E665E] dark:text-[#A89887] bg-white/70 dark:bg-[#1E1914]/80 px-2 py-0.5 rounded-md border border-white/50 dark:border-[#383028]/50 shadow-2xs">
+                        <span className="text-xs font-stat font-semibold text-[#6E665E] dark:text-[#A89887]">
                           {item.sharePercent}%
                         </span>
                       </div>
@@ -1046,7 +1033,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                         )}
                       </div>
 
-                      <div className="flex items-baseline justify-between mb-3 bg-white/80 dark:bg-[#1E1914]/85 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-white/60 dark:border-[#383028]/70 shadow-2xs">
+                      <div className="flex items-baseline justify-between mb-3">
                         <span className="text-2xl font-stat font-bold text-[#332F2B] dark:text-[#F0E8DE]">
                           {item.totalOccupancy.toLocaleString()}
                         </span>
@@ -1056,7 +1043,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       </div>
                     </div>
 
-                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3]/60 dark:border-[#383028]/60 relative z-10 bg-white/75 dark:bg-[#1E1914]/80 backdrop-blur-xs p-2 rounded-xl border border-white/50 dark:border-[#383028]/50 shadow-2xs">
+                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3] dark:border-[#383028]">
                       <div className="text-[11px] font-stat text-[#6E665E] dark:text-[#A89887] flex items-center justify-between">
                         <span>
                           {item.recordedSlotsCount}/{item.expectedSlotsCount} slots ·{' '}
@@ -1144,37 +1131,25 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                   totalCoveredHours += Math.round((diff / 60) * 10) / 10;
                 });
 
-                const bgPhoto = getAreaBackgroundImage(area);
-
                 return (
                   <div
                     key={`service-station-${area.id}`}
-                    className="lib-area-card literary-card literary-card-hover border-transparent! p-5 flex flex-col justify-between relative overflow-hidden group"
+                    className="lib-area-card literary-card literary-card-hover p-5 flex flex-col justify-between relative overflow-hidden"
                   >
-                    <div className="card-gradient-border" style={getAreaBorderGradientStyle(area.color_hex, isActivelyMonitoredLive)} />
-                    {bgPhoto && (
-                      <>
-                        <div
-                          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
-                          style={{ backgroundImage: `url('${bgPhoto}')` }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/35 to-white/80 dark:from-[#1E1914]/85 dark:via-[#16120F]/45 dark:to-[#1E1914]/90 pointer-events-none" />
-                      </>
-                    )}
                     <div
-                      className="h-1 w-full absolute top-0 left-0 z-10"
-                      style={{ background: `linear-gradient(90deg, ${area.color_hex} 0%, #E7B84B 60%, ${area.color_hex}30 100%)` }}
+                      className="h-1 w-full absolute top-0 left-0"
+                      style={{ backgroundColor: area.color_hex }}
                     />
-                    <div className="relative z-10">
+                    <div>
                       <div className="flex items-center justify-between mb-2 pt-1">
-                        <span className="font-heading font-bold text-base text-[#2A241F] dark:text-[#FFFFFF] flex items-center gap-2 drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
+                        <span className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
                           <span
                             className="w-2.5 h-2.5 rounded-full"
                             style={{ backgroundColor: area.color_hex }}
                           />
                           {area.name}
                         </span>
-                        <span className="text-[11px] font-stat font-semibold text-[#6E665E] dark:text-[#A89887] bg-white/70 dark:bg-[#1E1914]/80 px-2 py-0.5 rounded-md border border-white/50 dark:border-[#383028]/50 shadow-2xs">
+                        <span className="text-[11px] font-stat font-semibold text-[#6E665E] dark:text-[#A89887] bg-[#F5EBDD] dark:bg-[#25201B] px-2 py-0.5 rounded-md">
                           Service Station
                         </span>
                       </div>
@@ -1242,7 +1217,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                     </div>
 
                     {/* Footer */}
-                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3]/60 dark:border-[#383028]/60 relative z-10 bg-white/75 dark:bg-[#1E1914]/80 backdrop-blur-xs p-2 rounded-xl border border-white/50 dark:border-[#383028]/50 shadow-2xs">
+                    <div className="space-y-1.5 pt-2.5 border-t border-[#E6D7C3] dark:border-[#383028]">
                       <div className="text-[11px] font-stat text-[#6E665E] dark:text-[#A89887] flex items-center justify-between">
                         <span>
                           {totalCoveredHours > 0 ? `${totalCoveredHours} hrs scheduled today` : 'Unassigned'}
