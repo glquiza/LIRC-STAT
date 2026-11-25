@@ -101,6 +101,7 @@ interface StudentAssistantPortalProps {
   profile: UserProfile;
   allAreas: LibraryArea[];
   onSignOut: () => void;
+  onRefreshAreas?: () => void;
 }
 
 const PAGE_SIZE = 15;
@@ -188,6 +189,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
   profile,
   allAreas,
   onSignOut,
+  onRefreshAreas,
 }) => {
   const sortedAreas = useMemo(
     () =>
@@ -894,16 +896,67 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       }
     }
 
+    // Resolve target area ID: map any legacy/mock IDs (>= 9000) to actual database IDs
+    let targetAreaId = Number(area.id);
+    if (isNaN(targetAreaId) || targetAreaId >= 9000 || targetAreaId <= 0) {
+      const codeMap: Record<string, number> = {
+        FIL: 1,
+        READ: 2,
+        PER: 3,
+        LC: 4,
+        DR: 5,
+        REF: 6,
+        GEN: 6,
+        GRAD: 5,
+        INTERNET: 4,
+      };
+      targetAreaId = codeMap[area.code?.toUpperCase()] || codeMap[area.slug?.toUpperCase()] || 2;
+    }
+
     setStartingAreaId(area.id);
-    const { data, error } = await supabase.rpc('start_monitoring_session', {
-      p_area_id: area.id,
+    let { data, error } = await supabase.rpc('start_monitoring_session', {
+      p_area_id: targetAreaId,
     });
+
+    // Auto-recovery: if error is "not found or inactive", query active areas and retry
+    if (error && error.message?.includes('not found')) {
+      try {
+        const { data: dbAreas } = await supabase
+          .from('library_areas')
+          .select('id, code, slug, name')
+          .eq('is_active', true);
+        if (Array.isArray(dbAreas) && dbAreas.length > 0) {
+          const match =
+            dbAreas.find(
+              (a) =>
+                a.code === area.code ||
+                a.slug === area.slug ||
+                a.name?.toLowerCase() === area.name?.toLowerCase()
+            ) || dbAreas[0];
+          if (match) {
+            const retryRes = await supabase.rpc('start_monitoring_session', {
+              p_area_id: match.id,
+            });
+            if (!retryRes.error && retryRes.data) {
+              data = retryRes.data;
+              error = null;
+            }
+          }
+        }
+      } catch {
+        // ignore retry failure
+      }
+    }
+
     setStartingAreaId(null);
 
     if (error) {
       showToast('error', `Could not enter area: ${error.message}`);
       return;
     }
+
+    // Refresh areas to ensure latest database state
+    onRefreshAreas?.();
 
     // Clear active station if switching to statistical monitoring session
     setActiveStationDutyAreaId(null);

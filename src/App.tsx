@@ -13,20 +13,20 @@ export const CACHED_AREAS_KEY = 'lirc_cached_library_areas';
 
 export const DEFAULT_AREAS: LibraryArea[] = [
   {
-    id: 9901,
-    code: 'GEN',
-    slug: 'general-reference',
-    name: 'General Reference',
-    description: 'General reference collection, encyclopedias, and reference consultation desks.',
-    floor_location: '1st Floor, Reference Section',
-    capacity: 60,
-    color_hex: '#1E3A8A',
+    id: 1,
+    code: 'FIL',
+    slug: 'filipiniana',
+    name: 'Filipiniana',
+    description: 'Philippine history, culture, theses, and local publications reading hall.',
+    floor_location: '2nd Floor, East Wing',
+    capacity: 75,
+    color_hex: '#2563eb',
     icon_name: 'BookOpen',
     display_order: 1,
     is_active: true,
   },
   {
-    id: 9902,
+    id: 2,
     code: 'READ',
     slug: 'reading-area',
     name: 'Reading Area',
@@ -39,54 +39,54 @@ export const DEFAULT_AREAS: LibraryArea[] = [
     is_active: true,
   },
   {
-    id: 9903,
+    id: 3,
     code: 'PER',
     slug: 'periodicals',
-    name: 'Periodicals Section',
-    description: 'Journals, newspapers, magazines, serial publications, and newspaper archives.',
-    floor_location: '1st Floor, East Wing',
-    capacity: 40,
-    color_hex: '#D97706',
+    name: 'Periodicals',
+    description: 'Academic journals, magazines, newspapers, and serials study lounge.',
+    floor_location: '2nd Floor, North Wing',
+    capacity: 55,
+    color_hex: '#d97706',
     icon_name: 'Newspaper',
     display_order: 3,
     is_active: true,
   },
   {
-    id: 9904,
-    code: 'FIL',
-    slug: 'filipiniana',
-    name: 'Filipiniana Section',
-    description: 'Filipiniana books, local historical monographs, and Philippine government documents.',
-    floor_location: '2nd Floor, Main Wing',
-    capacity: 50,
-    color_hex: '#7C3AED',
-    icon_name: 'Bookmark',
+    id: 4,
+    code: 'LC',
+    slug: 'learning-commons',
+    name: 'Learning Commons',
+    description: 'Collaborative digital workspace, research workstations, and study pods.',
+    floor_location: '1st Floor, West Wing',
+    capacity: 120,
+    color_hex: '#7c3aed',
+    icon_name: 'Laptop',
     display_order: 4,
     is_active: true,
   },
   {
-    id: 9905,
-    code: 'GRAD',
-    slug: 'graduate-studies',
-    name: 'Graduate Studies & Research',
-    description: 'Quiet research carrels, thesis & dissertation repository, and postgraduate studies.',
-    floor_location: '2nd Floor, West Wing',
-    capacity: 30,
-    color_hex: '#0D9488',
-    icon_name: 'GraduationCap',
+    id: 5,
+    code: 'DR',
+    slug: 'discussion-rooms',
+    name: 'Discussion Rooms',
+    description: 'Reservable glass-walled group study and project collaboration suites.',
+    floor_location: '3rd Floor, Study Suites',
+    capacity: 60,
+    color_hex: '#e11d48',
+    icon_name: 'Users',
     display_order: 5,
     is_active: true,
   },
   {
-    id: 9906,
-    code: 'INTERNET',
-    slug: 'internet-multimedia',
-    name: 'Internet & Multimedia Lab',
-    description: 'Computer workstations, online research, e-journals, OPAC terminals, and digital resources.',
-    floor_location: '2nd Floor, Computer Lab',
-    capacity: 45,
-    color_hex: '#DC2626',
-    icon_name: 'Monitor',
+    id: 6,
+    code: 'REF',
+    slug: 'reference',
+    name: 'Reference',
+    description: 'Encyclopedias, dictionaries, indexes, and guided research consultation zone.',
+    floor_location: '2nd Floor, Central Hall',
+    capacity: 65,
+    color_hex: '#0891b2',
+    icon_name: 'Compass',
     display_order: 6,
     is_active: true,
   },
@@ -108,7 +108,16 @@ function getCachedAreas(): LibraryArea[] {
   try {
     const raw = localStorage.getItem(CACHED_AREAS_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_AREAS;
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      // Invalidate if contains mock IDs >= 9000 or negative/non-numeric IDs
+      const hasMockIds = parsed.some((a) => !a.id || a.id >= 9000 || typeof a.id !== 'number');
+      if (hasMockIds) {
+        localStorage.setItem(CACHED_AREAS_KEY, JSON.stringify(DEFAULT_AREAS));
+        return DEFAULT_AREAS;
+      }
+      return parsed;
+    }
+    return DEFAULT_AREAS;
   } catch {
     return DEFAULT_AREAS;
   }
@@ -198,7 +207,7 @@ export const App: React.FC = () => {
 
         if (!foundReading) {
           mapped.splice(1, 0, {
-            id: 9902,
+            id: 2,
             code: 'READ',
             slug: 'reading-area',
             name: 'Reading Area',
@@ -292,6 +301,8 @@ export const App: React.FC = () => {
             } catch {
               // ignore
             }
+
+            void loadAreas();
 
             if (rawProfile.role === 'librarian') {
               void syncLibraryAreasWithDatabase();
@@ -556,6 +567,7 @@ export const App: React.FC = () => {
       profile={profile}
       allAreas={areas}
       onSignOut={handleSignOut}
+      onRefreshAreas={loadAreas}
     />
   );
 };
