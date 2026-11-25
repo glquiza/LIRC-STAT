@@ -603,7 +603,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                         className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-[#A83232] hover:bg-[#FDF3F3] transition flex items-center gap-2 cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        Sign Out of LIRC MANAGEMENT SYSTEM
+                        Sign Out
                       </button>
                     </div>
                   </div>
