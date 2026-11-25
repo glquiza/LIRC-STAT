@@ -292,7 +292,8 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
   // Handle Exports (Librarian)
   const handleExport = async (format: 'xlsx' | 'pdf' | 'docx') => {
-    if (records.length === 0) {
+    const listToExport = filteredRecords.length > 0 ? filteredRecords : records;
+    if (listToExport.length === 0) {
       setExportNotice('No violation records available to export.');
       setTimeout(() => setExportNotice(null), 3000);
       return;
@@ -301,13 +302,13 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
     try {
       const preparedBy = profile.full_name || 'LIRC Staff';
       if (format === 'xlsx') {
-        exportViolationsToExcel(filteredRecords, preparedBy);
+        exportViolationsToExcel(listToExport, preparedBy);
         setExportNotice('Excel report (.xlsx) generated successfully.');
       } else if (format === 'pdf') {
-        exportViolationsToPDF(filteredRecords, preparedBy);
+        exportViolationsToPDF(listToExport, preparedBy);
         setExportNotice('PDF document (.pdf) downloaded.');
       } else if (format === 'docx') {
-        await exportViolationsToWord(filteredRecords, preparedBy);
+        await exportViolationsToWord(listToExport, preparedBy);
         setExportNotice('Word report (.docx) created.');
       }
     } catch (err: any) {
@@ -351,8 +352,10 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#A83232] to-[#8B2626] rounded-2xl p-6 text-white shadow-md relative overflow-hidden border border-[#A83232]/30">
-        <div className="absolute right-0 top-0 w-96 h-full bg-white/5 pointer-events-none transform skew-x-12" />
+      <div className="bg-gradient-to-r from-[#A83232] to-[#8B2626] rounded-2xl p-6 text-white shadow-md relative z-30 border border-[#A83232]/30">
+        <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+          <div className="absolute right-0 top-0 w-96 h-full bg-white/5 transform skew-x-12" />
+        </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="w-13 h-13 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-3 text-amber-300 shadow-inner">
@@ -419,7 +422,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                 </button>
 
                 {exportDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-[#E6D7C3] shadow-xl p-2 z-50 animate-literary-fade space-y-1">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-[#E6D7C3] shadow-2xl p-2 z-50 animate-literary-fade space-y-1">
                     <div className="px-3 py-1.5 text-[10px] font-bold text-[#8C827A] uppercase tracking-wider">
                       Available Export Formats
                     </div>
