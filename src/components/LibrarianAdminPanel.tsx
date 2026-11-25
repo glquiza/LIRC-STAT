@@ -45,7 +45,10 @@ import {
   formatTimeSlotLabel,
   generateRandomInviteCode,
   InvitationCodeRecord,
+  isCarrierProfile,
+  isCalendarCarrierProfile,
   isNonStatisticalArea,
+  isViolationsCarrierProfile,
   ParsedStaffAccount,
   parseInviteCodeCarrier,
   parseStaffAccount,
@@ -194,13 +197,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
     const schedules: DutyScheduleAssignment[] = [];
 
     rawProfiles.forEach((profile) => {
-      if (
-        profile.shift_schedule === 'REMOVED' ||
-        profile.full_name.startsWith('CALENDAR_ACTIVITY::') ||
-        (profile.staff_code || '').startsWith('CAL_ACT::') ||
-        (profile.username || '').startsWith('cal_')
-      ) return;
-
+      // First check for invitation code carrier
       const inviteCarrier = parseInviteCodeCarrier(profile);
       if (inviteCarrier) {
         if (inviteCarrier.isActive) {
@@ -209,7 +206,24 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
         return;
       }
 
+      // Filter out all removed profiles and all sync carrier records (calendar, violations, internal)
+      if (
+        profile.shift_schedule === 'REMOVED' ||
+        isCarrierProfile(profile)
+      ) {
+        return;
+      }
+
       const parsed = parseStaffAccount(profile);
+      if (
+        parsed.isRemoved ||
+        parsed.isViolationsCarrier ||
+        parsed.isCalendarCarrier ||
+        parsed.isInviteCarrier
+      ) {
+        return;
+      }
+
       if (parsed.isRegistrationRequest) {
         requests.push(parsed);
       }

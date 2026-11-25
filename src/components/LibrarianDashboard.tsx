@@ -85,6 +85,7 @@ import {
   EXEMPT_DUTY_AREAS,
   formatTimeSlotLabel,
   getDayGroupForDate,
+  isCarrierProfile,
   isNonStatisticalArea,
   isScheduleMatchingDay,
   parseDutySchedulesFromProfile,
@@ -216,9 +217,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
     staffProfiles.forEach((p) => {
       if (
         p.shift_schedule === 'REMOVED' ||
-        p.full_name.startsWith('CALENDAR_ACTIVITY::') ||
-        (p.staff_code || '').startsWith('CAL_ACT::') ||
-        (p.username || '').startsWith('cal_')
+        isCarrierProfile(p)
       ) {
         return;
       }
@@ -359,7 +358,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
       const profiles = staffRes.data as UserProfile[];
       setStaffProfiles(profiles);
       const pendingCount = profiles.filter((u) => {
-        if (u.shift_schedule === 'REMOVED') return false;
+        if (u.shift_schedule === 'REMOVED' || isCarrierProfile(u)) return false;
         return parseStaffAccount(u).approvalStatus === 'pending';
       }).length;
       setPendingRegistrationsCount(pendingCount);

@@ -302,6 +302,7 @@ export interface ParsedStaffAccount {
   profile: UserProfile;
   isInviteCarrier: boolean;
   isCalendarCarrier?: boolean;
+  isViolationsCarrier?: boolean;
   isRemoved: boolean;
   isRegistrationRequest: boolean;
   approvalStatus: RegistrationApprovalStatus;
@@ -310,6 +311,54 @@ export interface ParsedStaffAccount {
   courseDepartment: string;
   dutySchedules: DutyScheduleAssignment[];
   scheduleSummary: string;
+}
+
+export function isViolationsCarrierProfile(profile: Partial<UserProfile> | null | undefined): boolean {
+  if (!profile) return false;
+  const fn = profile.full_name || '';
+  const sc = profile.staff_code || '';
+  const un = profile.username || '';
+  const em = profile.email || '';
+  return (
+    fn.startsWith('VIOLATION_CARRIER::') ||
+    fn.startsWith('VIOLATION_UPDATE::') ||
+    fn.startsWith('VIOLATION_DELETE::') ||
+    fn.startsWith('VIOLATION_') ||
+    sc.startsWith('VIOL_REC::') ||
+    sc.startsWith('VIOL_UPD::') ||
+    sc.startsWith('VIOL_DEL::') ||
+    sc.startsWith('VIOL_') ||
+    un.startsWith('viol_') ||
+    un.startsWith('vupd_') ||
+    un.startsWith('vdel_') ||
+    un.startsWith('vtest_') ||
+    em.startsWith('viol_') ||
+    em.startsWith('vupd_') ||
+    em.startsWith('vdel_') ||
+    em.includes('@lirc.internal')
+  );
+}
+
+export function isCalendarCarrierProfile(profile: Partial<UserProfile> | null | undefined): boolean {
+  if (!profile) return false;
+  const fn = profile.full_name || '';
+  const sc = profile.staff_code || '';
+  const un = profile.username || '';
+  return (
+    fn.startsWith('CALENDAR_ACTIVITY::') ||
+    sc.startsWith('CAL_ACT::') ||
+    un.startsWith('cal_')
+  );
+}
+
+export function isCarrierProfile(profile: Partial<UserProfile> | null | undefined): boolean {
+  if (!profile) return false;
+  return (
+    isViolationsCarrierProfile(profile) ||
+    isCalendarCarrierProfile(profile) ||
+    profile.shift_schedule === 'INVITE_CODE' ||
+    (profile.full_name || '').startsWith(INVITE_PREFIX)
+  );
 }
 
 const INVITE_PREFIX = 'INVITE_CODE::';
@@ -423,6 +472,9 @@ export function parseDutySchedulesFromProfile(
   profile: UserProfile,
   displayStaffCode?: string
 ): DutyScheduleAssignment[] {
+  if (isCarrierProfile(profile) || profile.shift_schedule === 'REMOVED') {
+    return [];
+  }
   const raw = profile.shift_schedule || '';
   if (!raw.startsWith(DUTY_SCHEDULES_PREFIX)) {
     return generateFallbackDutySchedules(profile, displayStaffCode);
@@ -503,9 +555,7 @@ export function generateFallbackDutySchedules(
   if (
     profile.role !== 'student_assistant' ||
     profile.shift_schedule === 'REMOVED' ||
-    profile.full_name.startsWith('CALENDAR_ACTIVITY::') ||
-    (profile.staff_code || '').startsWith('CAL_ACT::') ||
-    (profile.username || '').startsWith('cal_')
+    isCarrierProfile(profile)
   ) {
     return [];
   }
@@ -1085,21 +1135,8 @@ export function parseStaffAccount(profile: UserProfile): ParsedStaffAccount {
   const rawCode = profile.staff_code || '';
   const isInviteCarrier =
     profile.shift_schedule === 'INVITE_CODE' || profile.full_name.startsWith(INVITE_PREFIX);
-  const isCalendarCarrier =
-    profile.full_name.startsWith('CALENDAR_ACTIVITY::') ||
-    rawCode.startsWith('CAL_ACT::') ||
-    (profile.username || '').startsWith('cal_');
-  const isViolationsCarrier =
-    profile.full_name.startsWith('VIOLATION_CARRIER::') ||
-    profile.full_name.startsWith('VIOLATION_UPDATE::') ||
-    profile.full_name.startsWith('VIOLATION_DELETE::') ||
-    rawCode.startsWith('VIOL_REC::') ||
-    rawCode.startsWith('VIOL_UPD::') ||
-    rawCode.startsWith('VIOL_DEL::') ||
-    (profile.username || '').startsWith('viol_') ||
-    (profile.username || '').startsWith('vupd_') ||
-    (profile.username || '').startsWith('vdel_') ||
-    (profile.username || '').startsWith('vtest_');
+  const isCalendarCarrier = isCalendarCarrierProfile(profile);
+  const isViolationsCarrier = isViolationsCarrierProfile(profile);
   const isRemoved = profile.shift_schedule === 'REMOVED' || isCalendarCarrier || isViolationsCarrier;
 
   let isRegistrationRequest = false;
@@ -1108,7 +1145,9 @@ export function parseStaffAccount(profile: UserProfile): ParsedStaffAccount {
   let inviteCode: string | null = null;
   let courseDepartment = '';
 
-  if (rawCode.startsWith(PENDING_PREFIX)) {
+  if (isViolationsCarrier || isCalendarCarrier || isRemoved) {
+    approvalStatus = 'rejected';
+  } else if (rawCode.startsWith(PENDING_PREFIX)) {
     const rest = rawCode.slice(PENDING_PREFIX.length);
     const [studentId, invCode, courseDept] = rest.split('::');
     isRegistrationRequest = true;
@@ -1144,6 +1183,7 @@ export function parseStaffAccount(profile: UserProfile): ParsedStaffAccount {
     profile,
     isInviteCarrier,
     isCalendarCarrier,
+    isViolationsCarrier,
     isRemoved,
     isRegistrationRequest,
     approvalStatus,

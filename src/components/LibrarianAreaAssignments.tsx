@@ -25,6 +25,7 @@ import {
   EXEMPT_DUTY_AREAS,
   formatTimeSlotLabel,
   getDayGroupForDate,
+  isCarrierProfile,
   isNonStatisticalArea,
   isScheduleMatchingDay,
   parseDutySchedulesFromProfile,
@@ -141,9 +142,7 @@ export const LibrarianAreaAssignments: React.FC<LibrarianAreaAssignmentsProps> =
     staffProfiles.forEach((profile) => {
       if (
         profile.shift_schedule === 'REMOVED' ||
-        profile.full_name.startsWith('CALENDAR_ACTIVITY::') ||
-        (profile.staff_code || '').startsWith('CAL_ACT::') ||
-        (profile.username || '').startsWith('cal_')
+        isCarrierProfile(profile)
       ) {
         return;
       }
