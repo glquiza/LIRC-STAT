@@ -197,11 +197,17 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
 
   const handleOpenAddHourClosure = () => {
     setEditingHourClosureId(null);
-    setSelectedDayOfWeek(1);
-    setSelectedEffectiveDate(new Date().toISOString().slice(0, 10));
+    const now = new Date();
+    const dow = now.getDay();
+    const defaultDow = dow === 0 ? 1 : dow;
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    setSelectedDayOfWeek(defaultDow);
+    setSelectedEffectiveDate(`${y}-${m}-${d}`);
     setHourClosureStartTime('12:00');
     setHourClosureEndTime('13:00');
-    setHourClosureReason('Weekly Faculty & Staff Meeting');
+    setHourClosureReason('');
     setHourClosureIsActive(true);
     setShowHourClosureModal(true);
   };
@@ -289,13 +295,50 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
     }
   };
 
+  const handleSelectDayOfWeek = (dow: number) => {
+    setSelectedDayOfWeek(dow);
+    const now = new Date();
+    const currentDow = now.getDay();
+    let diff = dow - currentDow;
+    if (diff < 0) diff += 7;
+    const targetDate = new Date(now.getTime() + diff * 86400000);
+    const y = targetDate.getFullYear();
+    const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const d = String(targetDate.getDate()).padStart(2, '0');
+    setSelectedEffectiveDate(`${y}-${m}-${d}`);
+  };
+
+  const handleStartTimeChange = (newStart: string) => {
+    setHourClosureStartTime(newStart);
+    if (newStart >= hourClosureEndTime) {
+      const [h, m] = newStart.split(':').map(Number);
+      const endH = h + 1;
+      const nextEnd =
+        endH <= 18
+          ? `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+          : '18:00';
+      setHourClosureEndTime(nextEnd > newStart ? nextEnd : '18:00');
+    }
+  };
+
+  const handleEndTimeChange = (newEnd: string) => {
+    setHourClosureEndTime(newEnd);
+    if (newEnd <= hourClosureStartTime) {
+      const [h, m] = newEnd.split(':').map(Number);
+      const startH = Math.max(8, h - 1);
+      const nextStart = `${String(startH).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      setHourClosureStartTime(nextStart < newEnd ? nextStart : '08:00');
+    }
+  };
+
   const handleDatePickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSelectedEffectiveDate(val);
     if (val && val.includes('-')) {
       const [y, m, d] = val.split('-').map(Number);
       if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
-        const dow = new Date(y, m - 1, d).getDay();
+        const dt = new Date(y, m - 1, d, 12, 0, 0);
+        const dow = dt.getDay();
         setSelectedDayOfWeek(dow);
       }
     }
@@ -760,35 +803,6 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
       ===================================================================== */}
       {activeSection === 'closures' && (
         <div className="space-y-5 animate-literary-fade">
-          {/* Institutional Advisory Notice */}
-          <div className="literary-card p-4 sm:p-5 bg-gradient-to-r from-[#FFFDF8] via-[#FEF9EC] to-[#FAF5EE] dark:from-[#261F12] dark:via-[#1F1910] dark:to-[#1A1409] border-[#E7B84B]/60 dark:border-[#E7B84B]/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-[#B88412] dark:text-[#E7B84B] shrink-0 mt-0.5" />
-              <div>
-                <div className="font-heading font-bold text-sm text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
-                  <span>Recurring Operating Schedule &amp; Day Closures</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FEF9EC] dark:bg-[#332512] text-[#7D5B06] dark:text-[#F5D075] border border-[#E7B84B]/40">
-                    Automatic Statistical Exclusion
-                  </span>
-                </div>
-                <p className="text-[#6E665E] dark:text-[#A6998C] mt-1 leading-relaxed">
-                  Temporarily close specific days of the week (Monday through Saturday) for sanitation, building maintenance, or institutional scheduling. 
-                  When closed, the system <strong>automatically excludes all data recorded on that day from statistical reports, calculations, and expected interval requirements</strong>. 
-                  The Librarian may reopen any day whenever necessary with zero loss of historical records.
-                </p>
-              </div>
-            </div>
-            {closedDaysOfWeek.length > 0 ? (
-              <span className="shrink-0 px-3 py-1.5 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] text-[#A83232] dark:text-[#F5A3A3] text-xs font-bold text-center">
-                {closedDaysOfWeek.length} {closedDaysOfWeek.length === 1 ? 'Day' : 'Days'} Temporarily Closed
-              </span>
-            ) : (
-              <span className="shrink-0 px-3 py-1.5 rounded-xl bg-[#F1F5EE] dark:bg-[#182414] border border-[#71865A]/40 text-[#455436] dark:text-[#B2D898] text-xs font-bold text-center">
-                All 6 Operating Days Open
-              </span>
-            )}
-          </div>
-
           {/* 6 Operating Days Cards Grid (Monday to Saturday) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {OPERATING_WEEKDAYS.map((wd) => {
@@ -888,34 +902,6 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
       ===================================================================== */}
       {activeSection === 'hour_closures' && (
         <div className="space-y-5 animate-literary-fade">
-          {/* Institutional Advisory Notice */}
-          <div className="literary-card p-4 sm:p-5 bg-gradient-to-r from-[#FFFDF8] via-[#FEF9EC] to-[#FAF5EE] dark:from-[#261F12] dark:via-[#1F1910] dark:to-[#1A1409] border-[#E7B84B]/60 dark:border-[#E7B84B]/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-start gap-3">
-              <Clock className="w-5 h-5 text-[#B88412] dark:text-[#E7B84B] shrink-0 mt-0.5" />
-              <div>
-                <div className="font-heading font-bold text-sm text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2 flex-wrap">
-                  <span>Temporary Hour Closure</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FEF9EC] dark:bg-[#332512] text-[#7D5B06] dark:text-[#F5D075] border border-[#E7B84B]/40">
-                    Automatic Recurring Statistical Exclusion
-                  </span>
-                </div>
-                <p className="text-[#6E665E] dark:text-[#A6998C] mt-1 leading-relaxed">
-                  Specify particular hours on a specific day when the library will be temporarily closed.
-                  The system <strong>automatically excludes the selected date and time period from statistical calculations and reports</strong>.
-                  Once configured, the system also <strong>automatically excludes those exact hours from statistics every time that specific day and time occurs in the future</strong>, without requiring setup again.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleOpenAddHourClosure}
-              className="shrink-0 px-3.5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8F2828] text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer transition"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Temporary Hour Closure</span>
-            </button>
-          </div>
-
           {/* Closures Management Card */}
           <div className="literary-card overflow-hidden">
             <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -948,7 +934,8 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                   className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs cursor-pointer transition shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Add Closure</span>
+                  <span className="hidden sm:inline">Add Temporary Hour Closure</span>
+                  <span className="sm:hidden">Add Closure</span>
                 </button>
               </div>
             </div>
@@ -1686,11 +1673,12 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
           MODAL: ADD / EDIT TEMPORARY HOUR CLOSURE
       ===================================================================== */}
       {showHourClosureModal && createPortal(
-        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade overflow-y-auto">
-          <div className="literary-card shadow-2xl max-w-lg w-full relative overflow-hidden bg-white dark:bg-[#1C1814] border border-[#E6D7C3] dark:border-[#383028] my-8">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-4 animate-literary-fade">
+          <div className="literary-card shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col relative overflow-hidden bg-white dark:bg-[#1C1814] border border-[#E6D7C3] dark:border-[#383028]">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0 shrink-0" />
 
-            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex items-center justify-between">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] flex items-center justify-center text-[#A83232] dark:text-[#E25D5D]">
                   <Clock className="w-4 h-4" />
@@ -1707,20 +1695,14 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
               <button
                 type="button"
                 onClick={() => setShowHourClosureModal(false)}
-                className="p-1.5 rounded-lg hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] cursor-pointer transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-5 space-y-4 text-xs">
-              <div className="p-3.5 rounded-xl bg-[#FEF9EC] dark:bg-[#261F12] border border-[#E7B84B]/60 text-[#7D5B06] dark:text-[#F5D075] flex items-start gap-2.5">
-                <Calendar className="w-4 h-4 shrink-0 mt-0.5" />
-                <p>
-                  Configuring a Temporary Hour Closure automatically excludes the selected hours from all statistical calculations, KPI summaries, and missing interval alerts for that date and every future occurrence of that day.
-                </p>
-              </div>
-
+            {/* Modal Scrollable Body */}
+            <div className="p-4 sm:p-5 space-y-4 text-xs overflow-y-auto flex-1">
               {/* Day of the Week Selection */}
               <div>
                 <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1.5">
@@ -1733,7 +1715,7 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                       <button
                         key={w.dayOfWeek}
                         type="button"
-                        onClick={() => setSelectedDayOfWeek(w.dayOfWeek)}
+                        onClick={() => handleSelectDayOfWeek(w.dayOfWeek)}
                         className={`py-2 px-1 rounded-xl text-center font-semibold text-xs transition cursor-pointer border ${
                           isSelected
                             ? 'bg-[#A83232] text-white border-[#A83232] shadow-2xs'
@@ -1760,7 +1742,7 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                   className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                 />
                 <p className="text-[11px] text-[#A89F91] dark:text-[#7A6F62] mt-0.5">
-                  Selecting a specific date automatically sets the day of the week and tracks when the closure takes effect.
+                  Selecting a date automatically synchronizes the day of the week ({DAY_OF_WEEK_NAMES[selectedDayOfWeek]}).
                 </p>
               </div>
 
@@ -1772,7 +1754,7 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                   </label>
                   <select
                     value={hourClosureStartTime}
-                    onChange={(e) => setHourClosureStartTime(e.target.value)}
+                    onChange={(e) => handleStartTimeChange(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs font-stat text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                   >
                     {TIME_OPTIONS.slice(0, -1).map((t) => (
@@ -1789,7 +1771,7 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                   </label>
                   <select
                     value={hourClosureEndTime}
-                    onChange={(e) => setHourClosureEndTime(e.target.value)}
+                    onChange={(e) => handleEndTimeChange(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs font-stat text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                   >
                     {TIME_OPTIONS.slice(1).map((t) => (
@@ -1811,7 +1793,8 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                 <div className="p-2.5 rounded-xl bg-[#F1F5EE] dark:bg-[#182414] border border-[#71865A]/40 text-[#455436] dark:text-[#B2D898] text-xs">
                   <span className="font-bold">Excluded Intervals ({affectedIntervals.length}):</span>{' '}
                   <span>
-                    {affectedIntervals.map((i) => i.label).join(', ')} ({hourClosureStartTime} – {hourClosureEndTime})
+                    {formatTime12Hour(hourClosureStartTime)} – {formatTime12Hour(hourClosureEndTime)}{' '}
+                    {affectedIntervals.length > 0 && `(${affectedIntervals.map((i) => i.label).join(', ')})`}
                   </span>
                 </div>
               )}
@@ -1819,13 +1802,13 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
               {/* Reason / Purpose with quick presets */}
               <div className="pt-1">
                 <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1">
-                  Closure Reason / Notes
+                  Closure Reason / Notes (optional)
                 </label>
                 <input
                   type="text"
                   value={hourClosureReason}
                   onChange={(e) => setHourClosureReason(e.target.value)}
-                  placeholder="e.g. Weekly Faculty & Staff Meeting"
+                  placeholder="e.g. Weekly Faculty & Staff Meeting, Sanitation..."
                   className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                 />
 
@@ -1834,8 +1817,12 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                     <button
                       key={reason}
                       type="button"
-                      onClick={() => setHourClosureReason(reason)}
-                      className="px-2 py-0.5 rounded-lg bg-[#FAF5EE] dark:bg-[#25201A] hover:bg-[#E6D7C3] dark:hover:bg-[#383028] text-[11px] text-[#6E665E] dark:text-[#A6998C] border border-[#D6C3A9] dark:border-[#383028] cursor-pointer transition"
+                      onClick={() => setHourClosureReason(hourClosureReason === reason ? '' : reason)}
+                      className={`px-2 py-0.5 rounded-lg text-[11px] border cursor-pointer transition ${
+                        hourClosureReason === reason
+                          ? 'bg-[#A83232] text-white border-[#A83232]'
+                          : 'bg-[#FAF5EE] dark:bg-[#25201A] hover:bg-[#E6D7C3] dark:hover:bg-[#383028] text-[#6E665E] dark:text-[#A6998C] border-[#D6C3A9] dark:border-[#383028]'
+                      }`}
                     >
                       {reason}
                     </button>
@@ -1863,30 +1850,35 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                   <div className="w-11 h-6 bg-[#D6C3A9] dark:bg-[#383028] peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#A83232]"></div>
                 </label>
               </div>
+            </div>
 
-              {/* Modal Action Buttons */}
-              <div className="pt-4 border-t border-[#E6D7C3] dark:border-[#383028] flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowHourClosureModal(false)}
-                  className="px-4 py-2 rounded-xl border border-[#D6C3A9] dark:border-[#383028] text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  disabled={savingHourClosure || hourClosureStartTime >= hourClosureEndTime}
-                  onClick={handleSaveHourClosure}
-                  className="px-5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs disabled:opacity-50"
-                >
-                  {savingHourClosure ? (
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-[#E6D7C3] dark:border-[#383028] bg-[#FAF5EE]/70 dark:bg-[#25201A]/70 flex items-center justify-end gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowHourClosureModal(false)}
+                className="px-4 py-2 rounded-xl border border-[#D6C3A9] dark:border-[#383028] text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] hover:bg-white dark:hover:bg-[#1C1814] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={savingHourClosure || hourClosureStartTime >= hourClosureEndTime}
+                onClick={handleSaveHourClosure}
+                className="px-5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs disabled:opacity-50"
+              >
+                {savingHourClosure ? (
+                  <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <>
                     <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>{editingHourClosureId ? 'Save Changes' : 'Save Hour Closure'}</span>
-                </button>
-              </div>
+                    <span>{editingHourClosureId ? 'Save Changes' : 'Save Hour Closure'}</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>,
