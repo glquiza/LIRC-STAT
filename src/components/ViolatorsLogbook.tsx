@@ -3,6 +3,7 @@ import {
   AlertCircle,
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   Clock,
   Download,
   FileSpreadsheet,
@@ -60,6 +61,22 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | TimerStatus>('all');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState<boolean>(false);
+  const exportDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        exportDropdownRef.current &&
+        !exportDropdownRef.current.contains(e.target as Node)
+      ) {
+        setExportDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Form states for Student Assistant
   const [violatorName, setViolatorName] = useState<string>('');
@@ -382,34 +399,95 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
             )}
 
             {mode === 'librarian' && (
-              <div className="flex items-center gap-2">
+              <div className="relative" ref={exportDropdownRef}>
                 <button
+                  type="button"
                   disabled={isExporting}
-                  onClick={() => handleExport('xlsx')}
-                  className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 border border-emerald-400/30"
-                  title="Export to Microsoft Excel Spreadsheet"
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>Excel</span>
-                </button>
-                <button
-                  disabled={isExporting}
-                  onClick={() => handleExport('pdf')}
-                  className="px-3 py-2 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 border border-white/30"
-                  title="Export to Adobe PDF Document"
+                  onClick={() => setExportDropdownOpen((prev) => !prev)}
+                  className="px-4 py-2 rounded-xl bg-[#71865A] hover:bg-[#5E7149] text-white text-xs font-bold tracking-wider flex items-center gap-2 cursor-pointer shadow-sm transition active:scale-95 disabled:opacity-50"
+                  title="Export Violations Logbook"
+                  aria-haspopup="true"
+                  aria-expanded={exportDropdownOpen}
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>PDF</span>
+                  <span>EXPORT</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                      exportDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
-                <button
-                  disabled={isExporting}
-                  onClick={() => handleExport('docx')}
-                  className="px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-600 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 border border-blue-400/30"
-                  title="Export to Microsoft Word Document"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Word</span>
-                </button>
+
+                {exportDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-[#E6D7C3] shadow-xl p-2 z-50 animate-literary-fade space-y-1">
+                    <div className="px-3 py-1.5 text-[10px] font-bold text-[#8C827A] uppercase tracking-wider">
+                      Available Export Formats
+                    </div>
+
+                    {/* Excel */}
+                    <button
+                      type="button"
+                      disabled={isExporting}
+                      onClick={() => {
+                        setExportDropdownOpen(false);
+                        handleExport('xlsx');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F2ECE1] transition flex items-center gap-3 cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#71865A]/15 text-[#71865A] flex items-center justify-center group-hover:bg-[#71865A] group-hover:text-white transition">
+                        <FileSpreadsheet className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-[#332F2B] group-hover:text-[#1E1B18]">
+                          Excel
+                        </div>
+                        <div className="text-[10px] text-[#8C827A]">Spreadsheet (.xlsx)</div>
+                      </div>
+                    </button>
+
+                    {/* PDF */}
+                    <button
+                      type="button"
+                      disabled={isExporting}
+                      onClick={() => {
+                        setExportDropdownOpen(false);
+                        handleExport('pdf');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F2ECE1] transition flex items-center gap-3 cursor-pointer group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#A83232]/15 text-[#A83232] flex items-center justify-center group-hover:bg-[#A83232] group-hover:text-white transition">
+                        <Download className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-[#332F2B] group-hover:text-[#1E1B18]">
+                          PDF
+                        </div>
+                        <div className="text-[10px] text-[#8C827A]">Printable document (.pdf)</div>
+                      </div>
+                    </button>
+
+                    {/* Word Document */}
+                    <button
+                      type="button"
+                      disabled={isExporting}
+                      onClick={() => {
+                        setExportDropdownOpen(false);
+                        handleExport('docx');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F2ECE1] transition flex items-center gap-3 cursor-pointer group disabled:opacity-50"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#332F2B]/15 text-[#332F2B] flex items-center justify-center group-hover:bg-[#332F2B] group-hover:text-white transition">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold text-[#332F2B] group-hover:text-[#1E1B18]">
+                          Word Document
+                        </div>
+                        <div className="text-[10px] text-[#8C827A]">Editable document (.docx)</div>
+                      </div>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
