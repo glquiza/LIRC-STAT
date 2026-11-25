@@ -309,8 +309,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         .eq('id', signInData.user.id)
         .maybeSingle();
 
+      const safeSignOutLocal = async () => {
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch {
+          // ignore signout errors
+        }
+      };
+
       if (!profileData) {
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        await safeSignOutLocal();
         localStorage.setItem('lirc_system_logged_out', 'true');
         throw new Error('User profile not found.');
       }
@@ -318,13 +326,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       const parsed = parseStaffAccount(profileData as UserProfile);
 
       if (parsed.isInviteCarrier || parsed.isRemoved) {
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        await safeSignOutLocal();
         localStorage.setItem('lirc_system_logged_out', 'true');
         throw new Error('This account is no longer active.');
       }
 
       if (parsed.approvalStatus === 'pending') {
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        await safeSignOutLocal();
         localStorage.setItem('lirc_system_logged_out', 'true');
         setPendingNoticeMsg(
           `Your Student Assistant registration (@${parsed.profile.username}) submitted with invitation code ${
@@ -335,7 +343,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       }
 
       if (parsed.approvalStatus === 'rejected') {
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        await safeSignOutLocal();
         localStorage.setItem('lirc_system_logged_out', 'true');
         throw new Error(
           'Your Student Assistant registration request was declined by the Librarian.'
@@ -343,7 +351,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       }
 
       if (!parsed.profile.is_active) {
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        await safeSignOutLocal();
         localStorage.setItem('lirc_system_logged_out', 'true');
         throw new Error('Your account is currently inactive. Please contact the Librarian.');
       }
@@ -361,12 +369,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         // ignore storage errors
       }
 
-      void supabase.rpc('log_client_activity', {
-        p_action_type: 'user_login',
-        p_description: `Signed in to LIRC MANAGEMENT SYSTEM (${cleanInput})`,
-        p_target_type: 'auth_session',
-        p_metadata: { identifier: cleanInput },
-      }).catch(() => {});
+      try {
+        void supabase
+          .rpc('log_client_activity', {
+            p_action_type: 'user_login',
+            p_description: `Signed in to LIRC MANAGEMENT SYSTEM (${cleanInput})`,
+            p_target_type: 'auth_session',
+            p_metadata: { identifier: cleanInput },
+          })
+          .then(
+            () => {},
+            () => {}
+          );
+      } catch {
+        // ignore logging errors
+      }
 
       onLoginSuccess(userProfile);
     } catch (err: unknown) {

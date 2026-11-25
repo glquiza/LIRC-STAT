@@ -761,7 +761,11 @@ export function subscribeToViolations(
     window.removeEventListener('focus', localHandler);
     bc?.close();
     if (supabaseChannel && supabase) {
-      supabase.removeChannel(supabaseChannel).catch(() => {});
+      try {
+        void supabase.removeChannel(supabaseChannel);
+      } catch {
+        // ignore
+      }
     }
   };
 }
