@@ -447,13 +447,16 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                 </div>
                 <div className="flex items-baseline gap-x-2 min-w-0 overflow-hidden">
                   <h1
-                    className="text-sm sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight truncate"
+                    className="text-sm sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight shrink-0"
                     title={pageTitle}
                   >
                     {pageTitle}
                   </h1>
                   {pageSubtitle && (
-                    <span className="hidden md:inline text-xs sm:text-sm text-[#6E665E] leading-tight truncate shrink-0">
+                    <span
+                      className="hidden md:inline text-xs sm:text-sm text-[#6E665E] leading-tight truncate min-w-0"
+                      title={pageSubtitle}
+                    >
                       · {pageSubtitle}
                     </span>
                   )}

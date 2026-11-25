@@ -766,7 +766,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         };
       case 'violators':
         return {
-          title: 'Violators Logbook & 1-Hour Monitoring',
+          title: 'Violators Logbook',
           subtitle:
             'Track library violations, monitor active timers, and export institutional reports',
           breadcrumbs: ['Librarian', 'Violators Logbook'],

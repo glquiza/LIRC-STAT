@@ -1656,7 +1656,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
       : viewMode === 'schedule'
       ? 'My Assigned Duty Schedule'
       : viewMode === 'violators'
-      ? 'Violators Logbook & Timers'
+      ? 'Violators Logbook'
       : 'Library Areas & Duty Stations';
 
   const breadcrumbs = [
