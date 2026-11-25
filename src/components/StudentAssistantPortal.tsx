@@ -2971,6 +2971,8 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         ? `Library operations and statistics for every ${wholeDayInfo.weekdayName || 'Weekday'} are temporarily suspended by the Admin. Any records submitted on this day are excluded from statistical calculations.`
                         : wholeDay
                         ? 'Today is marked as No Classes. This entire day is automatically excluded from library statistical calculations.'
+                        : slotExcludedInfo.isHourClosure
+                        ? `This interval (${formatSlotRangeLabel(effectiveTargetSlot)}) falls within a Temporary Hour Closure (${matchingAct?.startTime || ''} - ${matchingAct?.endTime || ''}) and is automatically excluded from statistical calculations.`
                         : `This interval (${formatSlotRangeLabel(effectiveTargetSlot)}) falls during a scheduled suspension (${matchingAct?.startTime || ''} - ${matchingAct?.endTime || ''}) and is excluded from statistical calculations.`}
                     </span>
                   </div>

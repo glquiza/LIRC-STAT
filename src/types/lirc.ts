@@ -248,6 +248,8 @@ export interface SlotStatisticalRow {
   areaAverages: Record<number, number>;
   totalAcrossAreas: number;
   averageAcrossDays: number;
+  isExcluded?: boolean;
+  exclusionReason?: string;
 }
 
 export interface MissingIntervalItem {

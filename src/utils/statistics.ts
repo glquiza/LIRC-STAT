@@ -17,8 +17,10 @@ import { getTimeSlotsFromCache } from './timeSlots';
 import {
   CalendarActivity,
   getClosedDaysOfWeekFromCache,
+  getTemporaryHourClosuresFromCache,
   isDateWholeDaySuspended,
   isSlotExcludedByCalendar,
+  TemporaryHourClosure,
 } from './calendarActivities';
 
 export const MONTH_NAMES = [
@@ -312,6 +314,7 @@ export function computeStatisticalReport(params: {
   isOperatingHours?: boolean;
   calendarActivities?: CalendarActivity[];
   closedDaysOfWeek?: number[];
+  hourClosures?: TemporaryHourClosure[];
   timeSlots?: TimeSlotDefinition[];
 }): ComputedStatisticalReport {
   const {
@@ -325,6 +328,7 @@ export function computeStatisticalReport(params: {
     isOperatingHours = false,
     calendarActivities = [],
     closedDaysOfWeek = getClosedDaysOfWeekFromCache(),
+    hourClosures = getTemporaryHourClosuresFromCache(),
     timeSlots,
   } = params;
 
@@ -382,7 +386,7 @@ export function computeStatisticalReport(params: {
 
     // Automatically exclude slots falling within suspended or closed periods
     const expectedSlots = rawExpectedSlots.filter((slotVal) => {
-      const { isExcluded } = isSlotExcludedByCalendar(d, slotVal, calendarActivities, closedDaysOfWeek);
+      const { isExcluded } = isSlotExcludedByCalendar(d, slotVal, calendarActivities, closedDaysOfWeek, hourClosures);
       return !isExcluded;
     });
 
@@ -521,8 +525,8 @@ export function computeStatisticalReport(params: {
   let correctedRecordsCount = 0;
 
   for (const rec of records) {
-    // Automatically exclude records that fall on suspended dates, intervals, or closed weekdays
-    const { isExcluded } = isSlotExcludedByCalendar(rec.record_date, rec.time_slot, calendarActivities, closedDaysOfWeek);
+    // Automatically exclude records that fall on suspended dates, intervals, or closed weekdays or temporary hour closures
+    const { isExcluded } = isSlotExcludedByCalendar(rec.record_date, rec.time_slot, calendarActivities, closedDaysOfWeek, hourClosures);
     if (isExcluded) {
       // Historical data remains preserved in the database, but excluded from statistical computations
       continue;
@@ -681,6 +685,23 @@ export function computeStatisticalReport(params: {
       areaAverages[area.id] = c > 0 ? Math.round(acc.areaTotals[area.id] / c) : 0;
     }
     const dayCount = acc.daysWithSlot.size || 1;
+
+    let isSlotExcluded = false;
+    let slotExclusionReason: string | undefined = undefined;
+    if (startDate === endDate) {
+      const exclusionCheck = isSlotExcludedByCalendar(
+        startDate,
+        slotDef.value,
+        calendarActivities,
+        closedDaysOfWeek,
+        hourClosures
+      );
+      if (exclusionCheck.isExcluded) {
+        isSlotExcluded = true;
+        slotExclusionReason = exclusionCheck.activity?.title || 'Temporarily Closed';
+      }
+    }
+
     return {
       slot: slotDef.value,
       label: slotDef.rangeLabel ? slotDef.rangeLabel.replace(/\s*–\s*/g, ' - ') : formatSlotRangeLabel(slotDef.value, activeSlots),
@@ -689,6 +710,8 @@ export function computeStatisticalReport(params: {
       areaAverages,
       totalAcrossAreas: acc.totalAcrossAreas,
       averageAcrossDays: acc.daysWithSlot.size > 0 ? Math.round(acc.totalAcrossAreas / dayCount) : 0,
+      isExcluded: isSlotExcluded,
+      exclusionReason: slotExclusionReason,
     };
   });
 

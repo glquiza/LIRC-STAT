@@ -31,9 +31,12 @@ import {
   DAY_OF_WEEK_NAMES,
   fetchCalendarActivities,
   fetchClosedDaysOfWeek,
+  fetchTemporaryHourClosures,
   getClosedDaysOfWeekFromCache,
+  getTemporaryHourClosuresFromCache,
   isDateWholeDaySuspended,
   subscribeToCalendarChanges,
+  TemporaryHourClosure,
 } from '../utils/calendarActivities';
 import { CalendarActivitiesModal } from './CalendarActivitiesModal';
 import { ViolatorsLogbook } from './ViolatorsLogbook';
@@ -295,6 +298,9 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
   // Calendar of Activities state (Class Suspensions & Excluded Time Management)
   const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
   const [closedDaysOfWeek, setClosedDaysOfWeek] = useState<number[]>(() => getClosedDaysOfWeekFromCache());
+  const [temporaryHourClosures, setTemporaryHourClosures] = useState<TemporaryHourClosure[]>(() =>
+    getTemporaryHourClosuresFromCache()
+  );
   const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
 
   // Close export dropdown when clicking outside
@@ -329,7 +335,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     const histStart = ninetyDaysAgo.toISOString().slice(0, 10);
 
-    const [dayRes, sessRes, histRes, staffRes, calList, closedList] = await Promise.all([
+    const [dayRes, sessRes, histRes, staffRes, calList, closedList, hoursList] = await Promise.all([
       supabase
         .from('occupancy_records')
         .select('*')
@@ -348,12 +354,14 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
       supabase.from('user_profiles').select('*'),
       fetchCalendarActivities(supabase),
       fetchClosedDaysOfWeek(supabase),
+      fetchTemporaryHourClosures(supabase),
     ]);
 
     if (!dayRes.error && dayRes.data) setDailyRecords(dayRes.data as OccupancyRecord[]);
     if (!sessRes.error && sessRes.data) setActiveSessions(sessRes.data as MonitoringSession[]);
     if (calList) setCalendarActivities(calList);
     if (closedList) setClosedDaysOfWeek(closedList);
+    if (hoursList) setTemporaryHourClosures(hoursList);
     if (!staffRes.error && staffRes.data) {
       const profiles = staffRes.data as UserProfile[];
       setStaffProfiles(profiles);
@@ -376,6 +384,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
           isOperatingHours: serverClock?.is_operating_hours || false,
           calendarActivities: calList,
           closedDaysOfWeek: closedList ?? closedDaysOfWeek,
+          hourClosures: hoursList ?? temporaryHourClosures,
         })
       );
     }
@@ -451,6 +460,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         isOperatingHours: serverClock?.is_operating_hours || false,
         calendarActivities,
         closedDaysOfWeek,
+        hourClosures: temporaryHourClosures,
         timeSlots,
       });
 
@@ -504,6 +514,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
       serverClock,
       calendarActivities,
       closedDaysOfWeek,
+      temporaryHourClosures,
       timeSlots,
       profile.id,
       profile.full_name,
@@ -521,9 +532,10 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
     // Purge any lingering blacklisted carriers from Supabase database
     cleanupBlacklistedCarriersIfLibrarian(supabase);
 
-    const unsubscribe = subscribeToCalendarChanges(supabase, (fresh, freshClosed) => {
+    const unsubscribe = subscribeToCalendarChanges(supabase, (fresh, freshClosed, freshHours) => {
       setCalendarActivities(fresh);
       if (freshClosed) setClosedDaysOfWeek(freshClosed);
+      if (freshHours) setTemporaryHourClosures(freshHours);
     });
 
     const unsubViolations = subscribeToViolations(supabase, () => {
@@ -561,9 +573,10 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         isOperatingHours: serverClock?.is_operating_hours || false,
         calendarActivities,
         closedDaysOfWeek,
+        hourClosures: temporaryHourClosures,
         timeSlots,
       }),
-    [selectedDate, sortedAreas, dailyRecords, todayDate, serverClock, calendarActivities, closedDaysOfWeek, timeSlots]
+    [selectedDate, sortedAreas, dailyRecords, todayDate, serverClock, calendarActivities, closedDaysOfWeek, temporaryHourClosures, timeSlots]
   );
 
   // GSAP: Animate KPI cards and Area cards on tab switch / data update
@@ -669,7 +682,14 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         label: 'Advanced Settings',
         group: 'Records & Administration',
         icon: SlidersHorizontal,
-        badge: closedDaysOfWeek.length > 0 ? `${closedDaysOfWeek.length} Closed` : undefined,
+        badge:
+          closedDaysOfWeek.length > 0 && temporaryHourClosures.filter((c) => c.isActive).length > 0
+            ? `${closedDaysOfWeek.length} Day, ${temporaryHourClosures.filter((c) => c.isActive).length} Hr Closed`
+            : closedDaysOfWeek.length > 0
+            ? `${closedDaysOfWeek.length} Closed`
+            : temporaryHourClosures.filter((c) => c.isActive).length > 0
+            ? `${temporaryHourClosures.filter((c) => c.isActive).length} Hr Closed`
+            : undefined,
         badgeTone: 'mustard',
       },
       {
@@ -681,7 +701,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
         badgeTone: 'mustard',
       },
     ],
-    [dailyComputed.missingSlotsCount, pendingRegistrationsCount, calendarActivities.length, closedDaysOfWeek.length, activeViolatorsCount]
+    [dailyComputed.missingSlotsCount, pendingRegistrationsCount, calendarActivities.length, closedDaysOfWeek.length, temporaryHourClosures, activeViolatorsCount]
   );
 
   // Notifications dropdown
@@ -1963,15 +1983,33 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                         {generatedReport.slotBreakdown.map((sRow) => (
                           <tr key={sRow.slot} className="hover:bg-[#FAF5EE]/70 transition-colors">
                             <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3]">
-                              {formatSlotRangeLabel(sRow.slot) || sRow.label}
+                              <div className="flex items-center gap-2">
+                                <span>{formatSlotRangeLabel(sRow.slot) || sRow.label}</span>
+                                {sRow.isExcluded && (
+                                  <span
+                                    className="px-1.5 py-0.2 rounded text-[10px] font-bold uppercase tracking-wider bg-[#FDF3F3] text-[#A83232] border border-[#E8BDBD]"
+                                    title={sRow.exclusionReason || 'Temporarily Closed'}
+                                  >
+                                    Closed
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             {generatedReport.areaSummaries.map((s) => (
                               <td key={s.area.id} className="py-2.5 px-4 text-right font-stat">
-                                {(sRow.areaTotals[s.area.id] || 0).toLocaleString()}
+                                {sRow.isExcluded ? (
+                                  <span className="text-[#A89F91]">—</span>
+                                ) : (
+                                  (sRow.areaTotals[s.area.id] || 0).toLocaleString()
+                                )}
                               </td>
                             ))}
                             <td className="py-2.5 px-4 text-right font-stat font-bold text-[#A83232] bg-[#FAF5EE]/60">
-                              {sRow.totalAcrossAreas.toLocaleString()}
+                              {sRow.isExcluded ? (
+                                <span className="text-[#A89F91] font-normal">—</span>
+                              ) : (
+                                sRow.totalAcrossAreas.toLocaleString()
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -2101,6 +2139,11 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
           timeSlots={timeSlots}
           onTimeSlotsUpdated={(freshSlots) => {
             setTimeSlots(freshSlots);
+          }}
+          temporaryHourClosures={temporaryHourClosures}
+          onTemporaryHourClosuresUpdated={(updatedHours) => {
+            setTemporaryHourClosures(updatedHours);
+            handleGenerateReport({ persistLog: false });
           }}
         />
       )}

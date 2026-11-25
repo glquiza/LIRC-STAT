@@ -14,15 +14,56 @@ export interface CalendarActivity {
   carrierId?: string; // If stored in Supabase user_profiles carrier record
 }
 
+export interface TemporaryHourClosure {
+  id: string; // e.g. "thc_3_1200_1330" or unique timestamp id
+  dayOfWeek: number; // 0=Sun, 1=Mon, ..., 6=Sat
+  dayName: string; // e.g. "Wednesday"
+  startTime: string; // 'HH:mm' e.g. '12:00'
+  endTime: string; // 'HH:mm' e.g. '13:00'
+  reason?: string; // e.g. "Weekly Faculty & Staff Meeting"
+  isActive: boolean; // default true
+  effectiveDate?: string; // YYYY-MM-DD
+  createdAt: string;
+  createdBy?: string;
+  updatedAt?: string;
+  updatedByName?: string;
+}
+
 export const CALENDAR_STORAGE_KEY = 'lirc_calendar_activities';
 export const CALENDAR_DELETED_KEY = 'lirc_calendar_deleted_ids';
 export const CLOSED_WEEKDAYS_STORAGE_KEY = 'lirc_calendar_closed_weekdays';
+export const TEMPORARY_HOUR_CLOSURES_STORAGE_KEY = 'lirc_temporary_hour_closures';
 export const CALENDAR_CARRIER_PREFIX = 'CALENDAR_ACTIVITY::';
 export const CALENDAR_STAFF_CODE_PREFIX = 'CAL_ACT::';
 export const CALENDAR_BROADCAST_CHANNEL = 'lirc_calendar_realtime';
 export const CALENDAR_REGISTRY_USERNAME = 'cal_master_registry';
 export const CALENDAR_REGISTRY_FULL_NAME = 'CALENDAR_MASTER_REGISTRY';
 export const CALENDAR_REGISTRY_STAFF_CODE = 'CAL_REGISTRY';
+
+export function getTemporaryHourClosuresFromCache(): TemporaryHourClosure[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(TEMPORARY_HOUR_CLOSURES_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return [];
+}
+
+export function syncTemporaryHourClosuresLocalStorage(closures: TemporaryHourClosure[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(TEMPORARY_HOUR_CLOSURES_STORAGE_KEY, JSON.stringify(closures));
+  } catch {
+    // ignore
+  }
+}
 
 export interface ClosedWeekdayInfo {
   dayOfWeek: number; // 0=Sun, 1=Mon, ..., 6=Sat
@@ -118,19 +159,20 @@ export function broadcastCalendarChange(type: 'UPDATE' | 'DELETE', payload?: any
  */
 export function subscribeToCalendarChanges(
   supabase: SupabaseClient,
-  onChange: (activities: CalendarActivity[], closedDays?: number[]) => void
+  onChange: (activities: CalendarActivity[], closedDays?: number[], hourClosures?: TemporaryHourClosure[]) => void
 ): () => void {
   let isMounted = true;
 
   const refresh = async () => {
     if (!isMounted) return;
     try {
-      const [fresh, freshClosed] = await Promise.all([
+      const [fresh, freshClosed, freshHours] = await Promise.all([
         fetchCalendarActivities(supabase),
         fetchClosedDaysOfWeek(supabase),
+        fetchTemporaryHourClosures(supabase),
       ]);
       if (!isMounted) return;
-      onChange(fresh, freshClosed);
+      onChange(fresh, freshClosed, freshHours);
     } catch {
       // ignore
     }
@@ -149,6 +191,13 @@ export function subscribeToCalendarChanges(
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'calendar_closed_weekdays' },
+      () => {
+        refresh();
+      }
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'calendar_temporary_hour_closures' },
       () => {
         refresh();
       }
@@ -178,7 +227,8 @@ export function subscribeToCalendarChanges(
     if (
       e.key === CALENDAR_STORAGE_KEY ||
       e.key === CALENDAR_DELETED_KEY ||
-      e.key === CLOSED_WEEKDAYS_STORAGE_KEY
+      e.key === CLOSED_WEEKDAYS_STORAGE_KEY ||
+      e.key === TEMPORARY_HOUR_CLOSURES_STORAGE_KEY
     ) {
       refresh();
     }
@@ -337,15 +387,23 @@ export function isDateWholeDaySuspended(
 }
 
 /**
- * Checks whether a 30-minute interval on a given date is excluded by calendar suspension or weekday closure.
+ * Checks whether a 30-minute interval on a given date is excluded by calendar suspension, weekday closure,
+ * or recurring Temporary Hour Closure.
  * Time slots are e.g. '10:00', '10:30', '11:00', '11:30' representing 30-min windows.
  */
 export function isSlotExcludedByCalendar(
   date: string,
   slotVal: string,
   activities: CalendarActivity[],
-  closedDaysOfWeek?: number[]
-): { isExcluded: boolean; activity?: CalendarActivity; isWeekdayClosed?: boolean } {
+  closedDaysOfWeek?: number[],
+  hourClosures?: TemporaryHourClosure[]
+): {
+  isExcluded: boolean;
+  activity?: CalendarActivity;
+  isWeekdayClosed?: boolean;
+  isHourClosure?: boolean;
+  hourClosure?: TemporaryHourClosure;
+} {
   const activeClosedDays = closedDaysOfWeek ?? getClosedDaysOfWeekFromCache();
   if (isDayOfWeekClosed(date, activeClosedDays)) {
     const [y, m, d] = date.split('-').map(Number);
@@ -380,6 +438,54 @@ export function isSlotExcludedByCalendar(
       return { isExcluded: true, activity: act };
     }
   }
+
+  // Check Temporary Hour Closures
+  const activeHourClosures = hourClosures ?? getTemporaryHourClosuresFromCache();
+  if (activeHourClosures && activeHourClosures.length > 0 && date && date.includes('-')) {
+    const [y, m, d] = date.split('-').map(Number);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+      const dow = new Date(y, m - 1, d).getDay();
+      for (const closure of activeHourClosures) {
+        if (!closure.isActive) continue;
+        if (closure.dayOfWeek !== dow) continue;
+        if (closure.effectiveDate && date < closure.effectiveDate) continue;
+
+        const start = closure.startTime || '08:00';
+        const end = closure.endTime || '18:00';
+        if (slotVal >= start && slotVal < end) {
+          const formatTime = (hhmm: string) => {
+            const [hStr, mStr] = hhmm.split(':');
+            let h = parseInt(hStr, 10);
+            const m = mStr || '00';
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return `${h}:${m} ${ampm}`;
+          };
+          const formattedRange = `${formatTime(closure.startTime)} - ${formatTime(closure.endTime)}`;
+
+          return {
+            isExcluded: true,
+            isHourClosure: true,
+            hourClosure: closure,
+            activity: {
+              id: closure.id,
+              title: `Temporary Hour Closure (${formattedRange})`,
+              description:
+                closure.reason ||
+                `Library temporarily closed every ${closure.dayName} from ${formattedRange}.`,
+              date,
+              isWholeDay: false,
+              startTime: closure.startTime,
+              endTime: closure.endTime,
+              createdAt: closure.createdAt,
+              createdBy: closure.updatedByName || closure.createdBy || 'Library Administration',
+            },
+          };
+        }
+      }
+    }
+  }
+
   return { isExcluded: false };
 }
 
@@ -389,7 +495,8 @@ export function isSlotExcludedByCalendar(
 export function getExcludedSlotsForDate(
   date: string,
   activities: CalendarActivity[],
-  closedDaysOfWeek?: number[]
+  closedDaysOfWeek?: number[],
+  hourClosures?: TemporaryHourClosure[]
 ): string[] {
   const activeClosedDays = closedDaysOfWeek ?? getClosedDaysOfWeekFromCache();
   if (isDayOfWeekClosed(date, activeClosedDays)) {
@@ -402,8 +509,6 @@ export function getExcludedSlotsForDate(
   }
 
   const matching = activities.filter((a) => a.date === date);
-  if (matching.length === 0) return [];
-
   const wholeDay = matching.find((a) => a.isWholeDay);
   if (wholeDay) {
     // All 20 standard slots are excluded
@@ -427,6 +532,27 @@ export function getExcludedSlotsForDate(
     for (const slot of ALL_SLOTS) {
       if (slot >= s && slot < e) {
         excluded.add(slot);
+      }
+    }
+  }
+
+  // Include Temporary Hour Closures for this date's day of week
+  const activeHourClosures = hourClosures ?? getTemporaryHourClosuresFromCache();
+  if (activeHourClosures && activeHourClosures.length > 0 && date && date.includes('-')) {
+    const [y, m, d] = date.split('-').map(Number);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+      const dow = new Date(y, m - 1, d).getDay();
+      for (const closure of activeHourClosures) {
+        if (!closure.isActive) continue;
+        if (closure.dayOfWeek !== dow) continue;
+        if (closure.effectiveDate && date < closure.effectiveDate) continue;
+        const s = closure.startTime || '08:00';
+        const e = closure.endTime || '18:00';
+        for (const slot of ALL_SLOTS) {
+          if (slot >= s && slot < e) {
+            excluded.add(slot);
+          }
+        }
       }
     }
   }
@@ -1234,11 +1360,13 @@ export async function toggleClosedDayOfWeek(
 
     let existingActivities: CalendarActivity[] = [];
     let existingDeleted: string[] = [];
+    let existingHourClosures: TemporaryHourClosure[] = [];
     if (registryRow && registryRow.shift_schedule) {
       try {
         const p = JSON.parse(registryRow.shift_schedule);
         if (Array.isArray(p.activities)) existingActivities = p.activities;
         if (Array.isArray(p.deletedKeys)) existingDeleted = p.deletedKeys;
+        if (Array.isArray(p.temporaryHourClosures)) existingHourClosures = p.temporaryHourClosures;
       } catch {
         // ignore
       }
@@ -1248,6 +1376,7 @@ export async function toggleClosedDayOfWeek(
       activities: existingActivities,
       deletedKeys: existingDeleted,
       closedDaysOfWeek: nextDays,
+      temporaryHourClosures: existingHourClosures,
       updatedAt: new Date().toISOString(),
     });
 
@@ -1269,4 +1398,294 @@ export async function toggleClosedDayOfWeek(
   }
 
   return nextDays;
+}
+
+/**
+ * Fetches all configured Temporary Hour Closures.
+ * Priority: native table public.calendar_temporary_hour_closures -> carrier registry -> local storage
+ */
+export async function fetchTemporaryHourClosures(supabase: SupabaseClient): Promise<TemporaryHourClosure[]> {
+  // 1. Try querying native table
+  try {
+    const { data, error } = await supabase
+      .from('calendar_temporary_hour_closures')
+      .select('*')
+      .order('day_of_week', { ascending: true })
+      .order('start_time', { ascending: true });
+
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const mapped: TemporaryHourClosure[] = data.map((r: any) => ({
+        id: String(r.id),
+        dayOfWeek: Number(r.day_of_week),
+        dayName: r.day_name || DAY_OF_WEEK_NAMES[Number(r.day_of_week)] || 'Weekday',
+        startTime: r.start_time,
+        endTime: r.end_time,
+        reason: r.reason || '',
+        isActive: r.is_active ?? true,
+        effectiveDate: r.effective_date,
+        createdAt: r.created_at || new Date().toISOString(),
+        createdBy: r.created_by,
+        updatedAt: r.updated_at,
+        updatedByName: r.updated_by_name,
+      }));
+      syncTemporaryHourClosuresLocalStorage(mapped);
+      return mapped;
+    }
+  } catch {
+    // ignore
+  }
+
+  // 2. Query master registry carrier in user_profiles
+  try {
+    const { data: dirData, error: dirError } = await supabase.rpc('get_login_directory');
+    if (!dirError && Array.isArray(dirData)) {
+      const registryRow = dirData.find(
+        (r: any) =>
+          r.username === CALENDAR_REGISTRY_USERNAME ||
+          r.full_name === CALENDAR_REGISTRY_FULL_NAME ||
+          r.staff_code === CALENDAR_REGISTRY_STAFF_CODE
+      );
+
+      if (registryRow && registryRow.shift_schedule && registryRow.shift_schedule !== 'REMOVED') {
+        try {
+          const parsed = JSON.parse(registryRow.shift_schedule);
+          if (parsed && Array.isArray(parsed.temporaryHourClosures)) {
+            syncTemporaryHourClosuresLocalStorage(parsed.temporaryHourClosures);
+            return parsed.temporaryHourClosures;
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // 3. Fallback to localStorage cache
+  return getTemporaryHourClosuresFromCache();
+}
+
+/**
+ * Saves or updates a Temporary Hour Closure.
+ * Excludes the specific hours on the specified day of week across all statistics and reports now and into the future.
+ */
+export async function saveTemporaryHourClosure(
+  supabase: SupabaseClient,
+  closure: Omit<TemporaryHourClosure, 'id' | 'createdAt'> & { id?: string; createdAt?: string },
+  actor: UserProfile
+): Promise<TemporaryHourClosure[]> {
+  const current = getTemporaryHourClosuresFromCache();
+  const id = closure.id || `thc_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  const now = new Date().toISOString();
+  const dayName = DAY_OF_WEEK_NAMES[closure.dayOfWeek] || `Day ${closure.dayOfWeek}`;
+
+  const itemToSave: TemporaryHourClosure = {
+    id,
+    dayOfWeek: closure.dayOfWeek,
+    dayName: closure.dayName || dayName,
+    startTime: closure.startTime,
+    endTime: closure.endTime,
+    reason: closure.reason || '',
+    isActive: closure.isActive ?? true,
+    effectiveDate: closure.effectiveDate,
+    createdAt: closure.createdAt || now,
+    createdBy: closure.createdBy || actor.full_name || 'Chief Librarian',
+    updatedAt: now,
+    updatedByName: actor.full_name || 'Chief Librarian',
+  };
+
+  const existingIndex = current.findIndex((c) => c.id === id);
+  let updatedList: TemporaryHourClosure[];
+  if (existingIndex >= 0) {
+    updatedList = [...current];
+    updatedList[existingIndex] = itemToSave;
+  } else {
+    updatedList = [...current, itemToSave];
+  }
+
+  // Sort by dayOfWeek then startTime
+  updatedList.sort((a, b) => {
+    if (a.dayOfWeek !== b.dayOfWeek) return a.dayOfWeek - b.dayOfWeek;
+    return a.startTime.localeCompare(b.startTime);
+  });
+
+  // 1. Sync localStorage
+  syncTemporaryHourClosuresLocalStorage(updatedList);
+
+  // 2. Broadcast across tabs
+  broadcastCalendarChange('UPDATE', { temporaryHourClosures: updatedList });
+
+  // 3. Try upserting to native table
+  try {
+    await supabase.from('calendar_temporary_hour_closures').upsert({
+      id: itemToSave.id,
+      day_of_week: itemToSave.dayOfWeek,
+      day_name: itemToSave.dayName,
+      start_time: itemToSave.startTime,
+      end_time: itemToSave.endTime,
+      reason: itemToSave.reason,
+      is_active: itemToSave.isActive,
+      effective_date: itemToSave.effectiveDate,
+      created_at: itemToSave.createdAt,
+      created_by: itemToSave.createdBy,
+      updated_at: itemToSave.updatedAt,
+      updated_by_name: itemToSave.updatedByName,
+    });
+  } catch {
+    // ignore
+  }
+
+  // 4. Save to master registry carrier
+  try {
+    const { data: dirData } = await supabase.rpc('get_login_directory');
+    const registryRow = Array.isArray(dirData)
+      ? dirData.find(
+          (r: any) =>
+            r.username === CALENDAR_REGISTRY_USERNAME ||
+            r.full_name === CALENDAR_REGISTRY_FULL_NAME ||
+            r.staff_code === CALENDAR_REGISTRY_STAFF_CODE
+        )
+      : null;
+
+    let existingActivities: CalendarActivity[] = [];
+    let existingDeleted: string[] = [];
+    let existingClosedDays: number[] = [];
+
+    if (registryRow && registryRow.shift_schedule) {
+      try {
+        const p = JSON.parse(registryRow.shift_schedule);
+        if (Array.isArray(p.activities)) existingActivities = p.activities;
+        if (Array.isArray(p.deletedKeys)) existingDeleted = p.deletedKeys;
+        if (Array.isArray(p.closedDaysOfWeek)) existingClosedDays = p.closedDaysOfWeek;
+      } catch {
+        // ignore
+      }
+    }
+
+    const registryPayload = JSON.stringify({
+      activities: existingActivities,
+      deletedKeys: existingDeleted,
+      closedDaysOfWeek: existingClosedDays,
+      temporaryHourClosures: updatedList,
+      updatedAt: now,
+    });
+
+    if (registryRow) {
+      await supabase.rpc('admin_update_staff_account', {
+        p_user_id: registryRow.id,
+        p_full_name: CALENDAR_REGISTRY_FULL_NAME,
+        p_username: CALENDAR_REGISTRY_USERNAME,
+        p_staff_code: CALENDAR_REGISTRY_STAFF_CODE,
+        p_role: 'student_assistant',
+        p_assigned_area_id: null,
+        p_shift_schedule: registryPayload,
+        p_is_active: true,
+        p_new_password: null,
+      });
+    }
+  } catch {
+    // ignore
+  }
+
+  return updatedList;
+}
+
+/**
+ * Permanently deletes a Temporary Hour Closure.
+ */
+export async function deleteTemporaryHourClosure(
+  supabase: SupabaseClient,
+  id: string,
+  actor: UserProfile
+): Promise<TemporaryHourClosure[]> {
+  const current = getTemporaryHourClosuresFromCache();
+  const updatedList = current.filter((c) => c.id !== id);
+
+  syncTemporaryHourClosuresLocalStorage(updatedList);
+  broadcastCalendarChange('UPDATE', { temporaryHourClosures: updatedList });
+
+  try {
+    await supabase.from('calendar_temporary_hour_closures').delete().eq('id', id);
+  } catch {
+    // ignore
+  }
+
+  try {
+    const { data: dirData } = await supabase.rpc('get_login_directory');
+    const registryRow = Array.isArray(dirData)
+      ? dirData.find(
+          (r: any) =>
+            r.username === CALENDAR_REGISTRY_USERNAME ||
+            r.full_name === CALENDAR_REGISTRY_FULL_NAME ||
+            r.staff_code === CALENDAR_REGISTRY_STAFF_CODE
+        )
+      : null;
+
+    let existingActivities: CalendarActivity[] = [];
+    let existingDeleted: string[] = [];
+    let existingClosedDays: number[] = [];
+
+    if (registryRow && registryRow.shift_schedule) {
+      try {
+        const p = JSON.parse(registryRow.shift_schedule);
+        if (Array.isArray(p.activities)) existingActivities = p.activities;
+        if (Array.isArray(p.deletedKeys)) existingDeleted = p.deletedKeys;
+        if (Array.isArray(p.closedDaysOfWeek)) existingClosedDays = p.closedDaysOfWeek;
+      } catch {
+        // ignore
+      }
+    }
+
+    const registryPayload = JSON.stringify({
+      activities: existingActivities,
+      deletedKeys: existingDeleted,
+      closedDaysOfWeek: existingClosedDays,
+      temporaryHourClosures: updatedList,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (registryRow) {
+      await supabase.rpc('admin_update_staff_account', {
+        p_user_id: registryRow.id,
+        p_full_name: CALENDAR_REGISTRY_FULL_NAME,
+        p_username: CALENDAR_REGISTRY_USERNAME,
+        p_staff_code: CALENDAR_REGISTRY_STAFF_CODE,
+        p_role: 'student_assistant',
+        p_assigned_area_id: null,
+        p_shift_schedule: registryPayload,
+        p_is_active: true,
+        p_new_password: null,
+      });
+    }
+  } catch {
+    // ignore
+  }
+
+  return updatedList;
+}
+
+/**
+ * Toggles a Temporary Hour Closure between active and inactive.
+ */
+export async function toggleTemporaryHourClosureActive(
+  supabase: SupabaseClient,
+  id: string,
+  isActive: boolean,
+  actor: UserProfile
+): Promise<TemporaryHourClosure[]> {
+  const current = getTemporaryHourClosuresFromCache();
+  const found = current.find((c) => c.id === id);
+  if (!found) return current;
+
+  return saveTemporaryHourClosure(
+    supabase,
+    {
+      ...found,
+      isActive,
+      updatedAt: new Date().toISOString(),
+      updatedByName: actor.full_name || 'Chief Librarian',
+    },
+    actor
+  );
 }

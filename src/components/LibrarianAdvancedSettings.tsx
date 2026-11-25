@@ -25,8 +25,14 @@ import { supabase } from '../lib/supabase';
 import { LibraryArea, TimeSlotDefinition, UserProfile } from '../types/lirc';
 import {
   DAY_OF_WEEK_NAMES,
+  deleteTemporaryHourClosure,
+  fetchTemporaryHourClosures,
+  getTemporaryHourClosuresFromCache,
   OPERATING_WEEKDAYS,
+  saveTemporaryHourClosure,
+  TemporaryHourClosure,
   toggleClosedDayOfWeek,
+  toggleTemporaryHourClosureActive,
 } from '../utils/calendarActivities';
 import {
   deleteTimeSlot,
@@ -54,9 +60,11 @@ interface LibrarianAdvancedSettingsProps {
   onNotify: (type: 'success' | 'error', message: string) => void;
   timeSlots?: TimeSlotDefinition[];
   onTimeSlotsUpdated?: (slots: TimeSlotDefinition[]) => void;
+  temporaryHourClosures?: TemporaryHourClosure[];
+  onTemporaryHourClosuresUpdated?: (closures: TemporaryHourClosure[]) => void;
 }
 
-type SettingsSection = 'closures' | 'intervals' | 'areas';
+type SettingsSection = 'closures' | 'hour_closures' | 'intervals' | 'areas';
 
 const ACADEMIC_PALETTE = [
   { name: 'Burgundy Crimson', hex: '#A83232' },
@@ -71,6 +79,49 @@ const ACADEMIC_PALETTE = [
   { name: 'Warm Amber', hex: '#B8860B' },
 ];
 
+const TIME_OPTIONS = [
+  { value: '08:00', label: '8:00 AM' },
+  { value: '08:30', label: '8:30 AM' },
+  { value: '09:00', label: '9:00 AM' },
+  { value: '09:30', label: '9:30 AM' },
+  { value: '10:00', label: '10:00 AM' },
+  { value: '10:30', label: '10:30 AM' },
+  { value: '11:00', label: '11:00 AM' },
+  { value: '11:30', label: '11:30 AM' },
+  { value: '12:00', label: '12:00 PM' },
+  { value: '12:30', label: '12:30 PM' },
+  { value: '13:00', label: '1:00 PM' },
+  { value: '13:30', label: '1:30 PM' },
+  { value: '14:00', label: '2:00 PM' },
+  { value: '14:30', label: '2:30 PM' },
+  { value: '15:00', label: '3:00 PM' },
+  { value: '15:30', label: '3:30 PM' },
+  { value: '16:00', label: '4:00 PM' },
+  { value: '16:30', label: '4:30 PM' },
+  { value: '17:00', label: '5:00 PM' },
+  { value: '17:30', label: '5:30 PM' },
+  { value: '18:00', label: '6:00 PM' },
+];
+
+const WEEKDAY_CHOICES = [
+  { dayOfWeek: 1, name: 'Monday', short: 'Mon' },
+  { dayOfWeek: 2, name: 'Tuesday', short: 'Tue' },
+  { dayOfWeek: 3, name: 'Wednesday', short: 'Wed' },
+  { dayOfWeek: 4, name: 'Thursday', short: 'Thu' },
+  { dayOfWeek: 5, name: 'Friday', short: 'Fri' },
+  { dayOfWeek: 6, name: 'Saturday', short: 'Sat' },
+  { dayOfWeek: 0, name: 'Sunday', short: 'Sun' },
+];
+
+const COMMON_CLOSURE_REASONS = [
+  'Weekly Faculty & Staff Meeting',
+  'Sanitation & Deep Cleaning',
+  'Library System Maintenance',
+  'Academic Assembly / Convocation',
+  'Midday / Lunch Break',
+  'Inventory & Book Stacking',
+];
+
 export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps> = ({
   profile,
   areas,
@@ -80,6 +131,8 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
   onNotify,
   timeSlots: initialTimeSlots,
   onTimeSlotsUpdated,
+  temporaryHourClosures,
+  onTemporaryHourClosuresUpdated,
 }) => {
   const [activeSection, setActiveSection] = useState<SettingsSection>('closures');
 
@@ -112,6 +165,159 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
       setClosureReasonText('');
     }
   };
+
+  // ---------------------------------------------------------------------------
+  // 2. TEMPORARY HOUR CLOSURES STATE
+  // ---------------------------------------------------------------------------
+  const [hourClosuresList, setHourClosuresList] = useState<TemporaryHourClosure[]>(() =>
+    temporaryHourClosures && temporaryHourClosures.length > 0
+      ? temporaryHourClosures
+      : getTemporaryHourClosuresFromCache()
+  );
+  const [hourClosureSearch, setHourClosureSearch] = useState<string>('');
+
+  // Add / Edit Modal State
+  const [showHourClosureModal, setShowHourClosureModal] = useState<boolean>(false);
+  const [editingHourClosureId, setEditingHourClosureId] = useState<string | null>(null);
+  const [selectedDayOfWeek, setSelectedDayOfWeek] = useState<number>(1);
+  const [selectedEffectiveDate, setSelectedEffectiveDate] = useState<string>('');
+  const [hourClosureStartTime, setHourClosureStartTime] = useState<string>('12:00');
+  const [hourClosureEndTime, setHourClosureEndTime] = useState<string>('13:00');
+  const [hourClosureReason, setHourClosureReason] = useState<string>('Weekly Faculty & Staff Meeting');
+  const [hourClosureIsActive, setHourClosureIsActive] = useState<boolean>(true);
+  const [savingHourClosure, setSavingHourClosure] = useState<boolean>(false);
+  const [deletingHourClosure, setDeletingHourClosure] = useState<TemporaryHourClosure | null>(null);
+  const [togglingHourClosureId, setTogglingHourClosureId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (temporaryHourClosures) {
+      setHourClosuresList(temporaryHourClosures);
+    }
+  }, [temporaryHourClosures]);
+
+  const handleOpenAddHourClosure = () => {
+    setEditingHourClosureId(null);
+    setSelectedDayOfWeek(1);
+    setSelectedEffectiveDate(new Date().toISOString().slice(0, 10));
+    setHourClosureStartTime('12:00');
+    setHourClosureEndTime('13:00');
+    setHourClosureReason('Weekly Faculty & Staff Meeting');
+    setHourClosureIsActive(true);
+    setShowHourClosureModal(true);
+  };
+
+  const handleOpenEditHourClosure = (closure: TemporaryHourClosure) => {
+    setEditingHourClosureId(closure.id);
+    setSelectedDayOfWeek(closure.dayOfWeek);
+    setSelectedEffectiveDate(closure.effectiveDate || '');
+    setHourClosureStartTime(closure.startTime);
+    setHourClosureEndTime(closure.endTime);
+    setHourClosureReason(closure.reason || '');
+    setHourClosureIsActive(closure.isActive);
+    setShowHourClosureModal(true);
+  };
+
+  const handleSaveHourClosure = async () => {
+    if (hourClosureStartTime >= hourClosureEndTime) {
+      onNotify('error', 'End time must be after start time.');
+      return;
+    }
+
+    setSavingHourClosure(true);
+    try {
+      const dayName = DAY_OF_WEEK_NAMES[selectedDayOfWeek] || `Day ${selectedDayOfWeek}`;
+      const payload: Omit<TemporaryHourClosure, 'id' | 'createdAt'> & { id?: string; createdAt?: string } = {
+        id: editingHourClosureId || undefined,
+        dayOfWeek: selectedDayOfWeek,
+        dayName,
+        startTime: hourClosureStartTime,
+        endTime: hourClosureEndTime,
+        reason: hourClosureReason.trim() || 'Temporary Hour Closure',
+        isActive: hourClosureIsActive,
+        effectiveDate: selectedEffectiveDate || undefined,
+      };
+
+      const updated = await saveTemporaryHourClosure(supabase, payload, profile);
+      setHourClosuresList(updated);
+      onTemporaryHourClosuresUpdated?.(updated);
+      setShowHourClosureModal(false);
+      onNotify(
+        'success',
+        editingHourClosureId
+          ? `Temporary Hour Closure for every ${dayName} (${formatTime12Hour(hourClosureStartTime)} - ${formatTime12Hour(hourClosureEndTime)}) updated successfully.`
+          : `Temporary Hour Closure for every ${dayName} (${formatTime12Hour(hourClosureStartTime)} - ${formatTime12Hour(hourClosureEndTime)}) configured. These hours are now automatically excluded from statistics.`
+      );
+    } catch (err: any) {
+      onNotify('error', `Failed to save Temporary Hour Closure: ${err?.message || 'Error occurred'}`);
+    } finally {
+      setSavingHourClosure(false);
+    }
+  };
+
+  const handleDeleteHourClosure = async (closure: TemporaryHourClosure) => {
+    try {
+      const updated = await deleteTemporaryHourClosure(supabase, closure.id, profile);
+      setHourClosuresList(updated);
+      onTemporaryHourClosuresUpdated?.(updated);
+      setDeletingHourClosure(null);
+      onNotify(
+        'success',
+        `Temporary Hour Closure for every ${closure.dayName} (${formatTime12Hour(closure.startTime)} - ${formatTime12Hour(closure.endTime)}) removed.`
+      );
+    } catch (err: any) {
+      onNotify('error', `Failed to delete Temporary Hour Closure: ${err?.message || 'Error occurred'}`);
+    }
+  };
+
+  const handleToggleHourClosure = async (closure: TemporaryHourClosure) => {
+    setTogglingHourClosureId(closure.id);
+    const nextState = !closure.isActive;
+    try {
+      const updated = await toggleTemporaryHourClosureActive(supabase, closure.id, nextState, profile);
+      setHourClosuresList(updated);
+      onTemporaryHourClosuresUpdated?.(updated);
+      onNotify(
+        'success',
+        nextState
+          ? `Temporary Hour Closure for every ${closure.dayName} (${formatTime12Hour(closure.startTime)} - ${formatTime12Hour(closure.endTime)}) activated.`
+          : `Temporary Hour Closure for every ${closure.dayName} (${formatTime12Hour(closure.startTime)} - ${formatTime12Hour(closure.endTime)}) paused.`
+      );
+    } catch (err: any) {
+      onNotify('error', `Failed to update status: ${err?.message || 'Error occurred'}`);
+    } finally {
+      setTogglingHourClosureId(null);
+    }
+  };
+
+  const handleDatePickerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSelectedEffectiveDate(val);
+    if (val && val.includes('-')) {
+      const [y, m, d] = val.split('-').map(Number);
+      if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+        const dow = new Date(y, m - 1, d).getDay();
+        setSelectedDayOfWeek(dow);
+      }
+    }
+  };
+
+  const affectedIntervals = useMemo(() => {
+    return TIME_OPTIONS.filter((t) => t.value >= hourClosureStartTime && t.value < hourClosureEndTime);
+  }, [hourClosureStartTime, hourClosureEndTime]);
+
+  const filteredHourClosures = useMemo(() => {
+    if (!hourClosureSearch.trim()) return hourClosuresList;
+    const q = hourClosureSearch.toLowerCase().trim();
+    return hourClosuresList.filter(
+      (c) =>
+        c.dayName.toLowerCase().includes(q) ||
+        (c.reason && c.reason.toLowerCase().includes(q)) ||
+        c.startTime.includes(q) ||
+        c.endTime.includes(q) ||
+        formatTime12Hour(c.startTime).toLowerCase().includes(q) ||
+        formatTime12Hour(c.endTime).toLowerCase().includes(q)
+    );
+  }, [hourClosuresList, hourClosureSearch]);
 
   // ---------------------------------------------------------------------------
   // 2. TIME INTERVAL MANAGEMENT STATE
@@ -480,6 +686,30 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
 
             <button
               type="button"
+              onClick={() => setActiveSection('hour_closures')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-2 cursor-pointer transition ${
+                activeSection === 'hour_closures'
+                  ? 'bg-[#A83232] text-white shadow-2xs'
+                  : 'text-[#6E665E] dark:text-[#A6998C] hover:text-[#332F2B] dark:hover:text-white'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>Temporary Hour Closure</span>
+              {hourClosuresList.length > 0 && (
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    activeSection === 'hour_closures'
+                      ? 'bg-white text-[#A83232]'
+                      : 'bg-[#A83232] text-white'
+                  }`}
+                >
+                  {hourClosuresList.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActiveSection('intervals')}
               className={`px-3.5 py-2 rounded-xl text-xs font-semibold inline-flex items-center gap-2 cursor-pointer transition ${
                 activeSection === 'intervals'
@@ -649,6 +879,211 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================================
+          SECTION: TEMPORARY HOUR CLOSURE
+      ===================================================================== */}
+      {activeSection === 'hour_closures' && (
+        <div className="space-y-5 animate-literary-fade">
+          {/* Institutional Advisory Notice */}
+          <div className="literary-card p-4 sm:p-5 bg-gradient-to-r from-[#FFFDF8] via-[#FEF9EC] to-[#FAF5EE] dark:from-[#261F12] dark:via-[#1F1910] dark:to-[#1A1409] border-[#E7B84B]/60 dark:border-[#E7B84B]/40 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-start gap-3">
+              <Clock className="w-5 h-5 text-[#B88412] dark:text-[#E7B84B] shrink-0 mt-0.5" />
+              <div>
+                <div className="font-heading font-bold text-sm text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2 flex-wrap">
+                  <span>Temporary Hour Closure</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FEF9EC] dark:bg-[#332512] text-[#7D5B06] dark:text-[#F5D075] border border-[#E7B84B]/40">
+                    Automatic Recurring Statistical Exclusion
+                  </span>
+                </div>
+                <p className="text-[#6E665E] dark:text-[#A6998C] mt-1 leading-relaxed">
+                  Specify particular hours on a specific day when the library will be temporarily closed.
+                  The system <strong>automatically excludes the selected date and time period from statistical calculations and reports</strong>.
+                  Once configured, the system also <strong>automatically excludes those exact hours from statistics every time that specific day and time occurs in the future</strong>, without requiring setup again.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleOpenAddHourClosure}
+              className="shrink-0 px-3.5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8F2828] text-white text-xs font-bold inline-flex items-center gap-2 shadow-xs cursor-pointer transition"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Temporary Hour Closure</span>
+            </button>
+          </div>
+
+          {/* Closures Management Card */}
+          <div className="literary-card overflow-hidden">
+            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
+                  <span>Configured Temporary Hour Closures</span>
+                  <span className="text-xs font-stat font-semibold px-2 py-0.5 rounded-full bg-[#FAF5EE] dark:bg-[#25201A] text-[#A83232] dark:text-[#E25D5D] border border-[#E6D7C3] dark:border-[#383028]">
+                    {hourClosuresList.filter((c) => c.isActive).length} Active
+                  </span>
+                </h2>
+                <p className="text-xs text-[#6E665E] dark:text-[#A6998C] mt-0.5">
+                  Specific day and hour periods excluded from attendance ledger, KPI summaries, and missing interval alerts.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 text-[#6E665E] dark:text-[#A6998C] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={hourClosureSearch}
+                    onChange={(e) => setHourClosureSearch(e.target.value)}
+                    placeholder="Search closures..."
+                    className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleOpenAddHourClosure}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs cursor-pointer transition shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Add Closure</span>
+                </button>
+              </div>
+            </div>
+
+            {filteredHourClosures.length === 0 ? (
+              <div className="p-10 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-center text-[#6E665E] dark:text-[#A6998C] mx-auto">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div className="max-w-md mx-auto">
+                  <p className="text-sm font-semibold text-[#332F2B] dark:text-[#F0E8DE]">
+                    {hourClosureSearch ? 'No closures match your search' : 'No Temporary Hour Closures Configured'}
+                  </p>
+                  <p className="text-xs text-[#6E665E] dark:text-[#A6998C] mt-1">
+                    {hourClosureSearch
+                      ? 'Try clearing the search query or specify a different keyword.'
+                      : 'Configure specific hours on a recurring day (such as Wednesday 12:00 PM - 1:30 PM) to automatically exclude them from all calculations and reports.'}
+                  </p>
+                </div>
+                {!hourClosureSearch && (
+                  <button
+                    type="button"
+                    onClick={handleOpenAddHourClosure}
+                    className="px-4 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs cursor-pointer transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add First Hour Closure</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="divide-y divide-[#E6D7C3]/60 dark:divide-[#383028]/60">
+                {filteredHourClosures.map((closure) => {
+                  const isBusy = togglingHourClosureId === closure.id;
+                  const rangeFormatted = `${formatTime12Hour(closure.startTime)} - ${formatTime12Hour(closure.endTime)}`;
+                  const [sH, sM] = closure.startTime.split(':').map(Number);
+                  const [eH, eM] = closure.endTime.split(':').map(Number);
+                  const totalMinutes = (eH * 60 + eM) - (sH * 60 + sM);
+                  const intervalCount = Math.max(1, Math.round(totalMinutes / 30));
+
+                  return (
+                    <div
+                      key={closure.id}
+                      className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#FAF5EE]/50 dark:hover:bg-[#25201A]/50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3.5">
+                        <div
+                          className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+                            closure.isActive
+                              ? 'bg-[#FDF3F3] dark:bg-[#331717] border-[#E8BDBD] text-[#A83232] dark:text-[#F5A3A3]'
+                              : 'bg-[#FAF5EE] dark:bg-[#25201A] border-[#E6D7C3] dark:border-[#383028] text-[#6E665E] dark:text-[#A6998C]'
+                          }`}
+                        >
+                          <Clock className="w-5 h-5" />
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-heading font-bold text-sm sm:text-base text-[#332F2B] dark:text-[#F0E8DE]">
+                              Every {closure.dayName}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold font-stat bg-[#FAF5EE] dark:bg-[#25201A] text-[#A83232] dark:text-[#E25D5D] border border-[#E6D7C3] dark:border-[#383028]">
+                              {rangeFormatted}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#FAF5EE] dark:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] border border-[#E6D7C3]/60 dark:border-[#383028]">
+                              {intervalCount} {intervalCount === 1 ? 'interval' : 'intervals'} ({closure.startTime} – {closure.endTime})
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                                closure.isActive
+                                  ? 'bg-[#F1F5EE] dark:bg-[#182414] text-[#455436] dark:text-[#B2D898] border-[#71865A]/40'
+                                  : 'bg-[#FAF5EE] dark:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] border-[#E6D7C3] dark:border-[#383028]'
+                              }`}
+                            >
+                              {closure.isActive ? 'Active Exclusion' : 'Paused'}
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-[#6E665E] dark:text-[#A6998C]">
+                            {closure.reason || 'Temporary Hour Closure (No specific reason recorded)'}
+                          </p>
+
+                          <div className="flex items-center gap-3 text-[11px] text-[#A89F91] dark:text-[#7A6F62] pt-0.5">
+                            {closure.effectiveDate && (
+                              <span>Effective starting {closure.effectiveDate}</span>
+                            )}
+                            <span>Configured by {closure.updatedByName || closure.createdBy || 'Librarian'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => handleToggleHourClosure(closure)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs disabled:opacity-50 ${
+                            closure.isActive
+                              ? 'border border-[#D6C3A9] dark:border-[#383028] bg-white dark:bg-[#1C1814] text-[#6E665E] dark:text-[#A6998C] hover:bg-[#FAF5EE] dark:hover:bg-[#25201A]'
+                              : 'border border-[#71865A] bg-[#F1F5EE] dark:bg-[#182414] text-[#455436] dark:text-[#B2D898] hover:bg-[#71865A] hover:text-white'
+                          }`}
+                        >
+                          {isBusy ? (
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          ) : closure.isActive ? (
+                            <Clock className="w-3.5 h-3.5" />
+                          ) : (
+                            <Check className="w-3.5 h-3.5" />
+                          )}
+                          <span>{closure.isActive ? 'Pause' : 'Activate'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditHourClosure(closure)}
+                          className="p-2 rounded-xl border border-[#D6C3A9] dark:border-[#383028] bg-white dark:bg-[#1C1814] hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] hover:text-[#332F2B] dark:hover:text-white transition cursor-pointer"
+                          title="Edit closure"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setDeletingHourClosure(closure)}
+                          className="p-2 rounded-xl border border-[#E8BDBD] dark:border-[#6B2A2A] bg-[#FDF3F3] dark:bg-[#331717] hover:bg-[#A83232] text-[#A83232] dark:text-[#F5A3A3] hover:text-white transition cursor-pointer"
+                          title="Delete closure"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1239,6 +1674,279 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                 >
                   <Clock className="w-3.5 h-3.5" />
                   <span>Confirm Temporary Closure</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* =====================================================================
+          MODAL: ADD / EDIT TEMPORARY HOUR CLOSURE
+      ===================================================================== */}
+      {showHourClosureModal && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade overflow-y-auto">
+          <div className="literary-card shadow-2xl max-w-lg w-full relative overflow-hidden bg-white dark:bg-[#1C1814] border border-[#E6D7C3] dark:border-[#383028] my-8">
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#A83232] via-[#E7B84B] to-[#71865A] absolute top-0 left-0" />
+
+            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] flex items-center justify-center text-[#A83232] dark:text-[#E25D5D]">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE]">
+                    {editingHourClosureId ? 'Edit Temporary Hour Closure' : 'Add Temporary Hour Closure'}
+                  </h3>
+                  <p className="text-xs text-[#6E665E] dark:text-[#A6998C]">
+                    Automatically exclude recurring hours from statistics &amp; reports.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowHourClosureModal(false)}
+                className="p-1.5 rounded-lg hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs">
+              <div className="p-3.5 rounded-xl bg-[#FEF9EC] dark:bg-[#261F12] border border-[#E7B84B]/60 text-[#7D5B06] dark:text-[#F5D075] flex items-start gap-2.5">
+                <Calendar className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>
+                  Configuring a Temporary Hour Closure automatically excludes the selected hours from all statistical calculations, KPI summaries, and missing interval alerts for that date and every future occurrence of that day.
+                </p>
+              </div>
+
+              {/* Day of the Week Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1.5">
+                  Select Day of the Week *
+                </label>
+                <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5">
+                  {WEEKDAY_CHOICES.map((w) => {
+                    const isSelected = selectedDayOfWeek === w.dayOfWeek;
+                    return (
+                      <button
+                        key={w.dayOfWeek}
+                        type="button"
+                        onClick={() => setSelectedDayOfWeek(w.dayOfWeek)}
+                        className={`py-2 px-1 rounded-xl text-center font-semibold text-xs transition cursor-pointer border ${
+                          isSelected
+                            ? 'bg-[#A83232] text-white border-[#A83232] shadow-2xs'
+                            : 'bg-[#FAF5EE] dark:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] border-[#D6C3A9] dark:border-[#383028] hover:border-[#A83232]'
+                        }`}
+                      >
+                        <div className="font-bold">{w.short}</div>
+                        <div className="text-[10px] opacity-80">{w.name.slice(0, 3)}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Specific Reference / Effective Date */}
+              <div className="pt-1">
+                <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1">
+                  Reference Date / Effective From (optional)
+                </label>
+                <input
+                  type="date"
+                  value={selectedEffectiveDate}
+                  onChange={handleDatePickerChange}
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
+                />
+                <p className="text-[11px] text-[#A89F91] dark:text-[#7A6F62] mt-0.5">
+                  Selecting a specific date automatically sets the day of the week and tracks when the closure takes effect.
+                </p>
+              </div>
+
+              {/* Time Range Selectors */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1">
+                    Start Time *
+                  </label>
+                  <select
+                    value={hourClosureStartTime}
+                    onChange={(e) => setHourClosureStartTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs font-stat text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
+                  >
+                    {TIME_OPTIONS.slice(0, -1).map((t) => (
+                      <option key={`start-${t.value}`} value={t.value}>
+                        {t.label} ({t.value})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1">
+                    End Time *
+                  </label>
+                  <select
+                    value={hourClosureEndTime}
+                    onChange={(e) => setHourClosureEndTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs font-stat text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
+                  >
+                    {TIME_OPTIONS.slice(1).map((t) => (
+                      <option key={`end-${t.value}`} value={t.value}>
+                        {t.label} ({t.value})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Intervals preview banner */}
+              {hourClosureStartTime >= hourClosureEndTime ? (
+                <div className="p-2.5 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] text-[#A83232] dark:text-[#F5A3A3] text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>End time must be strictly later than start time.</span>
+                </div>
+              ) : (
+                <div className="p-2.5 rounded-xl bg-[#F1F5EE] dark:bg-[#182414] border border-[#71865A]/40 text-[#455436] dark:text-[#B2D898] text-xs">
+                  <span className="font-bold">Excluded Intervals ({affectedIntervals.length}):</span>{' '}
+                  <span>
+                    {affectedIntervals.map((i) => i.label).join(', ')} ({hourClosureStartTime} – {hourClosureEndTime})
+                  </span>
+                </div>
+              )}
+
+              {/* Reason / Purpose with quick presets */}
+              <div className="pt-1">
+                <label className="block text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] mb-1">
+                  Closure Reason / Notes
+                </label>
+                <input
+                  type="text"
+                  value={hourClosureReason}
+                  onChange={(e) => setHourClosureReason(e.target.value)}
+                  placeholder="e.g. Weekly Faculty & Staff Meeting"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
+                />
+
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {COMMON_CLOSURE_REASONS.map((reason) => (
+                    <button
+                      key={reason}
+                      type="button"
+                      onClick={() => setHourClosureReason(reason)}
+                      className="px-2 py-0.5 rounded-lg bg-[#FAF5EE] dark:bg-[#25201A] hover:bg-[#E6D7C3] dark:hover:bg-[#383028] text-[11px] text-[#6E665E] dark:text-[#A6998C] border border-[#D6C3A9] dark:border-[#383028] cursor-pointer transition"
+                    >
+                      {reason}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Toggle Switch */}
+              <div className="pt-2 flex items-center justify-between p-3 rounded-xl bg-[#FAF5EE] dark:bg-[#25201A] border border-[#E6D7C3] dark:border-[#383028]">
+                <div>
+                  <span className="font-semibold text-[#332F2B] dark:text-[#F0E8DE] block">
+                    Active Closure Status
+                  </span>
+                  <span className="text-[11px] text-[#6E665E] dark:text-[#A6998C]">
+                    When active, these hours are automatically excluded from statistics and reports.
+                  </span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={hourClosureIsActive}
+                    onChange={(e) => setHourClosureIsActive(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-[#D6C3A9] dark:bg-[#383028] peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#A83232]"></div>
+                </label>
+              </div>
+
+              {/* Modal Action Buttons */}
+              <div className="pt-4 border-t border-[#E6D7C3] dark:border-[#383028] flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowHourClosureModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#D6C3A9] dark:border-[#383028] text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={savingHourClosure || hourClosureStartTime >= hourClosureEndTime}
+                  onClick={handleSaveHourClosure}
+                  className="px-5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs disabled:opacity-50"
+                >
+                  {savingHourClosure ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5" />
+                  )}
+                  <span>{editingHourClosureId ? 'Save Changes' : 'Save Hour Closure'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* =====================================================================
+          MODAL: CONFIRM DELETE TEMPORARY HOUR CLOSURE
+      ===================================================================== */}
+      {deletingHourClosure && createPortal(
+        <div className="fixed inset-0 z-[9999] bg-[#332F2B]/65 dark:bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4 animate-literary-fade">
+          <div className="literary-card shadow-2xl max-w-md w-full relative overflow-hidden bg-white dark:bg-[#1C1814] border border-[#E6D7C3] dark:border-[#383028]">
+            <div className="h-1.5 w-full bg-[#A83232] absolute top-0 left-0" />
+
+            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] flex items-center justify-center text-[#A83232] dark:text-[#E25D5D]">
+                  <Trash2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-base text-[#332F2B] dark:text-[#F0E8DE]">
+                    Delete Temporary Hour Closure
+                  </h3>
+                  <p className="text-xs text-[#6E665E] dark:text-[#A6998C]">
+                    Resume standard operating hours for this period
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDeletingHourClosure(null)}
+                className="p-1.5 rounded-lg hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] text-[#6E665E] dark:text-[#A6998C] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs">
+              <div className="p-3.5 rounded-xl bg-[#FDF3F3] dark:bg-[#331717] border border-[#E8BDBD] text-[#A83232] dark:text-[#F5A3A3] flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>
+                  Are you sure you want to delete the Temporary Hour Closure for <strong>Every {deletingHourClosure.dayName}</strong> ({formatTime12Hour(deletingHourClosure.startTime)} - {formatTime12Hour(deletingHourClosure.endTime)})? Normal statistical calculation and attendance expectations will resume for future occurrences.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-[#E6D7C3] dark:border-[#383028] flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setDeletingHourClosure(null)}
+                  className="px-4 py-2 rounded-xl border border-[#D6C3A9] dark:border-[#383028] text-xs font-semibold text-[#332F2B] dark:text-[#F0E8DE] hover:bg-[#FAF5EE] dark:hover:bg-[#25201A] transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteHourClosure(deletingHourClosure)}
+                  className="px-5 py-2 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Confirm Delete</span>
                 </button>
               </div>
             </div>
