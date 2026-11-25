@@ -53,6 +53,7 @@ import {
 import {
   computeStatisticalReport,
   formatShortDate,
+  formatSlotRangeLabel,
   formatTimestampPHT,
   getDayOfWeekName,
   getExpectedSlotsForDate,
@@ -1368,7 +1369,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                     return (
                       <tr key={slot.value} className="hover:bg-[#FAF5EE]/70 transition-colors">
                         <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap">
-                          {slot.rangeLabel || slot.label}
+                          {formatSlotRangeLabel(slot.value)}
                         </td>
                         {visibleAreas.map((area) => {
                           const rec = dailySlotAreaMap.get(`${slot.value}|${area.id}`);
@@ -1962,8 +1963,8 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.slotBreakdown.map((sRow) => (
                           <tr key={sRow.slot} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B]">
-                              {sRow.label}
+                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap">
+                              {formatSlotRangeLabel(sRow.slot) || sRow.label}
                             </td>
                             {generatedReport.areaSummaries.map((s) => (
                               <td key={s.area.id} className="py-2.5 px-4 text-right font-stat">

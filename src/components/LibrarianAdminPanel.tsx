@@ -497,9 +497,9 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
           setDutyConflictError(
             `Schedule Conflict in Form: Row #${i + 1} (${areaA}, ${formatTimeSlotLabel(
               blockA.startTime
-            )} – ${formatTimeSlotLabel(blockA.endTime)}) overlaps with Row #${
+            )} - ${formatTimeSlotLabel(blockA.endTime)}) overlaps with Row #${
               j + 1
-            } (${areaB}, ${formatTimeSlotLabel(blockB.startTime)} – ${formatTimeSlotLabel(
+            } (${areaB}, ${formatTimeSlotLabel(blockB.startTime)} - ${formatTimeSlotLabel(
               blockB.endTime
             )}).`
           );
@@ -645,7 +645,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
       'success',
       `Removed duty entry for ${sched.studentAssistantName} (${sched.areaName} · ${
         DAY_GROUP_LABELS[sched.dayGroup].shortDays
-      }, ${formatTimeSlotLabel(sched.startTime)} – ${formatTimeSlotLabel(sched.endTime)}).`
+      }, ${formatTimeSlotLabel(sched.startTime)} - ${formatTimeSlotLabel(sched.endTime)}).`
     );
 
     if (dutyStudentId === targetSA.profile.id && dutyDayGroup === sched.dayGroup) {
@@ -1925,7 +1925,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                               </td>
                               <td className="py-2.5 px-3.5 font-stat whitespace-nowrap">
                                 <span className="px-2.5 py-1 rounded-lg bg-[#FAF5EE] text-[#332F2B] border border-[#D6C3A9] font-semibold">
-                                  {formatTimeSlotLabel(sched.startTime)} –{' '}
+                                  {formatTimeSlotLabel(sched.startTime)} -{' '}
                                   {formatTimeSlotLabel(sched.endTime)}
                                 </span>
                               </td>

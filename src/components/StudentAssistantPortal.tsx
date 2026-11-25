@@ -770,7 +770,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
     for (const area of sortedAreas) {
       for (const slot of expectedTodaySlots) {
         if (!todayLookup.byAreaSlot.has(`${area.id}|${slot}`)) {
-          missing.push({ area, slot, slotLabel: formatSlotLabel(slot) });
+          missing.push({ area, slot, slotLabel: formatSlotRangeLabel(slot) });
         }
       }
     }
@@ -1374,7 +1374,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
     const targetAreaName = areaById.get(editingRecord.area_id)?.name || 'Area';
     showToast(
       'success',
-      `Updated ${targetAreaName} (${formatSlotLabel(editingRecord.time_slot)}) to ${cleanCount} students.`
+      `Updated ${targetAreaName} (${formatSlotRangeLabel(editingRecord.time_slot)}) to ${cleanCount} students.`
     );
     setEditingRecord(null);
     await loadDashboardData();
@@ -2732,7 +2732,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             />
                             <span className="font-semibold text-[#332F2B]">{area?.name}</span>
                             <span className="text-[#6E665E] font-stat">
-                              {formatSlotLabel(r.time_slot)}
+                              {formatSlotRangeLabel(r.time_slot)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2.5">
@@ -2971,7 +2971,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                         ? `Library operations and statistics for every ${wholeDayInfo.weekdayName || 'Weekday'} are temporarily suspended by the Admin. Any records submitted on this day are excluded from statistical calculations.`
                         : wholeDay
                         ? 'Today is marked as No Classes. This entire day is automatically excluded from library statistical calculations.'
-                        : `This interval (${formatSlotLabel(effectiveTargetSlot)}) falls during a scheduled suspension (${matchingAct?.startTime || ''} – ${matchingAct?.endTime || ''}) and is excluded from statistical calculations.`}
+                        : `This interval (${formatSlotRangeLabel(effectiveTargetSlot)}) falls during a scheduled suspension (${matchingAct?.startTime || ''} - ${matchingAct?.endTime || ''}) and is excluded from statistical calculations.`}
                     </span>
                   </div>
                 </div>
@@ -3322,7 +3322,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-stat font-semibold text-[#332F2B] dark:text-[#FFFFFF]">
-                        {slot.rangeLabel || slot.label}
+                        {formatSlotRangeLabel(slot.value)}
                       </span>
                       {rec ? (
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#71865A]" />
@@ -3369,7 +3369,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             openEditRecordModal(rec);
                           }}
                           className="px-2 py-1 rounded-lg bg-[#FFFFFF] dark:bg-[#1E1914] border border-[#E6D7C3] dark:border-[#383028] hover:bg-[#A83232] hover:border-[#A83232] hover:text-[#FFFFFF] text-[#332F2B] dark:text-[#F0E8DE] text-[11px] font-semibold inline-flex items-center gap-1 transition cursor-pointer shadow-2xs"
-                          title={`Edit ${slot.rangeLabel || slot.label} occupancy count`}
+                          title={`Edit ${formatSlotRangeLabel(slot.value)} occupancy count`}
                         >
                           <Edit3 className="w-3 h-3" />
                           Edit Count
@@ -3383,7 +3383,7 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                             openMissingSlotModal(activeArea, slot.value, todayDate);
                           }}
                           className="px-2.5 py-1 rounded-md bg-[#A83232] hover:bg-[#8E2828] text-white text-[10px] font-semibold cursor-pointer shadow-2xs transition inline-flex items-center gap-1"
-                          title={`Log headcount for ${slot.rangeLabel || slot.label}`}
+                          title={`Log headcount for ${formatSlotRangeLabel(slot.value)}`}
                         >
                           Log Now
                         </button>

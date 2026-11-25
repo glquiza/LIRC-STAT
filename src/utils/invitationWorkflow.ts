@@ -334,7 +334,7 @@ export function formatTimeSlotLabel(hhmm: string): string {
 export function formatTimeSlotRange(hhmm: string): string {
   const slots = getTimeSlotsFromCache();
   const found = slots.find((s) => s.value === hhmm) || LIBRARY_TIME_SLOTS.find((s) => s.value === hhmm);
-  if (found) return found.rangeLabel;
+  if (found) return found.rangeLabel.replace(/\s*–\s*/g, ' - ');
   return formatTimeSlotLabel(hhmm);
 }
 

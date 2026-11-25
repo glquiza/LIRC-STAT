@@ -422,7 +422,7 @@ export const CalendarActivitiesModal: React.FC<CalendarActivitiesModalProps> = (
         return;
       }
       if (startTime >= endTime) {
-        setFormError('Start time must be strictly earlier than end time (e.g. 10:00 AM – 12:00 PM).');
+        setFormError('Start time must be strictly earlier than end time (e.g. 10:00 AM - 12:00 PM).');
         return;
       }
     }

@@ -193,8 +193,9 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
     setEditingSlotKey(slot.value);
     const start = slot.value;
     let end = '18:30';
-    if (slot.rangeLabel && slot.rangeLabel.includes('–')) {
-      const parts = slot.rangeLabel.split('–').map((p) => p.trim());
+    if (slot.rangeLabel && (slot.rangeLabel.includes('-') || slot.rangeLabel.includes('–'))) {
+      const sep = slot.rangeLabel.includes('–') ? '–' : '-';
+      const parts = slot.rangeLabel.split(sep).map((p) => p.trim());
       // attempt parsing end time from 12h
       const endPart = parts[1];
       if (endPart) {

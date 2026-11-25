@@ -449,7 +449,7 @@ export function formatActivityTimeRange(activity: CalendarActivity): string {
     h = h % 12 || 12;
     return `${h}:${m} ${ampm}`;
   };
-  return `${formatTime(activity.startTime)} – ${formatTime(activity.endTime)}`;
+  return `${formatTime(activity.startTime)} - ${formatTime(activity.endTime)}`;
 }
 
 /**

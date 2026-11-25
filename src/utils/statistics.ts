@@ -65,7 +65,7 @@ export function formatSlotRangeLabel(slot: string, customSlots?: TimeSlotDefinit
   const cleanSlot = slot.trim();
   const activeSlots = customSlots || getTimeSlotsFromCache();
   const found = activeSlots.find((s) => s.value === cleanSlot || s.label === cleanSlot);
-  if (found) return found.rangeLabel;
+  if (found) return found.rangeLabel.replace(/\s*–\s*/g, ' - ');
 
   const match = cleanSlot.match(/^(\d{1,2}):(\d{2})$/);
   if (match) {
@@ -74,7 +74,7 @@ export function formatSlotRangeLabel(slot: string, customSlots?: TimeSlotDefinit
     const pad = (n: number) => String(n).padStart(2, '0');
     const startStr = `${pad(h)}:${pad(m)}`;
     const f = activeSlots.find((s) => s.value === startStr);
-    if (f) return f.rangeLabel;
+    if (f) return f.rangeLabel.replace(/\s*–\s*/g, ' - ');
 
     let endH = h;
     let endM = m + 30;
@@ -87,10 +87,10 @@ export function formatSlotRangeLabel(slot: string, customSlots?: TimeSlotDefinit
       const hr12 = hr % 12 || 12;
       return `${hr12}:${pad(min)} ${ampm}`;
     };
-    return `${fmt(h, m)} – ${fmt(endH, endM)}`;
+    return `${fmt(h, m)} - ${fmt(endH, endM)}`;
   }
 
-  return cleanSlot;
+  return cleanSlot.replace(/\s*–\s*/g, ' - ');
 }
 
 export function formatShortDate(dateStr: string): string {
@@ -571,7 +571,7 @@ export function computeStatisticalReport(params: {
       if (count > aAcc.peakCount) {
         aAcc.peakCount = count;
         aAcc.peakDate = formatShortDate(rec.record_date);
-        aAcc.peakSlot = formatSlotLabel(rec.time_slot);
+        aAcc.peakSlot = formatSlotRangeLabel(rec.time_slot, activeSlots);
       }
     }
 
@@ -683,7 +683,7 @@ export function computeStatisticalReport(params: {
     const dayCount = acc.daysWithSlot.size || 1;
     return {
       slot: slotDef.value,
-      label: slotDef.label,
+      label: slotDef.rangeLabel ? slotDef.rangeLabel.replace(/\s*–\s*/g, ' - ') : formatSlotRangeLabel(slotDef.value, activeSlots),
       period: slotDef.period,
       areaTotals: acc.areaTotals,
       areaAverages,

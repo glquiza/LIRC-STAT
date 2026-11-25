@@ -112,7 +112,7 @@ export function exportStatisticalReportToExcel(
 
   // Sheet 2: Hourly Occupancy Summary
   const hourlyRows: (string | number)[][] = [
-    [`HOURLY OCCUPANCY SUMMARY (8:00 AM – 6:00 PM) – ${report.periodLabel.toUpperCase()}`],
+    [`HOURLY OCCUPANCY SUMMARY (8:00 AM - 6:00 PM) – ${report.periodLabel.toUpperCase()}`],
     [],
     ['Hour Bracket', ...areaHeaders, 'Hourly Total (All Areas)', 'Avg per 30-Min Entry'],
   ];
@@ -203,7 +203,7 @@ export function exportStatisticalReportToExcel(
 
   // Sheet 5: 30-Minute Time-Slot Breakdown
   const slotRows: (string | number)[][] = [
-    [`30-MINUTE RECORDING INTERVALS (8:00 AM – 6:00 PM) – ${report.periodLabel.toUpperCase()}`],
+    [`30-MINUTE RECORDING INTERVALS (8:00 AM - 6:00 PM) – ${report.periodLabel.toUpperCase()}`],
     [],
     ['Time Interval', 'Shift Period', ...areaHeaders, 'Interval Total', 'Daily Interval Avg'],
   ];
@@ -218,7 +218,7 @@ export function exportStatisticalReportToExcel(
   }
   const wsSlots = XLSX.utils.aoa_to_sheet(slotRows);
   wsSlots['!cols'] = [
-    { wch: 15 },
+    { wch: 22 },
     { wch: 16 },
     ...report.areaSummaries.map(() => ({ wch: 18 })),
     { wch: 16 },
@@ -418,7 +418,7 @@ export function exportStatisticalReportToPDF(
     const afterChartsY = 56 + chartH + 26;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('3. Hourly Occupancy Summary (8:00 AM – 6:00 PM)', 40, afterChartsY);
+    doc.text('3. Hourly Occupancy Summary (8:00 AM - 6:00 PM)', 40, afterChartsY);
 
     autoTable(doc, {
       startY: afterChartsY + 8,
@@ -768,7 +768,7 @@ export async function exportStatisticalReportToWord(
       spacing: { before: 240, after: 100 },
       children: [
         new TextRun({
-          text: '3. Hourly Occupancy Summary (8:00 AM – 6:00 PM)',
+          text: '3. Hourly Occupancy Summary (8:00 AM - 6:00 PM)',
           bold: true,
           size: 21,
           color: '0F172A',

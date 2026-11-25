@@ -143,33 +143,33 @@ export interface SavedReport {
 export interface TimeSlotDefinition {
   value: string;      // '08:00'
   label: string;      // '8:00 AM'
-  rangeLabel: string; // '8:00 AM – 8:30 AM'
+  rangeLabel: string; // '8:00 AM - 8:30 AM'
   hourKey: string;    // '08'
-  hourLabel: string;  // '8:00 AM – 9:00 AM'
+  hourLabel: string;  // '8:00 AM - 9:00 AM'
   period: 'Morning' | 'Midday' | 'Afternoon' | 'Late Afternoon';
 }
 
 export const LIBRARY_TIME_SLOTS: TimeSlotDefinition[] = [
-  { value: '08:00', label: '8:00 AM', rangeLabel: '8:00 AM – 8:30 AM', hourKey: '08', hourLabel: '8:00 AM – 9:00 AM', period: 'Morning' },
-  { value: '08:30', label: '8:30 AM', rangeLabel: '8:30 AM – 9:00 AM', hourKey: '08', hourLabel: '8:00 AM – 9:00 AM', period: 'Morning' },
-  { value: '09:00', label: '9:00 AM', rangeLabel: '9:00 AM – 9:30 AM', hourKey: '09', hourLabel: '9:00 AM – 10:00 AM', period: 'Morning' },
-  { value: '09:30', label: '9:30 AM', rangeLabel: '9:30 AM – 10:00 AM', hourKey: '09', hourLabel: '9:00 AM – 10:00 AM', period: 'Morning' },
-  { value: '10:00', label: '10:00 AM', rangeLabel: '10:00 AM – 10:30 AM', hourKey: '10', hourLabel: '10:00 AM – 11:00 AM', period: 'Morning' },
-  { value: '10:30', label: '10:30 AM', rangeLabel: '10:30 AM – 11:00 AM', hourKey: '10', hourLabel: '10:00 AM – 11:00 AM', period: 'Morning' },
-  { value: '11:00', label: '11:00 AM', rangeLabel: '11:00 AM – 11:30 AM', hourKey: '11', hourLabel: '11:00 AM – 12:00 PM', period: 'Morning' },
-  { value: '11:30', label: '11:30 AM', rangeLabel: '11:30 AM – 12:00 PM', hourKey: '11', hourLabel: '11:00 AM – 12:00 PM', period: 'Morning' },
-  { value: '12:00', label: '12:00 PM', rangeLabel: '12:00 PM – 12:30 PM', hourKey: '12', hourLabel: '12:00 PM – 1:00 PM', period: 'Midday' },
-  { value: '12:30', label: '12:30 PM', rangeLabel: '12:30 PM – 1:00 PM', hourKey: '12', hourLabel: '12:00 PM – 1:00 PM', period: 'Midday' },
-  { value: '13:00', label: '1:00 PM', rangeLabel: '1:00 PM – 1:30 PM', hourKey: '13', hourLabel: '1:00 PM – 2:00 PM', period: 'Afternoon' },
-  { value: '13:30', label: '1:30 PM', rangeLabel: '1:30 PM – 2:00 PM', hourKey: '13', hourLabel: '1:00 PM – 2:00 PM', period: 'Afternoon' },
-  { value: '14:00', label: '2:00 PM', rangeLabel: '2:00 PM – 2:30 PM', hourKey: '14', hourLabel: '2:00 PM – 3:00 PM', period: 'Afternoon' },
-  { value: '14:30', label: '2:30 PM', rangeLabel: '2:30 PM – 3:00 PM', hourKey: '14', hourLabel: '2:00 PM – 3:00 PM', period: 'Afternoon' },
-  { value: '15:00', label: '3:00 PM', rangeLabel: '3:00 PM – 3:30 PM', hourKey: '15', hourLabel: '3:00 PM – 4:00 PM', period: 'Afternoon' },
-  { value: '15:30', label: '3:30 PM', rangeLabel: '3:30 PM – 4:00 PM', hourKey: '15', hourLabel: '3:00 PM – 4:00 PM', period: 'Afternoon' },
-  { value: '16:00', label: '4:00 PM', rangeLabel: '4:00 PM – 4:30 PM', hourKey: '16', hourLabel: '4:00 PM – 5:00 PM', period: 'Afternoon' },
-  { value: '16:30', label: '4:30 PM', rangeLabel: '4:30 PM – 5:00 PM', hourKey: '16', hourLabel: '4:00 PM – 5:00 PM', period: 'Late Afternoon' },
-  { value: '17:00', label: '5:00 PM', rangeLabel: '5:00 PM – 5:30 PM', hourKey: '17', hourLabel: '5:00 PM – 6:00 PM', period: 'Late Afternoon' },
-  { value: '17:30', label: '5:30 PM', rangeLabel: '5:30 PM – 6:00 PM', hourKey: '17', hourLabel: '5:00 PM – 6:00 PM', period: 'Late Afternoon' },
+  { value: '08:00', label: '8:00 AM', rangeLabel: '8:00 AM - 8:30 AM', hourKey: '08', hourLabel: '8:00 AM - 9:00 AM', period: 'Morning' },
+  { value: '08:30', label: '8:30 AM', rangeLabel: '8:30 AM - 9:00 AM', hourKey: '08', hourLabel: '8:00 AM - 9:00 AM', period: 'Morning' },
+  { value: '09:00', label: '9:00 AM', rangeLabel: '9:00 AM - 9:30 AM', hourKey: '09', hourLabel: '9:00 AM - 10:00 AM', period: 'Morning' },
+  { value: '09:30', label: '9:30 AM', rangeLabel: '9:30 AM - 10:00 AM', hourKey: '09', hourLabel: '9:00 AM - 10:00 AM', period: 'Morning' },
+  { value: '10:00', label: '10:00 AM', rangeLabel: '10:00 AM - 10:30 AM', hourKey: '10', hourLabel: '10:00 AM - 11:00 AM', period: 'Morning' },
+  { value: '10:30', label: '10:30 AM', rangeLabel: '10:30 AM - 11:00 AM', hourKey: '10', hourLabel: '10:00 AM - 11:00 AM', period: 'Morning' },
+  { value: '11:00', label: '11:00 AM', rangeLabel: '11:00 AM - 11:30 AM', hourKey: '11', hourLabel: '11:00 AM - 12:00 PM', period: 'Morning' },
+  { value: '11:30', label: '11:30 AM', rangeLabel: '11:30 AM - 12:00 PM', hourKey: '11', hourLabel: '11:00 AM - 12:00 PM', period: 'Morning' },
+  { value: '12:00', label: '12:00 PM', rangeLabel: '12:00 PM - 12:30 PM', hourKey: '12', hourLabel: '12:00 PM - 1:00 PM', period: 'Midday' },
+  { value: '12:30', label: '12:30 PM', rangeLabel: '12:30 PM - 1:00 PM', hourKey: '12', hourLabel: '12:00 PM - 1:00 PM', period: 'Midday' },
+  { value: '13:00', label: '1:00 PM', rangeLabel: '1:00 PM - 1:30 PM', hourKey: '13', hourLabel: '1:00 PM - 2:00 PM', period: 'Afternoon' },
+  { value: '13:30', label: '1:30 PM', rangeLabel: '1:30 PM - 2:00 PM', hourKey: '13', hourLabel: '1:00 PM - 2:00 PM', period: 'Afternoon' },
+  { value: '14:00', label: '2:00 PM', rangeLabel: '2:00 PM - 2:30 PM', hourKey: '14', hourLabel: '2:00 PM - 3:00 PM', period: 'Afternoon' },
+  { value: '14:30', label: '2:30 PM', rangeLabel: '2:30 PM - 3:00 PM', hourKey: '14', hourLabel: '2:00 PM - 3:00 PM', period: 'Afternoon' },
+  { value: '15:00', label: '3:00 PM', rangeLabel: '3:00 PM - 3:30 PM', hourKey: '15', hourLabel: '3:00 PM - 4:00 PM', period: 'Afternoon' },
+  { value: '15:30', label: '3:30 PM', rangeLabel: '3:30 PM - 4:00 PM', hourKey: '15', hourLabel: '3:00 PM - 4:00 PM', period: 'Afternoon' },
+  { value: '16:00', label: '4:00 PM', rangeLabel: '4:00 PM - 4:30 PM', hourKey: '16', hourLabel: '4:00 PM - 5:00 PM', period: 'Afternoon' },
+  { value: '16:30', label: '4:30 PM', rangeLabel: '4:30 PM - 5:00 PM', hourKey: '16', hourLabel: '4:00 PM - 5:00 PM', period: 'Late Afternoon' },
+  { value: '17:00', label: '5:00 PM', rangeLabel: '5:00 PM - 5:30 PM', hourKey: '17', hourLabel: '5:00 PM - 6:00 PM', period: 'Late Afternoon' },
+  { value: '17:30', label: '5:30 PM', rangeLabel: '5:30 PM - 6:00 PM', hourKey: '17', hourLabel: '5:00 PM - 6:00 PM', period: 'Late Afternoon' },
 ];
 
 export interface HourlyBracketDefinition {
@@ -180,16 +180,16 @@ export interface HourlyBracketDefinition {
 }
 
 export const HOURLY_BRACKETS: HourlyBracketDefinition[] = [
-  { hourKey: '08', label: '8:00 AM – 9:00 AM', shortLabel: '8–9 AM', slots: ['08:00', '08:30'] },
-  { hourKey: '09', label: '9:00 AM – 10:00 AM', shortLabel: '9–10 AM', slots: ['09:00', '09:30'] },
-  { hourKey: '10', label: '10:00 AM – 11:00 AM', shortLabel: '10–11 AM', slots: ['10:00', '10:30'] },
-  { hourKey: '11', label: '11:00 AM – 12:00 PM', shortLabel: '11–12 PM', slots: ['11:00', '11:30'] },
-  { hourKey: '12', label: '12:00 PM – 1:00 PM', shortLabel: '12–1 PM', slots: ['12:00', '12:30'] },
-  { hourKey: '13', label: '1:00 PM – 2:00 PM', shortLabel: '1–2 PM', slots: ['13:00', '13:30'] },
-  { hourKey: '14', label: '2:00 PM – 3:00 PM', shortLabel: '2–3 PM', slots: ['14:00', '14:30'] },
-  { hourKey: '15', label: '3:00 PM – 4:00 PM', shortLabel: '3–4 PM', slots: ['15:00', '15:30'] },
-  { hourKey: '16', label: '4:00 PM – 5:00 PM', shortLabel: '4–5 PM', slots: ['16:00', '16:30'] },
-  { hourKey: '17', label: '5:00 PM – 6:00 PM', shortLabel: '5–6 PM', slots: ['17:00', '17:30'] },
+  { hourKey: '08', label: '8:00 AM - 9:00 AM', shortLabel: '8-9 AM', slots: ['08:00', '08:30'] },
+  { hourKey: '09', label: '9:00 AM - 10:00 AM', shortLabel: '9-10 AM', slots: ['09:00', '09:30'] },
+  { hourKey: '10', label: '10:00 AM - 11:00 AM', shortLabel: '10-11 AM', slots: ['10:00', '10:30'] },
+  { hourKey: '11', label: '11:00 AM - 12:00 PM', shortLabel: '11-12 PM', slots: ['11:00', '11:30'] },
+  { hourKey: '12', label: '12:00 PM - 1:00 PM', shortLabel: '12-1 PM', slots: ['12:00', '12:30'] },
+  { hourKey: '13', label: '1:00 PM - 2:00 PM', shortLabel: '1-2 PM', slots: ['13:00', '13:30'] },
+  { hourKey: '14', label: '2:00 PM - 3:00 PM', shortLabel: '2-3 PM', slots: ['14:00', '14:30'] },
+  { hourKey: '15', label: '3:00 PM - 4:00 PM', shortLabel: '3-4 PM', slots: ['15:00', '15:30'] },
+  { hourKey: '16', label: '4:00 PM - 5:00 PM', shortLabel: '4-5 PM', slots: ['16:00', '16:30'] },
+  { hourKey: '17', label: '5:00 PM - 6:00 PM', shortLabel: '5-6 PM', slots: ['17:00', '17:30'] },
 ];
 
 export interface AreaStatisticalSummary {
