@@ -10,6 +10,7 @@ import {
   Edit3,
   KeyRound,
   Plus,
+  RefreshCw,
   Search,
   Trash2,
   UserCheck,
@@ -50,6 +51,7 @@ import {
   isNonStatisticalArea,
   isViolationsCarrierProfile,
   ParsedStaffAccount,
+  parseDutySchedulesFromProfile,
   parseInviteCodeCarrier,
   parseStaffAccount,
   SHELVER_AREA_ID,
@@ -161,16 +163,20 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
   const [removingStaff, setRemovingStaff] = useState<boolean>(false);
   const [exportingBackup, setExportingBackup] = useState<boolean>(false);
 
-  const fetchStaffAccounts = useCallback(async () => {
+  const fetchStaffAccounts = useCallback(async (): Promise<UserProfile[] | null> => {
     setLoadingStaff(true);
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
       .order('created_at', { ascending: false });
     if (!error && data) {
-      setRawProfiles(data as UserProfile[]);
+      const profiles = data as UserProfile[];
+      setRawProfiles(profiles);
+      setLoadingStaff(false);
+      return profiles;
     }
     setLoadingStaff(false);
+    return null;
   }, []);
 
   useEffect(() => {
@@ -341,9 +347,14 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
   }, [sortedAreas]);
 
   // Load draft blocks for a selected student assistant and day group
-  const loadStudentDayGroupBlocks = (studentId: string, dayGroup: DayGroup) => {
+  const loadStudentDayGroupBlocks = (
+    studentId: string,
+    dayGroup: DayGroup,
+    overrideSchedules?: DutyScheduleAssignment[]
+  ) => {
     setDutyConflictError(null);
-    const existing = allDutySchedules.filter(
+    const sourceSchedules = overrideSchedules ?? allDutySchedules;
+    const existing = sourceSchedules.filter(
       (s) => s.studentAssistantId === studentId && s.dayGroup === dayGroup
     );
     if (existing.length > 0) {
@@ -599,9 +610,34 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
       } on ${DAY_GROUP_LABELS[dutyDayGroup].label} (${areaChain}).`
     );
 
-    // Refresh draft blocks with saved IDs
-    loadStudentDayGroupBlocks(targetSA.profile.id, dutyDayGroup);
-    await fetchStaffAccounts();
+    // 1. Optimistic update of rawProfiles so counts and tables refresh immediately
+    setRawProfiles((prev) =>
+      prev.map((p) =>
+        p.id === targetSA.profile.id
+          ? {
+              ...p,
+              shift_schedule: encodedShiftColumn,
+              assigned_area_id: primaryStatisticalAreaId,
+            }
+          : p
+      )
+    );
+
+    // 2. Immediately refresh the builder draft blocks using the saved assignments
+    loadStudentDayGroupBlocks(targetSA.profile.id, dutyDayGroup, updatedSchedulesList);
+
+    // 3. Re-fetch fresh profiles from database to guarantee full synchronization
+    const freshProfiles = await fetchStaffAccounts();
+    if (freshProfiles) {
+      const freshTarget = freshProfiles.find((p) => p.id === targetSA.profile.id);
+      if (freshTarget) {
+        const freshSchedules = parseDutySchedulesFromProfile(
+          freshTarget,
+          freshTarget.staff_code || targetSA.displayStaffCode
+        );
+        loadStudentDayGroupBlocks(targetSA.profile.id, dutyDayGroup, freshSchedules);
+      }
+    }
   };
 
   const handleDeleteDutySchedule = async (sched: DutyScheduleAssignment) => {
@@ -643,10 +679,33 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
       }, ${formatTimeSlotLabel(sched.startTime)} - ${formatTimeSlotLabel(sched.endTime)}).`
     );
 
+    // Optimistic update of rawProfiles
+    setRawProfiles((prev) =>
+      prev.map((p) =>
+        p.id === targetSA.profile.id
+          ? {
+              ...p,
+              shift_schedule: encodedShiftColumn,
+            }
+          : p
+      )
+    );
+
     if (dutyStudentId === targetSA.profile.id && dutyDayGroup === sched.dayGroup) {
-      setDraftBlocks((prev) => prev.filter((b) => b.existingId !== sched.id));
+      loadStudentDayGroupBlocks(targetSA.profile.id, dutyDayGroup, remainingSchedules);
     }
-    await fetchStaffAccounts();
+
+    const freshProfiles = await fetchStaffAccounts();
+    if (freshProfiles && dutyStudentId === targetSA.profile.id) {
+      const freshTarget = freshProfiles.find((p) => p.id === targetSA.profile.id);
+      if (freshTarget) {
+        const freshSchedules = parseDutySchedulesFromProfile(
+          freshTarget,
+          freshTarget.staff_code || targetSA.displayStaffCode
+        );
+        loadStudentDayGroupBlocks(targetSA.profile.id, dutyDayGroup, freshSchedules);
+      }
+    }
   };
 
   // Generate a new Invitation Code
@@ -1488,16 +1547,38 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowDutyScheduleModal(false);
-                  setDutyConflictError(null);
-                }}
-                className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const fresh = await fetchStaffAccounts();
+                    if (fresh && dutyStudentId) {
+                      const t = fresh.find((p) => p.id === dutyStudentId);
+                      if (t) {
+                        const s = parseDutySchedulesFromProfile(t, t.staff_code || '');
+                        loadStudentDayGroupBlocks(dutyStudentId, dutyDayGroup, s);
+                      }
+                    }
+                    onNotify('success', 'Duty schedules refreshed.');
+                  }}
+                  disabled={loadingStaff}
+                  title="Refresh duty schedules"
+                  className="px-2.5 py-1.5 rounded-lg border border-[#D6C3A9] bg-white hover:bg-[#F5EBDD] text-[#332F2B] font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingStaff ? 'animate-spin text-[#A83232]' : 'text-[#6E665E]'}`} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDutyScheduleModal(false);
+                    setDutyConflictError(null);
+                  }}
+                  className="p-1.5 rounded-lg hover:bg-[#F5EBDD] text-[#6E665E] cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Scrollable Content */}
