@@ -938,7 +938,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                       key={preset}
                       type="button"
                       onClick={() => setViolation(preset)}
-                      className="text-[11px] px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700"
+                      className="text-[11px] px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer transition active:scale-95"
                     >
                       {preset}
                     </button>

@@ -93,6 +93,7 @@ export function decodeUnicodeBase64(str: string): string {
  */
 export const COMMON_VIOLATIONS = [
   'Disorderly Conduct / Excessive Noise',
+  'Phone Noise',
   'Eating / Drinking in Non-Designated Area',
   'Improper Attire / Failure to Wear School ID',
   'Unauthorized Moving / Reserving of Tables & Chairs',
