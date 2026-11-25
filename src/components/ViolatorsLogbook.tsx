@@ -536,13 +536,15 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
               Each record includes its 1-hour timer with Play, Pause, Completed status, and Remove controls.
             </p>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Log Violation</span>
-          </button>
+          {mode === 'librarian' && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Log Violation</span>
+            </button>
+          )}
         </div>
 
         {loading ? (
