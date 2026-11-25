@@ -88,8 +88,28 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
       return false;
     }
   });
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 1024;
+  });
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // On mobile (< 1024px), the slide-out drawer is ALWAYS fully expanded with labels and a close button.
+  // Collapsed rail mode only applies to desktop (lg: breakpoint).
+  const effectiveCollapsed = isMobile ? false : isCollapsed;
 
   const toggleSidebarCollapsed = () => {
     setIsCollapsed((prev) => {
@@ -105,6 +125,11 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSidebarOpen(false);
+        setNotifOpen(false);
+        setUserMenuOpen(false);
+      }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
         const activeEl = document.activeElement;
         const isInput =
@@ -113,7 +138,11 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
           activeEl instanceof HTMLSelectElement;
         if (!isInput) {
           e.preventDefault();
-          toggleSidebarCollapsed();
+          if (window.innerWidth < 1024) {
+            setSidebarOpen((v) => !v);
+          } else {
+            toggleSidebarCollapsed();
+          }
         }
       }
     };
@@ -185,21 +214,21 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
       {/* Left Sidebar Navigation (Desktop Collapsible Rail + Mobile Slide-Out Drawer) */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 bg-[#FFFFFF] dark:bg-[#181512] border-r border-[#E6D7C3] dark:border-[#383028] flex flex-col justify-between overflow-x-hidden transition-[width,transform] duration-300 ease-[cubic-bezier(0.2,0,0,1)] lg:sticky lg:top-0 lg:h-screen lg:z-20 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         } ${
-          isCollapsed ? 'w-72 lg:w-20' : 'w-72 lg:w-64'
+          effectiveCollapsed ? 'w-20' : 'w-72 sm:w-80 lg:w-64'
         }`}
       >
         <div>
           {/* Top Logo & System Name / Collapse Controls */}
           <div
             className={`border-b border-[#E6D7C3] dark:border-[#383028] transition-all duration-300 ${
-              isCollapsed
+              effectiveCollapsed
                 ? 'py-3.5 px-2 flex flex-col items-center gap-2'
                 : 'px-4 py-4 flex items-center justify-between gap-2.5'
             }`}
           >
-            {isCollapsed ? (
+            {effectiveCollapsed ? (
               <>
                 {/* Logo kept at the same size and position in the collapsed sidebar */}
                 <div className="w-7 h-7 rounded-lg bg-white dark:bg-[#241F1A] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-center p-0.5 shadow-2xs shrink-0 group hover:scale-105 transition-transform duration-200">
@@ -248,7 +277,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => setSidebarOpen(false)}
-                  className="lg:hidden p-1.5 rounded-lg text-[#6E665E] dark:text-[#A6998C] hover:bg-[#F5EBDD] dark:hover:bg-[#251F1A] cursor-pointer"
+                  className="lg:hidden p-2 rounded-xl text-[#6E665E] dark:text-[#A6998C] hover:bg-[#F5EBDD] dark:hover:bg-[#251F1A] hover:text-[#332F2B] dark:hover:text-white border border-[#E6D7C3] dark:border-[#383028] cursor-pointer transition"
                   aria-label="Close sidebar"
                 >
                   <X className="w-4 h-4" />
@@ -258,13 +287,13 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
           </div>
 
           {/* Navigation Groups */}
-          <div className={`py-4 space-y-4 overflow-y-auto overflow-x-hidden ${isCollapsed ? 'px-2' : 'px-3.5'}`}>
+          <div className={`py-4 space-y-4 overflow-y-auto overflow-x-hidden ${effectiveCollapsed ? 'px-2' : 'px-3.5'}`}>
             {groups.map((grp) => {
               const items = navItems.filter((i) => i.group === grp);
               return (
                 <div key={grp}>
                   {/* Group header: Text in expanded mode, divider in collapsed mode */}
-                  {isCollapsed ? (
+                  {effectiveCollapsed ? (
                     <div className="my-2 mx-auto w-6 h-[1px] bg-[#E6D7C3] dark:bg-[#383028]" />
                   ) : (
                     <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-[#6E665E] dark:text-[#A6998C] transition-opacity duration-200">
@@ -285,7 +314,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                             setSidebarOpen(false);
                           }}
                           title={
-                            isCollapsed
+                            effectiveCollapsed
                               ? item.badge !== undefined
                                 ? `${item.label} (${item.badge})`
                                 : item.label
@@ -293,7 +322,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                           }
                           aria-label={item.label}
                           className={`w-full rounded-xl text-xs font-semibold transition-all duration-200 relative group cursor-pointer ${
-                            isCollapsed
+                            effectiveCollapsed
                               ? 'h-11 flex items-center justify-center'
                               : 'px-3 py-2.5 flex items-center justify-between gap-2.5 hover:translate-x-0.5'
                           } ${
@@ -309,7 +338,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                             />
                           )}
 
-                          <span className={`flex items-center gap-2.5 ${isCollapsed ? 'justify-center' : 'truncate'}`}>
+                          <span className={`flex items-center gap-2.5 ${effectiveCollapsed ? 'justify-center' : 'truncate'}`}>
                             <Icon
                               className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
                                 isActive
@@ -317,11 +346,11 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                                   : 'text-[#6E665E] dark:text-[#A6998C] group-hover:text-[#A83232] dark:group-hover:text-[#E25D5D]'
                               }`}
                             />
-                            {!isCollapsed && <span className="truncate">{item.label}</span>}
+                            {!effectiveCollapsed && <span className="truncate">{item.label}</span>}
                           </span>
 
                           {/* Badge in Expanded Mode */}
-                          {!isCollapsed && item.badge !== undefined && (
+                          {!effectiveCollapsed && item.badge !== undefined && (
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-stat shrink-0 transition-colors ${
                                 isActive
@@ -338,7 +367,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                           )}
 
                           {/* Badge Pip in Collapsed Mode */}
-                          {isCollapsed && item.badge !== undefined && (
+                          {effectiveCollapsed && item.badge !== undefined && (
                             <span
                               className={`absolute top-1.5 right-2 w-2 h-2 rounded-full ${
                                 item.badgeTone === 'mustard'
@@ -362,10 +391,10 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
         {/* Bottom Sidebar Server Clock & Schedule Card */}
         <div
           className={`border-t border-[#E6D7C3] dark:border-[#383028] transition-all duration-300 ${
-            isCollapsed ? 'p-2 space-y-2' : 'p-4 space-y-3'
+            effectiveCollapsed ? 'p-2 space-y-2' : 'p-4 space-y-3'
           }`}
         >
-          {isCollapsed ? (
+          {effectiveCollapsed ? (
             /* Collapsed Compact Server Clock Icon */
             <div
               className="w-12 h-11 mx-auto rounded-xl bg-gradient-to-br from-[#FFFFFF] via-[#FAF5EE] to-[#F5EBDD] dark:from-[#241F1A] dark:via-[#1D1915] dark:to-[#181512] border border-[#E6D7C3] dark:border-[#383028] flex items-center justify-center relative cursor-pointer shadow-2xs hover:scale-105 transition-transform"
@@ -447,7 +476,7 @@ export const AcademicLayout: React.FC<AcademicLayoutProps> = ({
                 </div>
                 <div className="flex items-baseline gap-x-2 min-w-0 overflow-hidden">
                   <h1
-                    className="text-sm sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight shrink-0"
+                    className="text-sm sm:text-lg md:text-xl font-heading font-bold text-[#332F2B] leading-tight truncate min-w-0"
                     title={pageTitle}
                   >
                     {pageTitle}

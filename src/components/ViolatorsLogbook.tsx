@@ -514,64 +514,64 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
       )}
 
       {/* KPI Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white dark:bg-[#1B1714] p-3.5 sm:p-4 rounded-xl border border-stone-200/80 dark:border-[#383028] shadow-sm flex items-center gap-3 sm:gap-3.5">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-stone-100 dark:bg-[#251F1A] text-stone-700 dark:text-[#D6C7B7] flex items-center justify-center shrink-0">
             <ShieldAlert className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl font-bold text-stone-900">{totalCount}</div>
-            <div className="text-xs font-medium text-stone-500 uppercase tracking-wider">Total Records</div>
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-[#F0E8DE] truncate">{totalCount}</div>
+            <div className="text-[10px] sm:text-xs font-medium text-stone-500 dark:text-[#A6998C] uppercase tracking-wider truncate">Total Records</div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-red-50 text-[#A83232] flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#1B1714] p-3.5 sm:p-4 rounded-xl border border-stone-200/80 dark:border-[#383028] shadow-sm flex items-center gap-3 sm:gap-3.5">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-red-50 dark:bg-red-950/40 text-[#A83232] dark:text-[#E25D5D] flex items-center justify-center shrink-0">
             <Clock className="w-5 h-5 animate-pulse" />
           </div>
-          <div>
-            <div className="text-2xl font-bold text-[#A83232]">{runningCount}</div>
-            <div className="text-xs font-medium text-stone-500 uppercase tracking-wider">Active Countdown</div>
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl font-bold text-[#A83232] dark:text-[#E25D5D] truncate">{runningCount}</div>
+            <div className="text-[10px] sm:text-xs font-medium text-stone-500 dark:text-[#A6998C] uppercase tracking-wider truncate">Active Countdown</div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#1B1714] p-3.5 sm:p-4 rounded-xl border border-stone-200/80 dark:border-[#383028] shadow-sm flex items-center gap-3 sm:gap-3.5">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-[#E7B84B] flex items-center justify-center shrink-0">
             <Pause className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl font-bold text-amber-700">{pausedCount}</div>
-            <div className="text-xs font-medium text-stone-500 uppercase tracking-wider">Paused Timers</div>
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-[#E7B84B] truncate">{pausedCount}</div>
+            <div className="text-[10px] sm:text-xs font-medium text-stone-500 dark:text-[#A6998C] uppercase tracking-wider truncate">Paused Timers</div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+        <div className="bg-white dark:bg-[#1B1714] p-3.5 sm:p-4 rounded-xl border border-stone-200/80 dark:border-[#383028] shadow-sm flex items-center gap-3 sm:gap-3.5">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-[#71865A] flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
-          <div>
-            <div className="text-2xl font-bold text-emerald-700">{completedCount}</div>
-            <div className="text-xs font-medium text-stone-500 uppercase tracking-wider">Completed (1 Hr)</div>
+          <div className="min-w-0">
+            <div className="text-xl sm:text-2xl font-bold text-emerald-700 dark:text-[#71865A] truncate">{completedCount}</div>
+            <div className="text-[10px] sm:text-xs font-medium text-stone-500 dark:text-[#A6998C] uppercase tracking-wider truncate">Completed (1 Hr)</div>
           </div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-[#1B1714] p-3.5 sm:p-4 rounded-2xl border border-stone-200 dark:border-[#383028] shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-stone-400" />
+          <Search className="w-4 h-4 absolute left-3 top-2.5 sm:top-3 text-stone-400 dark:text-[#8F8275]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by student name, ID, course, violation, or assistant..."
-            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition"
+            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-stone-300 dark:border-[#383028] bg-white dark:bg-[#251F1A] text-stone-900 dark:text-[#F0E8DE] placeholder-stone-400 dark:placeholder-[#8F8275] focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] transition"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-2.5 text-stone-400 hover:text-stone-600"
+              className="absolute right-2.5 top-2.5 text-stone-400 hover:text-stone-600 dark:hover:text-[#F0E8DE]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -580,7 +580,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
         {/* Status Filter Buttons */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          <span className="text-xs text-stone-400 flex items-center gap-1 mr-1">
+          <span className="text-xs text-stone-400 dark:text-[#8F8275] flex items-center gap-1 mr-1 shrink-0">
             <Filter className="w-3.5 h-3.5" />
             <span>Filter:</span>
           </span>
@@ -588,10 +588,10 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition shrink-0 cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-[#332F2B] text-white shadow-sm'
-                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                  ? 'bg-[#332F2B] dark:bg-[#F0E8DE] text-white dark:text-[#1B1714] shadow-sm'
+                  : 'bg-stone-100 dark:bg-[#251F1A] hover:bg-stone-200 dark:hover:bg-[#332B24] text-stone-700 dark:text-[#D6C7B7]'
               }`}
             >
               {st === 'all'
@@ -607,20 +607,20 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
       </div>
 
       {/* Violations Table / List */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-stone-200 flex flex-wrap items-center justify-between gap-3 bg-stone-50/50">
+      <div className="bg-white dark:bg-[#1B1714] rounded-2xl border border-stone-200 dark:border-[#383028] shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-stone-200 dark:border-[#383028] flex flex-wrap items-center justify-between gap-3 bg-stone-50/50 dark:bg-[#201C18]">
           <div>
-            <h2 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+            <h2 className="text-sm font-bold text-stone-900 dark:text-[#F0E8DE] uppercase tracking-wider">
               Recorded Violations ({filteredRecords.length})
             </h2>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-stone-500 dark:text-[#A6998C]">
               Each record includes its 1-hour timer with Play, Pause, Completed status, and Remove controls.
             </p>
           </div>
           {mode === 'librarian' && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Log Violation</span>
@@ -645,18 +645,18 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-stone-100/70 border-b border-stone-200 text-[11px] font-bold text-stone-600 uppercase tracking-wider">
-                  <th className="py-3 px-4 w-12 text-center">#</th>
-                  <th className="py-3 px-4">Violator & Student Info</th>
-                  <th className="py-3 px-4">Violation Details</th>
-                  <th className="py-3 px-4">Recorded By</th>
-                  <th className="py-3 px-4 text-center w-52">1-Hour Countdown Timer</th>
-                  <th className="py-3 px-4 text-right w-24">Action</th>
+                <tr className="bg-stone-100/70 dark:bg-[#251F1A] border-b border-stone-200 dark:border-[#383028] text-[11px] font-bold text-stone-600 dark:text-[#A6998C] uppercase tracking-wider">
+                  <th className="py-3 px-4 w-12 text-center whitespace-nowrap">#</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Violator & Student Info</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Violation Details</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Recorded By</th>
+                  <th className="py-3 px-4 text-center w-52 whitespace-nowrap">1-Hour Countdown Timer</th>
+                  <th className="py-3 px-4 text-right w-24 whitespace-nowrap">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-100 text-xs">
+              <tbody className="divide-y divide-stone-100 dark:divide-[#2D2620] text-xs">
                 {filteredRecords.map((record, index) => {
                   const effStatus = resolveEffectiveTimerStatus(record);
                   const effRemaining = calculateEffectiveRemainingSeconds(record);
@@ -664,39 +664,39 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                   return (
                     <tr
                       key={record.id}
-                      className={`hover:bg-amber-50/30 transition ${
+                      className={`hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition ${
                         effStatus === 'running'
-                          ? 'bg-red-50/20'
+                          ? 'bg-red-50/20 dark:bg-red-950/15'
                           : effStatus === 'completed'
-                          ? 'bg-emerald-50/10'
+                          ? 'bg-emerald-50/10 dark:bg-emerald-950/15'
                           : ''
                       }`}
                     >
                       {/* Index */}
-                      <td className="py-3.5 px-4 text-center font-mono text-stone-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-center font-mono text-stone-400 dark:text-[#8F8275] text-[11px]">
                         {index + 1}
                       </td>
 
                       {/* Violator Name & ID */}
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-stone-900 text-sm">{record.violator_name}</div>
-                        <div className="flex items-center gap-2 mt-0.5 text-stone-500 font-mono text-[11px]">
-                          <span className="font-semibold text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">
+                        <div className="font-bold text-stone-900 dark:text-[#F0E8DE] text-sm">{record.violator_name}</div>
+                        <div className="flex items-center gap-2 mt-0.5 text-stone-500 dark:text-[#A6998C] font-mono text-[11px]">
+                          <span className="font-semibold text-stone-700 dark:text-[#D6C7B7] bg-stone-100 dark:bg-[#251F1A] px-1.5 py-0.5 rounded border border-stone-200 dark:border-[#383028]">
                             {record.student_id}
                           </span>
                           <span>•</span>
                           <span>{record.course}</span>
                         </div>
-                        <div className="text-[10px] text-stone-400 mt-0.5">
+                        <div className="text-[10px] text-stone-400 dark:text-[#8F8275] mt-0.5">
                           Logged: {formatTimestampPHT(record.created_at)}
                         </div>
                       </td>
 
                       {/* Violation Details */}
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-stone-800">{record.violation}</div>
+                        <div className="font-semibold text-stone-800 dark:text-[#E8DDD0]">{record.violation}</div>
                         {record.notes && (
-                          <div className="text-[11px] text-stone-500 mt-0.5 italic">
+                          <div className="text-[11px] text-stone-500 dark:text-[#A6998C] mt-0.5 italic">
                             Note: {record.notes}
                           </div>
                         )}
@@ -704,12 +704,12 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
                       {/* Recorded By */}
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-stone-800 flex items-center gap-1.5">
-                          <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <div className="font-medium text-stone-800 dark:text-[#E8DDD0] flex items-center gap-1.5">
+                          <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-[#71865A] shrink-0" />
                           <span>{record.recorded_by_name || 'Student Assistant'}</span>
                         </div>
                         {record.recorded_by_staff_code && (
-                          <div className="text-[10px] text-stone-400 font-mono ml-5">
+                          <div className="text-[10px] text-stone-400 dark:text-[#8F8275] font-mono ml-5">
                             Code: {record.recorded_by_staff_code}
                           </div>
                         )}
@@ -720,17 +720,17 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                         <div className="flex flex-col items-center justify-center gap-1.5">
                           {/* Timer Status Card with Play/Pause Button */}
                           {effStatus === 'completed' ? (
-                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs shadow-sm">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-[#9DD390] border border-emerald-300 dark:border-emerald-800 font-bold text-xs shadow-sm">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-[#71865A]" />
                               <span>Completed</span>
-                              <span className="text-[10px] font-normal text-emerald-700 ml-1">
+                              <span className="text-[10px] font-normal text-emerald-700 dark:text-[#88C57B] ml-1">
                                 (1 Hr Finished)
                               </span>
                             </div>
                           ) : effStatus === 'running' ? (
                             <div className="flex items-center gap-2">
                               {/* Pulsing countdown pill */}
-                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-100 text-[#A83232] border border-red-300 font-mono font-bold text-sm shadow-sm">
+                              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-red-100 dark:bg-red-950/60 text-[#A83232] dark:text-[#FF8A8A] border border-red-300 dark:border-red-800 font-mono font-bold text-sm shadow-sm">
                                 <span className="w-2 h-2 rounded-full bg-red-600 animate-ping shrink-0" />
                                 <span>{formatTimerCountdown(effRemaining)}</span>
                               </div>
@@ -738,7 +738,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                               {/* Pause Button */}
                               <button
                                 onClick={() => handlePauseTimer(record)}
-                                className="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition active:scale-95"
+                                className="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition active:scale-95 cursor-pointer"
                                 title="Pause 1-Hour Countdown (retains remaining time)"
                               >
                                 <Pause className="w-3.5 h-3.5" />
@@ -747,10 +747,10 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                           ) : effStatus === 'paused' ? (
                             <div className="flex items-center gap-2">
                               {/* Paused pill */}
-                              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 font-mono font-bold text-sm">
-                                <Pause className="w-3.5 h-3.5 text-amber-600" />
+                              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-[#F3CE75] border border-amber-300 dark:border-amber-800 font-mono font-bold text-sm">
+                                <Pause className="w-3.5 h-3.5 text-amber-600 dark:text-[#E7B84B]" />
                                 <span>{formatTimerCountdown(effRemaining)}</span>
-                                <span className="text-[10px] uppercase font-sans text-amber-600 font-normal">
+                                <span className="text-[10px] uppercase font-sans text-amber-600 dark:text-[#E7B84B] font-normal">
                                   Paused
                                 </span>
                               </div>
@@ -758,7 +758,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                               {/* Play / Resume Button */}
                               <button
                                 onClick={() => handlePlayTimer(record)}
-                                className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition active:scale-95"
+                                className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition active:scale-95 cursor-pointer"
                                 title="Resume 1-Hour Countdown"
                               >
                                 <Play className="w-3.5 h-3.5" />
@@ -768,7 +768,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                             /* Stopped / Ready state */
                             <button
                               onClick={() => handlePlayTimer(record)}
-                              className="px-3 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+                              className="px-3 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8B2626] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer"
                               title="Start 1-Hour Countdown Timer"
                             >
                               <Play className="w-3.5 h-3.5" />
@@ -778,12 +778,12 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
                           {/* Completion or Started sub-label */}
                           {effStatus === 'completed' && record.completed_at && (
-                            <div className="text-[10px] text-stone-400">
+                            <div className="text-[10px] text-stone-400 dark:text-[#8F8275]">
                               Done at: {formatTimestampPHT(record.completed_at)}
                             </div>
                           )}
                           {effStatus === 'running' && (
-                            <div className="text-[10px] text-red-600 font-medium animate-pulse">
+                            <div className="text-[10px] text-red-600 dark:text-[#FF8A8A] font-medium animate-pulse">
                               Counting down live...
                             </div>
                           )}
@@ -794,7 +794,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                       <td className="py-3.5 px-4 text-right">
                         <button
                           onClick={() => setRecordToDelete(record)}
-                          className="px-2.5 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs font-medium transition flex items-center gap-1 ml-auto"
+                          className="px-2.5 py-1.5 rounded-lg border border-red-200 dark:border-red-900/60 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-medium transition flex items-center gap-1 ml-auto cursor-pointer"
                           title="Remove this violation record"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -812,20 +812,20 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
       {/* Delete Confirmation Modal */}
       {recordToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-stone-200">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#1E1915] rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-stone-200 dark:border-[#383028] max-h-[92vh] overflow-y-auto">
+            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-[#E25D5D] flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-stone-900 text-center">
+            <h3 className="text-base font-bold text-stone-900 dark:text-[#F0E8DE] text-center">
               Remove Violation Record?
             </h3>
-            <p className="text-xs text-stone-600 text-center mt-2 leading-relaxed">
+            <p className="text-xs text-stone-600 dark:text-[#C5B7A8] text-center mt-2 leading-relaxed">
               Are you sure you want to remove the violation record for{' '}
-              <strong className="text-stone-900">{recordToDelete.violator_name}</strong> (
+              <strong className="text-stone-900 dark:text-[#FFFFFF]">{recordToDelete.violator_name}</strong> (
               {recordToDelete.student_id})?
             </p>
-            <p className="text-[11px] text-stone-400 text-center mt-1">
+            <p className="text-[11px] text-stone-400 dark:text-[#8F8275] text-center mt-1">
               This action will remove the record and its timer from the logbook.
             </p>
 
@@ -834,7 +834,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                 type="button"
                 disabled={deleting}
                 onClick={() => setRecordToDelete(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 transition"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-700 dark:text-[#D6C7B7] bg-stone-100 dark:bg-[#251F1A] hover:bg-stone-200 dark:hover:bg-[#332B24] transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -842,7 +842,7 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                 type="button"
                 disabled={deleting}
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {deleting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 <span>Yes, Remove Record</span>
@@ -854,16 +854,16 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
       {/* Student Assistant Add Violation Modal (if triggered via button) */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-[#1E1915] rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl border border-stone-200 dark:border-[#383028] max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-[#383028]">
               <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-[#A83232]" />
-                <h3 className="text-base font-bold text-stone-900">Log New Library Violation</h3>
+                <ShieldAlert className="w-5 h-5 text-[#A83232] dark:text-[#E25D5D]" />
+                <h3 className="text-base font-bold text-stone-900 dark:text-[#F0E8DE]">Log New Library Violation</h3>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-stone-400 hover:text-stone-600 p-1 rounded-lg"
+                className="text-stone-400 hover:text-stone-600 dark:hover:text-[#F0E8DE] p-1.5 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -871,14 +871,14 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
 
             <form onSubmit={handleSubmitViolation} className="mt-4 space-y-4">
               {formError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-medium flex items-center gap-2">
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-[#FF8A8A] rounded-xl text-xs font-medium flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-stone-700 dark:text-[#D6C7B7] uppercase tracking-wider mb-1">
                   Violator&apos;s Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -887,13 +887,13 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                   value={violatorName}
                   onChange={(e) => setViolatorName(e.target.value)}
                   placeholder="e.g. Juan Dela Cruz"
-                  className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                  className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 dark:border-[#383028] bg-white dark:bg-[#251F1A] text-stone-900 dark:text-[#F0E8DE] placeholder-stone-400 dark:placeholder-[#8F8275] focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-[#D6C7B7] uppercase tracking-wider mb-1">
                     Student ID <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -902,11 +902,11 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
                     placeholder="e.g. 2024-01234"
-                    className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] uppercase"
+                    className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 dark:border-[#383028] bg-white dark:bg-[#251F1A] text-stone-900 dark:text-[#F0E8DE] placeholder-stone-400 dark:placeholder-[#8F8275] focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232] uppercase"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-[#D6C7B7] uppercase tracking-wider mb-1">
                     Course / Program <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -915,13 +915,13 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                     value={course}
                     onChange={(e) => setCourse(e.target.value)}
                     placeholder="e.g. BS Civil Engineering"
-                    className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                    className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 dark:border-[#383028] bg-white dark:bg-[#251F1A] text-stone-900 dark:text-[#F0E8DE] placeholder-stone-400 dark:placeholder-[#8F8275] focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-stone-700 dark:text-[#D6C7B7] uppercase tracking-wider mb-1">
                   Violation <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -930,15 +930,15 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                   value={violation}
                   onChange={(e) => setViolation(e.target.value)}
                   placeholder="Specify violation..."
-                  className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
+                  className="w-full px-3 py-2 text-sm rounded-xl border border-stone-300 dark:border-[#383028] bg-white dark:bg-[#251F1A] text-stone-900 dark:text-[#F0E8DE] placeholder-stone-400 dark:placeholder-[#8F8275] focus:outline-none focus:ring-2 focus:ring-[#A83232]/20 focus:border-[#A83232]"
                 />
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {COMMON_VIOLATIONS.map((preset) => (
                     <button
                       key={preset}
                       type="button"
                       onClick={() => setViolation(preset)}
-                      className="text-[11px] px-2 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-700 cursor-pointer transition active:scale-95"
+                      className="text-[11px] px-2.5 py-1 rounded-lg bg-stone-100 dark:bg-[#251F1A] hover:bg-stone-200 dark:hover:bg-[#332B24] text-stone-700 dark:text-[#D6C7B7] border border-stone-200 dark:border-[#383028] cursor-pointer transition active:scale-95"
                     >
                       {preset}
                     </button>
@@ -946,23 +946,23 @@ export const ViolatorsLogbook: React.FC<ViolatorsLogbookProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs text-stone-600">
-                <span className="font-semibold text-stone-800">Recording Assistant (Automatic): </span>
+              <div className="p-3 bg-stone-50 dark:bg-[#251F1A] rounded-xl border border-stone-200 dark:border-[#383028] text-xs text-stone-600 dark:text-[#A6998C]">
+                <span className="font-semibold text-stone-800 dark:text-[#E8DDD0]">Recording Assistant (Automatic): </span>
                 {profile.full_name || 'Student Assistant'}
               </div>
 
-              <div className="pt-2 flex justify-end gap-3">
+              <div className="pt-2 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-stone-700 dark:text-[#D6C7B7] bg-stone-100 dark:bg-[#251F1A] hover:bg-stone-200 dark:hover:bg-[#332B24] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#A83232] hover:bg-[#8B2626] shadow-sm flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#A83232] hover:bg-[#8B2626] shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   <span>Save Record & Arm Timer</span>

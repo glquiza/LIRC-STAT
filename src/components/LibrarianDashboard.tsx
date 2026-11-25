@@ -1736,11 +1736,11 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
               {/* Statistical Tables */}
               <div className="literary-card overflow-hidden">
-                <div className="px-5 py-3.5 border-b border-[#E6D7C3] flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="text-base font-heading font-bold text-[#332F2B]">
+                <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-[#E6D7C3] flex flex-wrap items-center justify-between gap-3">
+                  <h2 className="text-sm sm:text-base font-heading font-bold text-[#332F2B]">
                     Report Ledger — {generatedReport.periodLabel}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-1 bg-[#F5EBDD] p-1 rounded-xl border border-[#E6D7C3] no-print">
+                  <div className="flex items-center gap-1 bg-[#F5EBDD] p-1 rounded-xl border border-[#E6D7C3] no-print max-w-full overflow-x-auto">
                     {(
                       [
                         { id: 'areas', label: 'By Area' },
@@ -1754,7 +1754,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                         key={t.id}
                         type="button"
                         onClick={() => setReportTableTab(t.id)}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer transition ${
+                        className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer transition whitespace-nowrap shrink-0 ${
                           reportTableTab === t.id
                             ? 'bg-[#A83232] text-white shadow-xs'
                             : 'text-[#6E665E] hover:text-[#332F2B]'
@@ -1768,22 +1768,22 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
                 {reportTableTab === 'areas' && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                         <tr>
-                          <th className="py-3 px-4 font-semibold">Library Area</th>
-                          <th className="py-3 px-4 font-semibold text-right">Recorded</th>
-                          <th className="py-3 px-4 font-semibold text-right">Daily Avg</th>
-                          <th className="py-3 px-4 font-semibold text-right">Seat Util.</th>
-                          <th className="py-3 px-4 font-semibold text-right">Peak Count</th>
-                          <th className="py-3 px-4 font-semibold text-right">Total</th>
-                          <th className="py-3 px-4 font-semibold text-right">Share</th>
+                          <th className="py-3 px-4 font-semibold sticky left-0 bg-[#FAF5EE] z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">Library Area</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Recorded</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Daily Avg</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Seat Util.</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Peak Count</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Total</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Share</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.areaSummaries.map((item) => (
                           <tr key={item.area.id} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-semibold text-[#332F2B]">
+                            <td className="py-2.5 px-4 font-semibold text-[#332F2B] sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">
                               <span
                                 className="inline-block w-2.5 h-2.5 rounded-full mr-2"
                                 style={{ backgroundColor: item.area.color_hex }}
@@ -1813,7 +1813,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       </tbody>
                       <tfoot>
                         <tr className="bg-[#332F2B] text-white font-bold">
-                          <td className="py-3 px-4">Overall Total</td>
+                          <td className="py-3 px-4 sticky left-0 bg-[#332F2B] z-10 whitespace-nowrap">Overall Total</td>
                           <td className="py-3 px-4 text-right font-stat">
                             {generatedReport.totalSlotEntries.toLocaleString()}
                           </td>
@@ -1834,16 +1834,16 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
                 {reportTableTab === 'hourly' && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                         <tr>
-                          <th className="py-3 px-4 font-semibold">Hour</th>
+                          <th className="py-3 px-4 font-semibold sticky left-0 bg-[#FAF5EE] z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">Hour</th>
                           {generatedReport.areaSummaries.map((s) => (
-                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right">
+                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right whitespace-nowrap">
                               {s.area.name}
                             </th>
                           ))}
-                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60">
+                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60 whitespace-nowrap">
                             Total
                           </th>
                         </tr>
@@ -1851,7 +1851,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.hourlyBreakdown.map((h) => (
                           <tr key={h.hourKey} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap">
+                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3]">
                               {h.label}
                             </td>
                             {generatedReport.areaSummaries.map((s) => (
@@ -1871,16 +1871,16 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
                 {reportTableTab === 'daily' && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                         <tr>
-                          <th className="py-3 px-4 font-semibold">Date</th>
+                          <th className="py-3 px-4 font-semibold sticky left-0 bg-[#FAF5EE] z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">Date</th>
                           {generatedReport.areaSummaries.map((s) => (
-                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right">
+                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right whitespace-nowrap">
                               {s.area.name}
                             </th>
                           ))}
-                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60">
+                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60 whitespace-nowrap">
                             Total
                           </th>
                         </tr>
@@ -1888,7 +1888,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.dailyBreakdown.map((d) => (
                           <tr key={d.date} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-semibold text-[#332F2B] whitespace-nowrap">
+                            <td className="py-2.5 px-4 font-semibold text-[#332F2B] whitespace-nowrap sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3]">
                               {d.formattedDate} ({d.dayOfWeek})
                             </td>
                             {generatedReport.areaSummaries.map((s) => (
@@ -1908,17 +1908,17 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
                 {reportTableTab === 'monthly' && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                         <tr>
-                          <th className="py-3 px-4 font-semibold">Month</th>
-                          <th className="py-3 px-4 font-semibold text-right">Days</th>
+                          <th className="py-3 px-4 font-semibold sticky left-0 bg-[#FAF5EE] z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">Month</th>
+                          <th className="py-3 px-4 font-semibold text-right whitespace-nowrap">Days</th>
                           {generatedReport.areaSummaries.map((s) => (
-                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right">
+                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right whitespace-nowrap">
                               {s.area.name}
                             </th>
                           ))}
-                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60">
+                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60 whitespace-nowrap">
                             Total
                           </th>
                         </tr>
@@ -1926,7 +1926,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.monthlyBreakdown.map((m) => (
                           <tr key={m.yearMonth} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-semibold text-[#332F2B]">{m.label}</td>
+                            <td className="py-2.5 px-4 font-semibold text-[#332F2B] whitespace-nowrap sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3]">{m.label}</td>
                             <td className="py-2.5 px-4 text-right font-stat">{m.operatingDays}</td>
                             {generatedReport.areaSummaries.map((s) => (
                               <td key={s.area.id} className="py-2.5 px-4 text-right font-stat">
@@ -1945,16 +1945,16 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
 
                 {reportTableTab === 'slots' && (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs min-w-[620px]">
                       <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                         <tr>
-                          <th className="py-3 px-4 font-semibold">Time Slot</th>
+                          <th className="py-3 px-4 font-semibold sticky left-0 bg-[#FAF5EE] z-10 shadow-[1px_0_0_0_#E6D7C3] whitespace-nowrap">Time Slot</th>
                           {generatedReport.areaSummaries.map((s) => (
-                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right">
+                            <th key={s.area.id} className="py-3 px-4 font-semibold text-right whitespace-nowrap">
                               {s.area.name}
                             </th>
                           ))}
-                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60">
+                          <th className="py-3 px-4 font-semibold text-right bg-[#F5EBDD]/60 whitespace-nowrap">
                             Total
                           </th>
                         </tr>
@@ -1962,7 +1962,7 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                       <tbody className="divide-y divide-[#E6D7C3]/60 bg-white">
                         {generatedReport.slotBreakdown.map((sRow) => (
                           <tr key={sRow.slot} className="hover:bg-[#FAF5EE]/70 transition-colors">
-                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap">
+                            <td className="py-2.5 px-4 font-stat font-semibold text-[#332F2B] whitespace-nowrap sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#E6D7C3]">
                               {formatSlotRangeLabel(sRow.slot) || sRow.label}
                             </td>
                             {generatedReport.areaSummaries.map((s) => (

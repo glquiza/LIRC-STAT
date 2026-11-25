@@ -2724,19 +2724,19 @@ export const StudentAssistantPortal: React.FC<StudentAssistantPortalProps> = ({
                     .map((r) => {
                       const area = areaById.get(r.area_id);
                     return (
-                        <div key={r.id} className="py-2.5 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2.5">
+                        <div key={r.id} className="py-2.5 flex items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-2 min-w-0 flex-1 truncate">
                             <span
-                              className="w-2.5 h-2.5 rounded-full"
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
                               style={{ backgroundColor: area?.color_hex || '#A83232' }}
                             />
-                            <span className="font-semibold text-[#332F2B]">{area?.name}</span>
-                            <span className="text-[#6E665E] font-stat">
+                            <span className="font-semibold text-[#332F2B] truncate">{area?.name}</span>
+                            <span className="text-[#6E665E] font-stat text-[11px] shrink-0">
                               {formatSlotRangeLabel(r.time_slot)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2.5">
-                            <span className="font-stat font-bold text-[#332F2B]">
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-stat font-bold text-[#332F2B] whitespace-nowrap">
                               {r.occupancy_count} students
                             </span>
                             <button

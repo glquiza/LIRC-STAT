@@ -1297,7 +1297,7 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
           <div className="p-8 text-center text-xs text-[#6E665E]">Loading accounts...</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[680px]">
               <thead className="bg-[#FAF5EE] border-b border-[#E6D7C3] text-[#332F2B]">
                 <tr>
                   <th className="py-3 px-4 font-semibold whitespace-nowrap">Full Name</th>
