@@ -6,13 +6,11 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Download,
   FileSpreadsheet,
   FileText,
   FileType2,
   History,
   LayoutDashboard,
-  Printer,
   Radio,
   RefreshCw,
   Settings,
@@ -62,7 +60,6 @@ import {
   MONTH_NAMES,
 } from '../utils/statistics';
 import {
-  exportStatisticalReportToCSV,
   exportStatisticalReportToExcel,
   exportStatisticalReportToPDF,
   exportStatisticalReportToWord,
@@ -1608,30 +1605,6 @@ export const LibrarianDashboard: React.FC<LibrarianDashboardProps> = ({
                   >
                     <FileText className="w-3.5 h-3.5" />
                     {exportingWord ? 'Building...' : 'Word'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      exportStatisticalReportToCSV(generatedReport);
-                      await logReportExport('CSV', generatedReport);
-                      showToast('success', 'Downloaded raw records CSV.');
-                    }}
-                    className="px-3 py-2 rounded-xl border border-[#D6C3A9] bg-white hover:bg-[#F5EBDD] text-[#332F2B] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    CSV
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await logReportExport('PRINT', generatedReport);
-                      window.print();
-                    }}
-                    className="px-3 py-2 rounded-xl border border-[#D6C3A9] bg-white hover:bg-[#F5EBDD] text-[#332F2B] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition"
-                    title="Print formatted report"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    Print
                   </button>
                 </div>
               )}
