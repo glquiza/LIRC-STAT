@@ -1081,8 +1081,8 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
       {activeSection === 'intervals' && (
         <div className="space-y-5 animate-literary-fade">
           <div className="literary-card overflow-hidden">
-            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
+            <div className="p-5 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+              <div className="max-w-xl">
                 <h2 className="text-lg font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
                   <span>Operating Time Intervals</span>
                   <span className="text-xs font-stat font-semibold px-2 py-0.5 rounded-full bg-[#FAF5EE] dark:bg-[#25201A] text-[#A83232] dark:text-[#E25D5D] border border-[#E6D7C3] dark:border-[#383028]">
@@ -1094,22 +1094,22 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-[#6E665E] absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+                <div className="relative w-full sm:w-52">
+                  <Search className="w-3.5 h-3.5 text-[#6E665E] dark:text-[#A6998C] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={slotSearch}
                     onChange={(e) => setSlotSearch(e.target.value)}
                     placeholder="Search interval, period..."
-                    className="pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#201B17] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] w-48 sm:w-56"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#201B17] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={openAddSlotModal}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs whitespace-nowrap shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add New Interval</span>
@@ -1231,8 +1231,8 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
       {activeSection === 'areas' && (
         <div className="space-y-5 animate-literary-fade">
           <div className="literary-card p-5">
-            <div className="mb-4 pb-3 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
+            <div className="mb-4 pb-3 border-b border-[#E6D7C3] dark:border-[#383028] flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+              <div className="max-w-xl">
                 <h2 className="text-lg font-heading font-bold text-[#332F2B] dark:text-[#F0E8DE] flex items-center gap-2">
                   <span>Monitored Library Areas</span>
                   <span className="text-xs font-stat font-semibold px-2 py-0.5 rounded-full bg-[#FAF5EE] dark:bg-[#25201A] text-[#A83232] dark:text-[#E25D5D] border border-[#E6D7C3] dark:border-[#383028]">
@@ -1244,22 +1244,22 @@ export const LibrarianAdvancedSettings: React.FC<LibrarianAdvancedSettingsProps>
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-[#6E665E] absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+                <div className="relative w-full sm:w-52">
+                  <Search className="w-3.5 h-3.5 text-[#6E665E] dark:text-[#A6998C] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={areaSearch}
                     onChange={(e) => setAreaSearch(e.target.value)}
                     placeholder="Search library area..."
-                    className="pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#201B17] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] w-48 sm:w-56"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#201B17] border border-[#D6C3A9] dark:border-[#383028] text-xs text-[#332F2B] dark:text-[#F0E8DE] focus:outline-hidden focus:border-[#A83232]"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={openAddAreaModal}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer transition shadow-2xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#A83232] hover:bg-[#8E2828] text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5 cursor-pointer transition shadow-2xs whitespace-nowrap shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add New Library Area</span>
