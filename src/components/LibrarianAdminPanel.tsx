@@ -435,36 +435,17 @@ export const LibrarianAdminPanel: React.FC<LibrarianAdminPanelProps> = ({
       const idx = prev.findIndex((r) => r.tempId === tempId);
       if (idx === -1) return prev;
 
-      const nextBlocks = prev.map((row) => (row.tempId === tempId ? { ...row, ...patch } : row));
-
-      // Automatically connect the starting time to end time:
-      // When current row's End Time changes: automatically update next row's Start Time to match
-      if (patch.endTime && idx < nextBlocks.length - 1) {
-        const currentEnd = patch.endTime;
-        const nextRow = nextBlocks[idx + 1];
-        let newNextEnd = nextRow.endTime;
-        if (newNextEnd <= currentEnd) {
-          newNextEnd = getNextTimeSlotAfter(currentEnd, 2);
-          if (newNextEnd <= currentEnd) newNextEnd = '18:00';
+      return prev.map((row) => {
+        if (row.tempId !== tempId) return row;
+        const updated = { ...row, ...patch };
+        // If user changed startTime and it's >= current endTime, gently push this row's endTime
+        // to maintain a valid interval for this row only, without modifying any other rows.
+        if (patch.startTime && updated.endTime <= patch.startTime) {
+          const nextEnd = getNextTimeSlotAfter(patch.startTime, 2);
+          updated.endTime = nextEnd > patch.startTime ? nextEnd : '18:00';
         }
-        nextBlocks[idx + 1] = {
-          ...nextRow,
-          startTime: currentEnd,
-          endTime: newNextEnd,
-        };
-      }
-
-      // When current row's Start Time changes: automatically update previous row's End Time to match
-      if (patch.startTime && idx > 0) {
-        const currentStart = patch.startTime;
-        const prevRow = nextBlocks[idx - 1];
-        nextBlocks[idx - 1] = {
-          ...prevRow,
-          endTime: currentStart,
-        };
-      }
-
-      return nextBlocks;
+        return updated;
+      });
     });
   };
 
